@@ -3,6 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
     const inventoryToggle = document.getElementById('inventoryToggle');
     
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    
     // Toggle Sidebar
     if (sidebarToggleBtn && sidebar) {
         sidebarToggleBtn.addEventListener('click', () => {
@@ -19,7 +22,24 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 // On mobile, toggle 'open' class for off-canvas
                 sidebar.classList.toggle('open');
+                if (sidebarOverlay) sidebarOverlay.classList.toggle('active');
             }
+        });
+    }
+
+    // Mobile Menu Button
+    if (mobileMenuBtn && sidebar) {
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.add('open');
+            if (sidebarOverlay) sidebarOverlay.classList.add('active');
+        });
+    }
+
+    // Sidebar Overlay Click
+    if (sidebarOverlay && sidebar) {
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
         });
     }
 
@@ -112,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             if (sidebar) {
                 sidebar.classList.remove('open');
+                if (sidebarOverlay) sidebarOverlay.classList.remove('active');
             }
         }
     });

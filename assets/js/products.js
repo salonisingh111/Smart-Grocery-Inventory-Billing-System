@@ -207,22 +207,22 @@ function renderTable() {
         return;
     }
 
-    paginatedItems.forEach(p => {
+    paginatedItems.forEach((p, index) => {
         const tr = document.createElement('tr');
+        tr.style.animationDelay = `${index * 50}ms`;
         tr.innerHTML = `
             <td><img src="${p.imgUrl || 'assets/images/products/fallback.png'}" alt="${p.name}" class="product-thumb" onerror="this.src='assets/images/products/fallback.png'"></td>
             <td title="${p.name}"><span class="product-name-trunc">${p.name}</span></td>
             <td>${p.code}</td>
             <td>${p.category}</td>
-            <td>${p.unit}</td>
             <td><span style="font-weight:600; color:var(--color-primary);">${p.currentQuantity}</span> ${p.unit}</td>
             <td style="text-align: right;">₹${p.purchasePrice.toFixed(2)}</td>
             <td style="text-align: right;">₹${p.sellingPrice.toFixed(2)}</td>
             <td style="text-align: center;">
-                <div class="action-buttons" style="justify-content: center;">
-                    <button class="icon-btn view-btn" title="View" onclick="openViewModal('${p.id}')"><i class="fa-solid fa-eye"></i></button>
-                    <button class="icon-btn edit-btn" title="Edit" onclick="openEditModal('${p.id}')"><i class="fa-solid fa-pen"></i></button>
-                    <button class="icon-btn delete-btn" title="Delete" onclick="openDeleteModal('${p.id}')"><i class="fa-solid fa-trash"></i></button>
+                <div class="action-buttons" style="justify-content: center; gap: 8px;">
+                    <a href="javascript:void(0)" class="action-icon view" title="View" onclick="openViewModal('${p.id}')"><i class="fa-solid fa-eye"></i></a>
+                    <a href="javascript:void(0)" class="action-icon edit" title="Edit" onclick="openEditModal('${p.id}')"><i class="fa-solid fa-pen"></i></a>
+                    <a href="javascript:void(0)" class="action-icon delete" title="Delete" onclick="openDeleteModal('${p.id}')"><i class="fa-solid fa-trash"></i></a>
                 </div>
             </td>
         `;
@@ -272,6 +272,7 @@ function addNotificationToDropdown(message) {
         const timeString = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute:'2-digit' });
         
         item.innerHTML = `
+            <div class="unread-dot"></div>
             <div class="notification-icon">
                 <i class="fa-solid fa-bell"></i>
             </div>
@@ -279,13 +280,16 @@ function addNotificationToDropdown(message) {
                 <p>${message}</p>
                 <small>${timeString}</small>
             </div>
-            <i class="fa-solid fa-xmark dismiss-notif" style="color:#94a3b8; cursor:pointer; font-size:14px; padding:4px;" title="Dismiss"></i>
+            <i class="fa-solid fa-xmark dismiss-notif" title="Dismiss"></i>
         `;
         
         item.querySelector('.dismiss-notif').addEventListener('click', (e) => {
             e.stopPropagation();
-            item.remove();
-            checkEmptyNotifications();
+            item.classList.add('notif-dismissing');
+            setTimeout(() => {
+                item.remove();
+                checkEmptyNotifications();
+            }, 300);
         });
         
         notifList.prepend(item);
@@ -299,7 +303,13 @@ function addNotificationToDropdown(message) {
 function checkEmptyNotifications() {
     const notifList = document.getElementById('notificationList');
     if (notifList && !notifList.querySelector('.notification-item')) {
-        notifList.innerHTML = '<p class="empty-state" style="padding:16px; text-align:center; color:#94a3b8;">No notifications available.</p>';
+        notifList.innerHTML = `
+            <div class="empty-state" style="padding:48px 24px; text-align:center; color:#94a3b8;">
+                <i class="fa-regular fa-bell-slash" style="font-size:32px; margin-bottom:12px; color:#cbd5e1;"></i>
+                <div style="font-size:15px; font-weight:500; color:#475569;">No notifications available.</div>
+                <div style="font-size:13px; margin-top:4px;">You're all caught up!</div>
+            </div>
+        `;
     }
 }
 
@@ -347,63 +357,54 @@ function showUndoToast(message) {
 // Initial Render
 document.addEventListener('DOMContentLoaded', () => {
     populateCategoryDropdowns();
-    
-    const catDropdown = document.getElementById('categoryDropdown');
-    const catSelected = document.getElementById('categorySelected');
-    if (catDropdown) {
-        catSelected.addEventListener('click', (e) => {
+    // Custom Dropdown UI interactions
+    const categoryDropdown = document.getElementById('categoryDropdown');
+    const sortDropdown = document.getElementById('sortDropdown');
+
+    if (categoryDropdown) {
+        categoryDropdown.addEventListener('click', (e) => {
             e.stopPropagation();
-            catDropdown.classList.toggle('open');
-        });
-
-        window.addEventListener('click', (e) => {
-            if (!catDropdown.contains(e.target)) {
-                catDropdown.classList.remove('open');
-            }
-        });
-
-        catDropdown.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                catDropdown.classList.toggle('open');
-            }
-            if (catDropdown.classList.contains('open')) {
-                const options = Array.from(catDropdown.querySelectorAll('.dropdown-option'));
-                let focusedIdx = options.findIndex(o => o.classList.contains('focused'));
-                
-                if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    if (focusedIdx > -1) options[focusedIdx].classList.remove('focused');
-                    focusedIdx = (focusedIdx + 1) % options.length;
-                    options[focusedIdx].classList.add('focused');
-                    options[focusedIdx].scrollIntoView({ block: 'nearest' });
-                } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    if (focusedIdx > -1) options[focusedIdx].classList.remove('focused');
-                    focusedIdx = (focusedIdx - 1 + options.length) % options.length;
-                    options[focusedIdx].classList.add('focused');
-                    options[focusedIdx].scrollIntoView({ block: 'nearest' });
-                } else if (e.key === 'Enter') {
-                    if (focusedIdx > -1) {
-                        e.preventDefault();
-                        options[focusedIdx].click();
-                    }
-                } else if (e.key === 'Escape') {
-                    catDropdown.classList.remove('open');
-                    catDropdown.focus();
-                }
-            }
+            if (sortDropdown) sortDropdown.classList.remove('open');
+            categoryDropdown.classList.toggle('open');
         });
     }
     
-    // Check if the sort select has Recently Added
-    if (sortFilter && !Array.from(sortFilter.options).find(o => o.value === 'recently-added')) {
-        const opt = document.createElement('option');
-        opt.value = 'recently-added';
-        opt.textContent = 'Recently Added';
-        sortFilter.appendChild(opt);
+    if (sortDropdown) {
+        sortDropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (categoryDropdown) categoryDropdown.classList.remove('open');
+            sortDropdown.classList.toggle('open');
+        });
+        
+        const sortOptions = sortDropdown.querySelectorAll('.dropdown-option');
+        const sortFilterInput = document.getElementById('sortFilter');
+        const sortSelectedText = document.querySelector('#sortSelected span');
+        
+        sortOptions.forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sortOptions.forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                
+                sortFilterInput.value = opt.getAttribute('data-value');
+                sortSelectedText.textContent = opt.querySelector('span').textContent;
+                
+                sortDropdown.classList.remove('open');
+                currentPage = 1;
+                renderTable();
+            });
+        });
     }
 
+    document.addEventListener('click', (e) => {
+        if (categoryDropdown && !categoryDropdown.contains(e.target)) {
+            categoryDropdown.classList.remove('open');
+        }
+        if (sortDropdown && !sortDropdown.contains(e.target)) {
+            sortDropdown.classList.remove('open');
+        }
+    });
+    
     renderTable();
 
     // Listeners for Action Bar
@@ -423,9 +424,14 @@ document.addEventListener('DOMContentLoaded', () => {
         resetToPageOne();
     });
     // Note: custom categoryDropdown calls renderTable() directly on option click.
-    sortFilter.addEventListener('change', resetToPageOne);
+    // Note: custom sortDropdown calls renderTable() directly on option click.
 
     refreshBtn.addEventListener('click', () => {
+        const icon = refreshBtn.querySelector('i');
+        if (icon) {
+            icon.classList.add('rotating');
+            setTimeout(() => icon.classList.remove('rotating'), 500);
+        }
         searchInput.value = '';
         if(clearSearchBtn) clearSearchBtn.style.display = 'none';
         if(categoryFilter) categoryFilter.value = '';
@@ -435,7 +441,13 @@ document.addEventListener('DOMContentLoaded', () => {
             defaultCatOpt.classList.add('selected');
             document.querySelector('#categorySelected span').textContent = 'All Categories';
         }
-        sortFilter.value = '';
+        if(sortFilter) sortFilter.value = '';
+        const defaultSortOpt = document.querySelector('#sortOptions .dropdown-option[data-value=""]');
+        if(defaultSortOpt) {
+            document.querySelectorAll('#sortOptions .dropdown-option').forEach(o => o.classList.remove('selected'));
+            defaultSortOpt.classList.add('selected');
+            document.querySelector('#sortSelected span').textContent = 'Sort By';
+        }
         currentPage = 1;
         renderTable();
         showToast('Products refreshed successfully.');
@@ -574,18 +586,35 @@ document.addEventListener('DOMContentLoaded', () => {
             notifBadge.textContent = '0';
             notifBadge.style.display = 'none';
         }
+        document.querySelectorAll('.unread-dot').forEach(dot => {
+            dot.style.opacity = '0';
+            dot.style.transform = 'scale(0)';
+            setTimeout(() => dot.remove(), 300);
+        });
     });
 
     document.getElementById('clearNotifBtn')?.addEventListener('click', () => {
         const notifList = document.getElementById('notificationList');
         const notifBadge = document.getElementById('notificationBadge');
-        if (notifList) {
-            notifList.innerHTML = '';
-            checkEmptyNotifications();
-        }
+        
         if (notifBadge) {
             notifBadge.textContent = '0';
             notifBadge.style.display = 'none';
+        }
+        
+        if (notifList) {
+            const items = notifList.querySelectorAll('.notification-item');
+            if (items.length > 0) {
+                items.forEach((item, index) => {
+                    setTimeout(() => {
+                        item.classList.add('notif-dismissing');
+                        setTimeout(() => item.remove(), 300);
+                    }, index * 60);
+                });
+                setTimeout(() => checkEmptyNotifications(), (items.length * 60) + 300);
+            } else {
+                checkEmptyNotifications();
+            }
         }
     });
 

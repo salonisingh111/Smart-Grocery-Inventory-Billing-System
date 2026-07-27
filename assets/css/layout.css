@@ -81,7 +81,7 @@ button {
     display: flex;
     flex-direction: column;
     transition: width var(--transition-speed) ease;
-    z-index: 1000;
+    z-index: 40; /* Sidebar Layer */
     flex-shrink: 0;
     border-radius: 0 16px 16px 0;
 }
@@ -326,7 +326,7 @@ button {
     padding: 0 32px;
     position: sticky;
     top: 0;
-    z-index: 99;
+    z-index: 30; /* Navbar Layer */
 }
 
 .breadcrumb {
@@ -383,13 +383,21 @@ button {
     color: white;
     font-size: 10px;
     font-weight: 600;
-    height: 16px;
-    width: 16px;
+    height: 18px;
+    width: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
     border: 2px solid var(--color-cards);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.notification-btn:active i {
+    transform: scale(0.9);
+}
+.notification-btn i {
+    transition: transform 0.2s ease;
 }
 
 .user-profile {
@@ -433,40 +441,78 @@ button {
 /* Navbar Dropdowns */
 .dropdown-menu-wrapper {
     position: absolute;
-    top: calc(100% + 10px);
+    top: calc(100% + 12px);
     right: 0;
-    background-color: var(--color-cards);
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    border: 1px solid var(--color-border);
-    width: 320px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(16px);
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(226, 232, 240, 0.6);
+    width: 400px; /* Increased to approx 400px */
     opacity: 0;
     visibility: hidden;
-    transform: translateY(10px);
-    transition: all 0.3s ease;
-    z-index: 100;
+    transform: translateY(-8px) scale(0.98);
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 60;
+}
+
+#notificationDropdown {
+    z-index: 60; /* Notification Layer */
+}
+
+#profileDropdown {
+    z-index: 70; /* Admin User Layer */
+}
+
+#notificationDropdown.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
 }
 
 .dropdown-menu-wrapper.active {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
 }
 
 .dropdown-header {
-    padding: 16px;
-    border-bottom: 1px solid var(--color-border);
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
 }
 
 .dropdown-header h3 {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--color-heading);
+    margin: 0;
+}
+
+.icon-btn-hover:hover {
+    color: var(--color-heading) !important;
+    background: rgba(0,0,0,0.05) !important;
+}
+.action-btn-hover {
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.action-btn-hover:hover {
+    transform: scale(1.05);
+    opacity: 0.8;
 }
 
 .dropdown-content {
-    max-height: 300px;
+    max-height: 420px; /* Max height 420px */
     overflow-y: auto;
+    padding-bottom: 8px;
+}
+
+/* Custom scrollbar for notification list */
+.dropdown-content::-webkit-scrollbar {
+    width: 6px;
+}
+.dropdown-content::-webkit-scrollbar-thumb {
+    background: rgba(203, 213, 225, 0.5);
+    border-radius: 10px;
 }
 
 .empty-state {
@@ -477,34 +523,89 @@ button {
 }
 
 .notification-item {
-    padding: 12px 16px;
-    border-bottom: 1px solid #f1f5f9;
+    padding: 16px 24px; /* Increased padding */
+    border-bottom: 1px solid rgba(226, 232, 240, 0.4); /* Subtle divider */
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: 16px;
+    transition: all 0.25s ease;
+    cursor: default;
+    border-left: 3px solid transparent;
+    position: relative;
+    background: transparent;
+    margin: 4px 8px;
+    border-radius: 12px;
 }
 .notification-item:last-child {
     border-bottom: none;
 }
+.notification-item:hover {
+    background: #F0F7FF; /* Very Light Blue */
+    border-left-color: #2563EB; /* Left Accent Border */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04); /* Soft shadow */
+    border-bottom-color: transparent;
+}
 .notification-icon {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    background-color: rgba(37,99,235,0.1);
-    color: var(--color-primary);
+    background-color: #DBEAFE;
+    color: #2563EB;
+    transition: transform 0.2s ease;
+}
+.notification-item:hover .notification-icon {
+    transform: scale(1.1); /* Icon scale on hover */
 }
 .notification-text p {
-    font-size: 13px;
+    font-size: 14px;
+    font-weight: 500;
     color: var(--color-heading);
     margin-bottom: 4px;
+    line-height: 1.4;
 }
 .notification-text small {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--color-text-secondary);
+}
+
+.unread-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--color-primary);
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.dismiss-notif {
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 6px;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+    opacity: 0;
+}
+.notification-item:hover .dismiss-notif {
+    opacity: 1;
+}
+.dismiss-notif:hover {
+    background: rgba(0,0,0,0.05);
+    color: var(--color-heading);
+}
+
+/* Animations for Dismiss and Clear All */
+.notif-dismissing {
+    transform: translateX(-50px);
+    opacity: 0;
+    margin-top: -70px; /* Collapse height roughly */
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .profile-dropdown {
@@ -543,8 +644,10 @@ button {
 .content-area {
     flex: 1;
     overflow-y: auto;
-    padding: 32px;
     background-color: var(--color-background);
+    position: relative;
+    padding: 32px;
+    animation: fadeInSlideUp 0.5s ease-out;
 }
 
 .page-header {

@@ -67,6 +67,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const closeNotifBtn = document.getElementById('closeNotifBtn');
+    if (closeNotifBtn && notificationDropdown) {
+        closeNotifBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            notificationDropdown.classList.remove('active');
+        });
+    }
+
     if (userProfileBtn && profileDropdown) {
         userProfileBtn.addEventListener('click', (e) => {
             e.stopPropagation();

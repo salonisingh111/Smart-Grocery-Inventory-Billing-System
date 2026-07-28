@@ -104,7 +104,7 @@
 .search-box {
     position: relative;
     flex: 1;
-    max-width: 320px;
+    max-width: none;
 }
 
 .search-icon-input {
@@ -160,7 +160,7 @@
 .filter-group {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
 }
 
 .form-select {
@@ -283,12 +283,13 @@
 
 /* Responsive Column Widths */
 .col-image { width: 8%; }
-.col-product { width: 28%; }
+.col-product { width: 20%; }
 .col-sku { width: 14%; }
-.col-category { width: 16%; }
+.col-category { width: 12%; }
 .col-qty { width: 10%; }
 .col-buy-price { width: 12%; }
 .col-sell-price { width: 12%; }
+.col-status { width: 12%; }
 .col-actions { width: 100px; }
 
 .product-name-trunc {
@@ -747,9 +748,15 @@ select.form-control {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    max-width: calc(100vw - 32px);
+    box-sizing: border-box;
+    pointer-events: none;
 }
 .toast {
-    min-width: 280px;
+    min-width: 260px;
+    max-width: 360px;
+    box-sizing: border-box;
+    pointer-events: auto;
     background-color: #ffffff;
     border-radius: 8px;
     padding: 16px;
@@ -776,7 +783,7 @@ select.form-control {
 /* Custom Dropdown */
 .custom-dropdown {
     position: relative;
-    width: 320px;
+    width: 200px;
     font-family: var(--font-family);
     background-color: #ffffff;
     border: 1px solid var(--color-border);
@@ -791,13 +798,20 @@ select.form-control {
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 .dropdown-selected {
-    padding: 10px 16px;
+    padding: 12px 18px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: var(--color-heading);
     font-size: var(--font-size-small);
     font-weight: 500;
+}
+.dropdown-selected span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 140px;
 }
 .dropdown-selected i {
     color: var(--color-text-secondary);
@@ -811,7 +825,7 @@ select.form-control {
     position: absolute;
     top: calc(100% + 12px);
     left: 0;
-    width: 100%;
+    width: 230px;
     background: #ffffff;
     border-radius: 14px;
     box-shadow: 0 10px 30px rgba(15, 23, 42, 0.10);
@@ -843,6 +857,12 @@ select.form-control {
     margin: 0 4px;
     border-radius: 10px;
     border-left: 3px solid transparent;
+    white-space: nowrap;
+}
+.dropdown-option span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .dropdown-option:hover,
 .dropdown-option.focused {

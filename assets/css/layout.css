@@ -101,21 +101,41 @@ button {
 .logo {
     display: flex;
     align-items: center;
-    gap: 16px;
-    font-size: 20px;
-    font-weight: 600;
+    gap: 12px;
     color: #ffffff;
     white-space: nowrap;
     overflow: hidden;
     transition: opacity var(--transition-speed) ease;
 }
 
-.logo i {
-    color: var(--color-primary);
-    font-size: 24px;
+.brand-logo {
+    height: 44px;
+    width: auto;
+    object-fit: contain;
+    flex-shrink: 0;
 }
 
-.sidebar.collapsed .logo span {
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.brand-name {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.brand-tagline {
+    font-size: 10px;
+    font-weight: 300;
+    color: #94a3b8;
+    line-height: 1.2;
+    margin-top: 2px;
+}
+
+.sidebar.collapsed .brand-text {
     display: none;
 }
 
@@ -453,7 +473,9 @@ button {
     border-radius: 16px;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(226, 232, 240, 0.6);
-    width: 400px; /* Increased to approx 400px */
+    width: 400px;
+    max-width: calc(100vw - 32px);
+    box-sizing: border-box;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-8px) scale(0.98);

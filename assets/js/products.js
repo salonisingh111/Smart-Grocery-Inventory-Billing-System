@@ -1,74 +1,82 @@
 // Master Data State
 let products = [
     // 1. Atta & Flour
-    { id: "PRD-001", name: "Aashirvaad Whole Wheat Atta", code: "PRD-001", category: "Atta & Flour", unit: "Kg", purchasePrice: 190, sellingPrice: 210, desc: "Premium whole wheat flour.", imgUrl: "assets/images/products/PRD-001.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-002", name: "Fortune Chakki Fresh Atta", code: "PRD-002", category: "Atta & Flour", unit: "Kg", purchasePrice: 380, sellingPrice: 420, desc: "100% Atta, 0% Maida.", imgUrl: "assets/images/products/PRD-002.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-003", name: "Pillsbury Gold Atta", code: "PRD-003", category: "Atta & Flour", unit: "Kg", purchasePrice: 220, sellingPrice: 240, desc: "Premium quality wheat flour.", imgUrl: "assets/images/products/PRD-003.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-004", name: "Rajdhani Besan", code: "PRD-004", category: "Atta & Flour", unit: "Packet", purchasePrice: 45, sellingPrice: 55, desc: "Gram flour (Besan) 500g.", imgUrl: "assets/images/products/PRD-004.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-005", name: "Nature Fresh Maida", code: "PRD-005", category: "Atta & Flour", unit: "Kg", purchasePrice: 50, sellingPrice: 60, desc: "Refined wheat flour 1Kg.", imgUrl: "assets/images/products/PRD-005.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-001", name: "Aashirvaad Whole Wheat Atta", code: "PRD-001", category: "Atta & Flour", unit: "Kg", purchasePrice: 190, sellingPrice: 210, desc: "Premium whole wheat flour.", imgUrl: "assets/images/products/gen_atta.png", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-002", name: "Fortune Chakki Fresh Atta", code: "PRD-002", category: "Atta & Flour", unit: "Kg", purchasePrice: 380, sellingPrice: 420, desc: "100% Atta, 0% Maida.", imgUrl: "https://images.unsplash.com/photo-1608686207856-001b95cf60ca?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-003", name: "Pillsbury Gold Atta", code: "PRD-003", category: "Atta & Flour", unit: "Kg", purchasePrice: 220, sellingPrice: 240, desc: "Premium quality wheat flour.", imgUrl: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-004", name: "Rajdhani Besan", code: "PRD-004", category: "Atta & Flour", unit: "Packet", purchasePrice: 45, sellingPrice: 55, desc: "Gram flour (Besan) 500g.", imgUrl: "https://images.unsplash.com/photo-1627485937980-221c88ab04f9?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-005", name: "Nature Fresh Maida", code: "PRD-005", category: "Atta & Flour", unit: "Kg", purchasePrice: 50, sellingPrice: 60, desc: "Refined wheat flour 1Kg.", imgUrl: "https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 
     // 2. Bakery
-    { id: "PRD-006", name: "Britannia White Bread", code: "PRD-006", category: "Bakery", unit: "Packet", purchasePrice: 35, sellingPrice: 40, desc: "Classic white bread 400g.", imgUrl: "assets/images/products/PRD-006.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-007", name: "Harvest Gold Brown Bread", code: "PRD-007", category: "Bakery", unit: "Packet", purchasePrice: 40, sellingPrice: 45, desc: "Healthy brown bread 400g.", imgUrl: "assets/images/products/PRD-007.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-008", name: "English Oven Burger Buns", code: "PRD-008", category: "Bakery", unit: "Packet", purchasePrice: 30, sellingPrice: 35, desc: "Soft burger buns 4pcs.", imgUrl: "assets/images/products/PRD-008.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-009", name: "Bonn Garlic Bread", code: "PRD-009", category: "Bakery", unit: "Packet", purchasePrice: 45, sellingPrice: 55, desc: "Toasted garlic bread 200g.", imgUrl: "assets/images/products/PRD-009.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-010", name: "Wibs Sandwich Bread", code: "PRD-010", category: "Bakery", unit: "Packet", purchasePrice: 30, sellingPrice: 35, desc: "Jumbo sandwich bread 400g.", imgUrl: "assets/images/products/PRD-010.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-006", name: "Britannia White Bread", code: "PRD-006", category: "Bakery", unit: "Packet", purchasePrice: 35, sellingPrice: 40, desc: "Classic white bread 400g.", imgUrl: "assets/images/products/gen_bread.png", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-007", name: "Harvest Gold Brown Bread", code: "PRD-007", category: "Bakery", unit: "Packet", purchasePrice: 40, sellingPrice: 45, desc: "Healthy brown bread 400g.", imgUrl: "https://images.unsplash.com/photo-1586444248902-2f64eddc13df?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-008", name: "English Oven Burger Buns", code: "PRD-008", category: "Bakery", unit: "Packet", purchasePrice: 30, sellingPrice: 35, desc: "Soft burger buns 4pcs.", imgUrl: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-009", name: "Bonn Garlic Bread", code: "PRD-009", category: "Bakery", unit: "Packet", purchasePrice: 45, sellingPrice: 55, desc: "Toasted garlic bread 200g.", imgUrl: "https://images.unsplash.com/photo-1619535860434-ba1d8fa12536?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-010", name: "Wibs Sandwich Bread", code: "PRD-010", category: "Bakery", unit: "Packet", purchasePrice: 30, sellingPrice: 35, desc: "Jumbo sandwich bread 400g.", imgUrl: "https://images.unsplash.com/photo-1589367920969-ab8e050bbb04?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 
     // 3. Beverages
-    { id: "PRD-011", name: "Nescafe Classic Coffee", code: "PRD-011", category: "Beverages", unit: "Unit", purchasePrice: 150, sellingPrice: 165, desc: "Instant coffee 50g jar.", imgUrl: "assets/images/products/PRD-011.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-012", name: "Taj Mahal Tea", code: "PRD-012", category: "Beverages", unit: "Unit", purchasePrice: 130, sellingPrice: 145, desc: "Premium black tea 250g.", imgUrl: "assets/images/products/PRD-012.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-013", name: "Red Label Tea", code: "PRD-013", category: "Beverages", unit: "Unit", purchasePrice: 240, sellingPrice: 260, desc: "Brooke Bond tea 500g.", imgUrl: "assets/images/products/PRD-013.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-014", name: "Coca-Cola", code: "PRD-014", category: "Beverages", unit: "Litre", purchasePrice: 40, sellingPrice: 45, desc: "Soft drink 1L bottle.", imgUrl: "assets/images/products/PRD-014.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-015", name: "Frooti Mango Drink", code: "PRD-015", category: "Beverages", unit: "Litre", purchasePrice: 50, sellingPrice: 60, desc: "Mango juice 1L bottle.", imgUrl: "assets/images/products/PRD-015.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-011", name: "Nescafe Classic Coffee", code: "PRD-011", category: "Beverages", unit: "Unit", purchasePrice: 150, sellingPrice: 165, desc: "Instant coffee 50g jar.", imgUrl: "assets/images/products/gen_coffee.png", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-012", name: "Taj Mahal Tea", code: "PRD-012", category: "Beverages", unit: "Unit", purchasePrice: 130, sellingPrice: 145, desc: "Premium black tea 250g.", imgUrl: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-013", name: "Red Label Tea", code: "PRD-013", category: "Beverages", unit: "Unit", purchasePrice: 240, sellingPrice: 260, desc: "Brooke Bond tea 500g.", imgUrl: "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-014", name: "Coca-Cola", code: "PRD-014", category: "Beverages", unit: "Litre", purchasePrice: 40, sellingPrice: 45, desc: "Soft drink 1L bottle.", imgUrl: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-015", name: "Frooti Mango Drink", code: "PRD-015", category: "Beverages", unit: "Litre", purchasePrice: 50, sellingPrice: 60, desc: "Mango juice 1L bottle.", imgUrl: "https://images.unsplash.com/photo-1546173159-315724a31696?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 
     // 4. Biscuits
-    { id: "PRD-016", name: "Parle-G", code: "PRD-016", category: "Biscuits", unit: "Packet", purchasePrice: 70, sellingPrice: 80, desc: "Original glucose biscuits 800g.", imgUrl: "assets/images/products/PRD-016.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-017", name: "Britannia Good Day", code: "PRD-017", category: "Biscuits", unit: "Packet", purchasePrice: 30, sellingPrice: 35, desc: "Cashew cookies 250g.", imgUrl: "assets/images/products/PRD-017.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-018", name: "Sunfeast Dark Fantasy", code: "PRD-018", category: "Biscuits", unit: "Packet", purchasePrice: 90, sellingPrice: 110, desc: "Choco fill cookies 300g.", imgUrl: "assets/images/products/PRD-018.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-019", name: "Oreo Chocolate", code: "PRD-019", category: "Biscuits", unit: "Packet", purchasePrice: 25, sellingPrice: 30, desc: "Chocolate sandwich cookies 120g.", imgUrl: "assets/images/products/PRD-019.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-020", name: "ITC Marie Light", code: "PRD-020", category: "Biscuits", unit: "Packet", purchasePrice: 20, sellingPrice: 25, desc: "Light tea biscuits 200g.", imgUrl: "assets/images/products/PRD-020.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-016", name: "Parle-G", code: "PRD-016", category: "Biscuits", unit: "Packet", purchasePrice: 70, sellingPrice: 80, desc: "Original glucose biscuits 800g.", imgUrl: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-017", name: "Britannia Good Day", code: "PRD-017", category: "Biscuits", unit: "Packet", purchasePrice: 30, sellingPrice: 35, desc: "Cashew cookies 250g.", imgUrl: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-018", name: "Sunfeast Dark Fantasy", code: "PRD-018", category: "Biscuits", unit: "Packet", purchasePrice: 90, sellingPrice: 110, desc: "Choco fill cookies 300g.", imgUrl: "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-019", name: "Oreo Chocolate", code: "PRD-019", category: "Biscuits", unit: "Packet", purchasePrice: 25, sellingPrice: 30, desc: "Chocolate sandwich cookies 120g.", imgUrl: "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-020", name: "ITC Marie Light", code: "PRD-020", category: "Biscuits", unit: "Packet", purchasePrice: 20, sellingPrice: 25, desc: "Light tea biscuits 200g.", imgUrl: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 
     // 5. Dairy
-    { id: "PRD-021", name: "Amul Taaza Milk", code: "PRD-021", category: "Dairy", unit: "Litre", purchasePrice: 60, sellingPrice: 66, desc: "Toned milk 1L carton.", imgUrl: "assets/images/products/PRD-021.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-022", name: "Mother Dairy Paneer", code: "PRD-022", category: "Dairy", unit: "Unit", purchasePrice: 75, sellingPrice: 85, desc: "Fresh cottage cheese 200g.", imgUrl: "assets/images/products/PRD-022.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-023", name: "Gowardhan Ghee", code: "PRD-023", category: "Dairy", unit: "Litre", purchasePrice: 550, sellingPrice: 600, desc: "Pure cow ghee 1L.", imgUrl: "assets/images/products/PRD-023.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-024", name: "Nandini Butter", code: "PRD-024", category: "Dairy", unit: "Unit", purchasePrice: 240, sellingPrice: 265, desc: "Salted butter 500g.", imgUrl: "assets/images/products/PRD-024.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-025", name: "Epigamia Greek Yogurt", code: "PRD-025", category: "Dairy", unit: "Unit", purchasePrice: 35, sellingPrice: 45, desc: "Blueberry yogurt 120g.", imgUrl: "assets/images/products/PRD-025.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-021", name: "Amul Taaza Milk", code: "PRD-021", category: "Dairy", unit: "Litre", purchasePrice: 60, sellingPrice: 66, desc: "Toned milk 1L carton.", imgUrl: "assets/images/products/gen_milk.png", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-022", name: "Mother Dairy Paneer", code: "PRD-022", category: "Dairy", unit: "Unit", purchasePrice: 75, sellingPrice: 85, desc: "Fresh cottage cheese 200g.", imgUrl: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-023", name: "Gowardhan Ghee", code: "PRD-023", category: "Dairy", unit: "Litre", purchasePrice: 550, sellingPrice: 600, desc: "Pure cow ghee 1L.", imgUrl: "https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-024", name: "Nandini Butter", code: "PRD-024", category: "Dairy", unit: "Unit", purchasePrice: 240, sellingPrice: 265, desc: "Salted butter 500g.", imgUrl: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-025", name: "Epigamia Greek Yogurt", code: "PRD-025", category: "Dairy", unit: "Unit", purchasePrice: 35, sellingPrice: 45, desc: "Blueberry yogurt 120g.", imgUrl: "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 
     // 6. Grocery Essentials
-    { id: "PRD-026", name: "Tata Salt", code: "PRD-026", category: "Grocery Essentials", unit: "Kg", purchasePrice: 20, sellingPrice: 25, desc: "Vacuum evaporated iodized salt.", imgUrl: "assets/images/products/PRD-026.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-027", name: "Fortune Sunflower Oil", code: "PRD-027", category: "Grocery Essentials", unit: "Litre", purchasePrice: 120, sellingPrice: 140, desc: "Refined sunflower oil 1L.", imgUrl: "assets/images/products/PRD-027.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-028", name: "India Gate Basmati Rice", code: "PRD-028", category: "Grocery Essentials", unit: "Kg", purchasePrice: 450, sellingPrice: 520, desc: "Classic basmati rice 5Kg.", imgUrl: "assets/images/products/PRD-028.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-029", name: "MDH Garam Masala", code: "PRD-029", category: "Grocery Essentials", unit: "Unit", purchasePrice: 70, sellingPrice: 82, desc: "Mixed spice powder 100g.", imgUrl: "assets/images/products/PRD-029.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-030", name: "Everest Turmeric Powder", code: "PRD-030", category: "Grocery Essentials", unit: "Unit", purchasePrice: 45, sellingPrice: 55, desc: "Pure Haldi powder 200g.", imgUrl: "assets/images/products/PRD-030.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-026", name: "Tata Salt", code: "PRD-026", category: "Grocery Essentials", unit: "Kg", purchasePrice: 20, sellingPrice: 25, desc: "Vacuum evaporated iodized salt.", imgUrl: "https://images.unsplash.com/photo-1518110168401-f28435863675?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-027", name: "Fortune Sunflower Oil", code: "PRD-027", category: "Grocery Essentials", unit: "Litre", purchasePrice: 120, sellingPrice: 140, desc: "Refined sunflower oil 1L.", imgUrl: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-028", name: "India Gate Basmati Rice", code: "PRD-028", category: "Grocery Essentials", unit: "Kg", purchasePrice: 450, sellingPrice: 520, desc: "Classic basmati rice 5Kg.", imgUrl: "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-029", name: "MDH Garam Masala", code: "PRD-029", category: "Grocery Essentials", unit: "Unit", purchasePrice: 70, sellingPrice: 82, desc: "Mixed spice powder 100g.", imgUrl: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-030", name: "Everest Turmeric Powder", code: "PRD-030", category: "Grocery Essentials", unit: "Unit", purchasePrice: 45, sellingPrice: 55, desc: "Pure Haldi powder 200g.", imgUrl: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 
     // 7. Snacks
-    { id: "PRD-031", name: "Lays Classic Salted", code: "PRD-031", category: "Snacks", unit: "Packet", purchasePrice: 15, sellingPrice: 20, desc: "Potato chips 50g.", imgUrl: "assets/images/products/PRD-031.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-032", name: "Haldiram Bhujia Sev", code: "PRD-032", category: "Snacks", unit: "Packet", purchasePrice: 45, sellingPrice: 55, desc: "Spicy Indian snack 200g.", imgUrl: "assets/images/products/PRD-032.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-033", name: "Kurkure Masala Munch", code: "PRD-033", category: "Snacks", unit: "Packet", purchasePrice: 15, sellingPrice: 20, desc: "Crispy snack 90g.", imgUrl: "assets/images/products/PRD-033.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-034", name: "Bingo Mad Angles", code: "PRD-034", category: "Snacks", unit: "Packet", purchasePrice: 15, sellingPrice: 20, desc: "Achaari Masti 80g.", imgUrl: "assets/images/products/PRD-034.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-035", name: "Balaji Wafers", code: "PRD-035", category: "Snacks", unit: "Packet", purchasePrice: 15, sellingPrice: 20, desc: "Cream & Onion chips 65g.", imgUrl: "assets/images/products/PRD-035.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-031", name: "Lays Classic Salted", code: "PRD-031", category: "Snacks", unit: "Packet", purchasePrice: 15, sellingPrice: 20, desc: "Potato chips 50g.", imgUrl: "https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-032", name: "Haldiram Bhujia Sev", code: "PRD-032", category: "Snacks", unit: "Packet", purchasePrice: 45, sellingPrice: 55, desc: "Spicy Indian snack 200g.", imgUrl: "https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-033", name: "Kurkure Masala Munch", code: "PRD-033", category: "Snacks", unit: "Packet", purchasePrice: 15, sellingPrice: 20, desc: "Crispy snack 90g.", imgUrl: "https://images.unsplash.com/photo-1599490659213-e2b9527bd087?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-034", name: "Bingo Mad Angles", code: "PRD-034", category: "Snacks", unit: "Packet", purchasePrice: 15, sellingPrice: 20, desc: "Achaari Masti 80g.", imgUrl: "https://images.unsplash.com/photo-1613919113640-25732ec5e61f?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-035", name: "Balaji Wafers", code: "PRD-035", category: "Snacks", unit: "Packet", purchasePrice: 15, sellingPrice: 20, desc: "Cream & Onion chips 65g.", imgUrl: "https://images.unsplash.com/photo-1528751014936-863e6e7a319c?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 
     // 8. Personal Care
-    { id: "PRD-036", name: "Colgate MaxFresh", code: "PRD-036", category: "Personal Care", unit: "Unit", purchasePrice: 85, sellingPrice: 95, desc: "Cool Mint toothpaste 150g.", imgUrl: "assets/images/products/PRD-036.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-037", name: "Dove Soap", code: "PRD-037", category: "Personal Care", unit: "Unit", purchasePrice: 40, sellingPrice: 48, desc: "Cream beauty bathing bar 100g.", imgUrl: "assets/images/products/PRD-037.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-038", name: "Head & Shoulders", code: "PRD-038", category: "Personal Care", unit: "Unit", purchasePrice: 140, sellingPrice: 160, desc: "Anti-dandruff shampoo 180ml.", imgUrl: "assets/images/products/PRD-038.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-039", name: "Gillette Mach 3", code: "PRD-039", category: "Personal Care", unit: "Unit", purchasePrice: 210, sellingPrice: 235, desc: "Shaving razor + 1 cartridge.", imgUrl: "assets/images/products/PRD-039.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-040", name: "Nivea Body Lotion", code: "PRD-040", category: "Personal Care", unit: "Unit", purchasePrice: 195, sellingPrice: 220, desc: "Nourishing body lotion 200ml.", imgUrl: "assets/images/products/PRD-040.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-036", name: "Colgate MaxFresh", code: "PRD-036", category: "Personal Care", unit: "Unit", purchasePrice: 85, sellingPrice: 95, desc: "Cool Mint toothpaste 150g.", imgUrl: "https://images.unsplash.com/photo-1559598467-f8b76c8155d0?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-037", name: "Dove Soap", code: "PRD-037", category: "Personal Care", unit: "Unit", purchasePrice: 40, sellingPrice: 48, desc: "Cream beauty bathing bar 100g.", imgUrl: "https://images.unsplash.com/photo-1607006482172-3d5f3089d5f0?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-038", name: "Head & Shoulders", code: "PRD-038", category: "Personal Care", unit: "Unit", purchasePrice: 140, sellingPrice: 160, desc: "Anti-dandruff shampoo 180ml.", imgUrl: "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-039", name: "Gillette Mach 3", code: "PRD-039", category: "Personal Care", unit: "Unit", purchasePrice: 210, sellingPrice: 235, desc: "Shaving razor + 1 cartridge.", imgUrl: "https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-040", name: "Nivea Body Lotion", code: "PRD-040", category: "Personal Care", unit: "Unit", purchasePrice: 195, sellingPrice: 220, desc: "Nourishing body lotion 200ml.", imgUrl: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 
     // 9. Cleaning & Household
-    { id: "PRD-041", name: "Surf Excel Matic", code: "PRD-041", category: "Cleaning", unit: "Kg", purchasePrice: 200, sellingPrice: 225, desc: "Top load detergent powder 1Kg.", imgUrl: "assets/images/products/PRD-041.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-042", name: "Vim Dishwash Gel", code: "PRD-042", category: "Cleaning", unit: "Litre", purchasePrice: 130, sellingPrice: 145, desc: "Lemon dishwash gel 750ml.", imgUrl: "assets/images/products/PRD-042.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-043", name: "Lizol Floor Cleaner", code: "PRD-043", category: "Cleaning", unit: "Litre", purchasePrice: 155, sellingPrice: 175, desc: "Citrus floor cleaner 1L.", imgUrl: "assets/images/products/PRD-043.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-044", name: "Harpic Toilet Cleaner", code: "PRD-044", category: "Cleaning", unit: "Litre", purchasePrice: 135, sellingPrice: 150, desc: "Original power plus 1L.", imgUrl: "assets/images/products/PRD-044.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-045", name: "Colin Glass Cleaner", code: "PRD-045", category: "Cleaning", unit: "Unit", purchasePrice: 85, sellingPrice: 95, desc: "Glass and surface cleaner 500ml.", imgUrl: "assets/images/products/PRD-045.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-041", name: "Surf Excel Matic", code: "PRD-041", category: "Cleaning", unit: "Kg", purchasePrice: 200, sellingPrice: 225, desc: "Top load detergent powder 1Kg.", imgUrl: "https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-042", name: "Vim Dishwash Gel", code: "PRD-042", category: "Cleaning", unit: "Litre", purchasePrice: 130, sellingPrice: 145, desc: "Lemon dishwash gel 750ml.", imgUrl: "https://images.unsplash.com/photo-1585830810419-7ac6e4f8442b?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-043", name: "Lizol Floor Cleaner", code: "PRD-043", category: "Cleaning", unit: "Litre", purchasePrice: 155, sellingPrice: 175, desc: "Citrus floor cleaner 1L.", imgUrl: "https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-044", name: "Harpic Toilet Cleaner", code: "PRD-044", category: "Cleaning", unit: "Litre", purchasePrice: 135, sellingPrice: 150, desc: "Original power plus 1L.", imgUrl: "https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-045", name: "Colin Glass Cleaner", code: "PRD-045", category: "Cleaning", unit: "Unit", purchasePrice: 85, sellingPrice: 95, desc: "Glass and surface cleaner 500ml.", imgUrl: "https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 
     // 10. Fresh Produce (Sample)
-    { id: "PRD-046", name: "Farm Fresh Apples", code: "PRD-046", category: "Produce", unit: "Kg", purchasePrice: 120, sellingPrice: 140, desc: "Fresh Washington apples.", imgUrl: "assets/images/products/PRD-046.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-047", name: "Organic Bananas", code: "PRD-047", category: "Produce", unit: "Kg", purchasePrice: 40, sellingPrice: 55, desc: "Robusta bananas 1Kg.", imgUrl: "assets/images/products/PRD-047.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-048", name: "Red Onions", code: "PRD-048", category: "Produce", unit: "Kg", purchasePrice: 25, sellingPrice: 35, desc: "Fresh red onions.", imgUrl: "assets/images/products/PRD-048.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-049", name: "Russet Potatoes", code: "PRD-049", category: "Produce", unit: "Kg", purchasePrice: 20, sellingPrice: 28, desc: "Premium quality potatoes.", imgUrl: "assets/images/products/PRD-049.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-050", name: "Fresh Tomatoes", code: "PRD-050", category: "Produce", unit: "Kg", purchasePrice: 30, sellingPrice: 45, desc: "Farm fresh tomatoes.", imgUrl: "assets/images/products/PRD-050.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+    { id: "PRD-046", name: "Farm Fresh Apples", code: "PRD-046", category: "Produce", unit: "Kg", purchasePrice: 120, sellingPrice: 140, desc: "Fresh Washington apples.", imgUrl: "assets/images/products/gen_apples.png", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-047", name: "Organic Bananas", code: "PRD-047", category: "Produce", unit: "Kg", purchasePrice: 40, sellingPrice: 55, desc: "Robusta bananas 1Kg.", imgUrl: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-048", name: "Red Onions", code: "PRD-048", category: "Produce", unit: "Kg", purchasePrice: 25, sellingPrice: 35, desc: "Fresh red onions.", imgUrl: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-049", name: "Russet Potatoes", code: "PRD-049", category: "Produce", unit: "Kg", purchasePrice: 20, sellingPrice: 28, desc: "Premium quality potatoes.", imgUrl: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-050", name: "Fresh Tomatoes", code: "PRD-050", category: "Produce", unit: "Kg", purchasePrice: 30, sellingPrice: 45, desc: "Farm fresh tomatoes.", imgUrl: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+
+    // 11. Newly Added Products
+    { id: "PRD-051", name: "Harpic Toilet Cleaner", code: "PRD-051", category: "Cleaning", unit: "Bottle", purchasePrice: 145, sellingPrice: 170, currentQuantity: 42, desc: "Harpic Toilet Cleaner", imgUrl: "https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-052", name: "Lizol Floor Cleaner", code: "PRD-052", category: "Cleaning", unit: "Bottle", purchasePrice: 165, sellingPrice: 195, currentQuantity: 38, desc: "Lizol Floor Cleaner", imgUrl: "https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-053", name: "Surf Excel Easy Wash", code: "PRD-053", category: "Household Essentials", unit: "Pack", purchasePrice: 185, sellingPrice: 220, currentQuantity: 47, desc: "Surf Excel Easy Wash", imgUrl: "https://images.unsplash.com/photo-1582735689369-4fe89db7114c?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-054", name: "Vim Dishwash Liquid", code: "PRD-054", category: "Household Essentials", unit: "Bottle", purchasePrice: 95, sellingPrice: 120, currentQuantity: 56, desc: "Vim Dishwash Liquid", imgUrl: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-055", name: "Colgate Strong Teeth Toothpaste", code: "PRD-055", category: "Personal Care", unit: "Tube", purchasePrice: 82, sellingPrice: 99, currentQuantity: 64, desc: "Colgate Strong Teeth Toothpaste", imgUrl: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-056", name: "Dove Beauty Soap (Pack of 4)", code: "PRD-056", category: "Personal Care", unit: "Pack", purchasePrice: 165, sellingPrice: 195, currentQuantity: 35, desc: "Dove Beauty Soap (Pack of 4)", imgUrl: "https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
 ];
 
 // 
@@ -110,7 +118,7 @@ const addCategoryModal = document.getElementById('addCategoryModal');
 
 function populateCategoryDropdowns() {
     const extracted = products.map(p => p.category);
-    categories = [...new Set([...categories, ...extracted])].filter(Boolean).sort();
+    categories = [...new Set(extracted)].filter(Boolean).sort();
     
     const addCat = document.getElementById('addCategory');
     const editCat = document.getElementById('editCategory');
@@ -163,24 +171,111 @@ function populateCategoryDropdowns() {
     }
 }
 
-// Pixabay API
+// Product-Accurate Image Dictionary Map
+const PRODUCT_IMAGE_MAP = {
+    'atta': 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=400&q=80',
+    'besan': 'https://images.unsplash.com/photo-1627485937980-221c88ab04f9?auto=format&fit=crop&w=400&q=80',
+    'maida': 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=400&q=80',
+    'bread': 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=400&q=80',
+    'buns': 'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=400&q=80',
+    'garlic bread': 'https://images.unsplash.com/photo-1619535860434-ba1d8fa12536?auto=format&fit=crop&w=400&q=80',
+    'coffee': 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=400&q=80',
+    'tea': 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80',
+    'coca-cola': 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=400&q=80',
+    'cola': 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=400&q=80',
+    'mango': 'https://images.unsplash.com/photo-1546173159-315724a31696?auto=format&fit=crop&w=400&q=80',
+    'frooti': 'https://images.unsplash.com/photo-1546173159-315724a31696?auto=format&fit=crop&w=400&q=80',
+    'parle': 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=400&q=80',
+    'biscuit': 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=400&q=80',
+    'good day': 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=400&q=80',
+    'cookies': 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=400&q=80',
+    'oreo': 'https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=400&q=80',
+    'milk': 'https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=400&q=80',
+    'paneer': 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=400&q=80',
+    'ghee': 'https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?auto=format&fit=crop&w=400&q=80',
+    'butter': 'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=400&q=80',
+    'yogurt': 'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=400&q=80',
+    'salt': 'https://images.unsplash.com/photo-1518110168401-f28435863675?auto=format&fit=crop&w=400&q=80',
+    'oil': 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&q=80',
+    'rice': 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=400&q=80',
+    'masala': 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=400&q=80',
+    'turmeric': 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=400&q=80',
+    'chips': 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=400&q=80',
+    'lays': 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=400&q=80',
+    'bhujia': 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&w=400&q=80',
+    'kurkure': 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&w=400&q=80',
+    'bingo': 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=400&q=80',
+    'wafers': 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=400&q=80',
+    'colgate': 'https://images.unsplash.com/photo-1559598467-f8b76c8155d0?auto=format&fit=crop&w=400&q=80',
+    'toothpaste': 'https://images.unsplash.com/photo-1559598467-f8b76c8155d0?auto=format&fit=crop&w=400&q=80',
+    'soap': 'https://images.unsplash.com/photo-1607006482172-3d5f3089d5f0?auto=format&fit=crop&w=400&q=80',
+    'dove': 'https://images.unsplash.com/photo-1607006482172-3d5f3089d5f0?auto=format&fit=crop&w=400&q=80',
+    'shampoo': 'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=400&q=80',
+    'razor': 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?auto=format&fit=crop&w=400&q=80',
+    'gillette': 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?auto=format&fit=crop&w=400&q=80',
+    'lotion': 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=400&q=80',
+    'nivea': 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=400&q=80',
+    'surf': 'https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&w=400&q=80',
+    'detergent': 'https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&w=400&q=80',
+    'vim': 'https://images.unsplash.com/photo-1585830810419-7ac6e4f8442b?auto=format&fit=crop&w=400&q=80',
+    'dishwash': 'https://images.unsplash.com/photo-1585830810419-7ac6e4f8442b?auto=format&fit=crop&w=400&q=80',
+    'lizol': 'https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=400&q=80',
+    'floor cleaner': 'https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=400&q=80',
+    'harpic': 'https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=400&q=80',
+    'toilet cleaner': 'https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=400&q=80',
+    'colin': 'https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?auto=format&fit=crop&w=400&q=80',
+    'glass cleaner': 'https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?auto=format&fit=crop&w=400&q=80',
+    'apples': 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80',
+    'bananas': 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&q=80',
+    'onions': 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=400&q=80',
+    'potatoes': 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=400&q=80',
+    'tomatoes': 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=400&q=80'
+};
+
+// Pixabay API & Automated Image Resolver
 async function resolveImage(productName, imgElement) {
-    if (pixabayCache[productName]) {
-        imgElement.src = pixabayCache[productName];
+    if (!productName || !imgElement) return;
+    const cleanName = productName.replace(/\(.*?\)/g, '').trim().toLowerCase();
+
+    if (pixabayCache[cleanName]) {
+        imgElement.src = pixabayCache[cleanName];
         return;
     }
-    if (!PIXABAY_API_KEY || PIXABAY_API_KEY === 'YOUR_API_KEY') return;
-    try {
-        const res = await fetch(`https://pixabay.com/api/?key=${PIXABAY_API_KEY}&q=${encodeURIComponent(productName)}&image_type=photo&per_page=3`);
-        const data = await res.json();
-        if (data.hits && data.hits.length > 0) {
-            const url = data.hits[0].previewURL;
-            pixabayCache[productName] = url;
-            imgElement.src = url;
+
+    if (PIXABAY_API_KEY && PIXABAY_API_KEY !== 'YOUR_API_KEY') {
+        try {
+            const res = await fetch(`https://pixabay.com/api/?key=${PIXABAY_API_KEY}&q=${encodeURIComponent(cleanName)}&image_type=photo&per_page=3`);
+            const data = await res.json();
+            if (data && data.hits && data.hits.length > 0) {
+                const url = data.hits[0].webformatURL || data.hits[0].previewURL;
+                pixabayCache[cleanName] = url;
+                imgElement.src = url;
+                return;
+            }
+        } catch(e) {
+            console.error("Pixabay fetch failed", e);
         }
-    } catch(e) {
-        console.error("Pixabay fetch failed", e);
     }
+
+    // Match related high-resolution product image from PRODUCT_IMAGE_MAP
+    for (const [key, mapUrl] of Object.entries(PRODUCT_IMAGE_MAP)) {
+        if (cleanName.includes(key)) {
+            pixabayCache[cleanName] = mapUrl;
+            imgElement.src = mapUrl;
+            return;
+        }
+    }
+
+    // Default grocery item photo if no specific keyword matched
+    const defaultGroceryUrl = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&q=80';
+    pixabayCache[cleanName] = defaultGroceryUrl;
+    imgElement.src = defaultGroceryUrl;
+}
+
+function handleImgError(imgEl, productName) {
+    if (imgEl.dataset.fallbackTried) return;
+    imgEl.dataset.fallbackTried = 'true';
+    resolveImage(productName, imgEl);
 }
 
 // Render Engine
@@ -284,13 +379,14 @@ function renderTable() {
             const tr = document.createElement('tr');
             tr.style.animationDelay = `${index * 50}ms`;
             tr.innerHTML = `
-                <td><img src="${imgSrc}" alt="${p.name}" class="product-thumb" onerror="this.src='${fallbackSrc}'"></td>
+                <td><img src="${imgSrc}" alt="${p.name}" class="product-thumb" onerror="handleImgError(this, '${p.name.replace(/'/g, "\\'")}')"></td>
                 <td title="${p.name}"><span class="product-name-trunc">${p.name}</span></td>
                 <td>${p.code}</td>
                 <td>${p.category}</td>
                 <td><span style="font-weight:600; color:var(--color-primary);">${p.currentQuantity}</span> ${p.unit}</td>
                 <td style="text-align: right;">₹${p.purchasePrice.toFixed(2)}</td>
                 <td style="text-align: right;">₹${p.sellingPrice.toFixed(2)}</td>
+                <td style="text-align: center;"><span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; background-color: ${p.status === 'Available' ? '#dcfce7' : '#fee2e2'}; color: ${p.status === 'Available' ? '#166534' : '#991b1b'};">${p.status}</span></td>
                 <td style="text-align: center;">
                     <div class="action-menu-container">
                         <button class="action-menu-btn" onclick="toggleActionMenu('${p.id}', event)">
@@ -315,19 +411,20 @@ function renderTable() {
             card.style.animation = `fadeSlideUp 0.3s ease forwards ${index * 50}ms`;
             card.innerHTML = `
                 <div class="grid-card-img">
-                    <img src="${imgSrc}" alt="${p.name}" onerror="this.src='${fallbackSrc}'">
-                    <div class="grid-card-badge">${p.category}</div>
+                    <img src="${imgSrc}" alt="${p.name}" onerror="handleImgError(this, '${p.name.replace(/'/g, "\\'")}')">
                     <div class="grid-card-menu" onclick="toggleActionMenu('${p.id}', event)">
                         <i class="fa-solid fa-ellipsis-vertical" style="color: #64748b;"></i>
                     </div>
                 </div>
                 <div class="grid-card-body">
                     <div class="grid-card-title" title="${p.name}">${p.name}</div>
-                    <div class="grid-card-subtitle">${p.code} • ${p.unit}</div>
+                    <div class="grid-card-subtitle" style="margin-bottom: 4px;"><strong>SKU:</strong> ${p.code}</div>
+                    <div class="grid-card-subtitle" style="margin-bottom: 4px;"><strong>Category:</strong> ${p.category}</div>
+                    <div class="grid-card-subtitle" style="margin-bottom: 8px;"><strong>Status:</strong> <span style="color: ${p.status === 'Available' ? '#166534' : '#991b1b'}; font-weight: 500;">${p.status}</span></div>
                     <div class="grid-card-stats">
                         <div class="grid-card-stat">
-                            <span class="grid-card-stat-label">Stock</span>
-                            <span class="grid-card-stat-val" style="color: var(--color-primary);">${p.currentQuantity}</span>
+                            <span class="grid-card-stat-label">Qty</span>
+                            <span class="grid-card-stat-val" style="color: var(--color-primary);">${p.currentQuantity} ${p.unit}</span>
                         </div>
                         <div class="grid-card-stat" style="align-items: flex-end;">
                             <span class="grid-card-stat-label">Buy Price</span>

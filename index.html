@@ -21,9 +21,7 @@
                     <i class="fa-solid fa-basket-shopping"></i>
                     <span>SmartGrocery</span>
                 </div>
-                <button class="toggle-btn" id="sidebarToggleBtn">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
+
             </div>
             
             <nav class="sidebar-nav">
@@ -94,9 +92,7 @@
             <!-- Top Navbar -->
             <header class="top-navbar">
                 <div class="navbar-left">
-                    <button class="icon-btn mobile-menu-btn" id="mobileMenuBtn">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
+
                     <nav class="breadcrumb">
                         <a href="#">Inventory</a>
                         <span class="separator"><i class="fa-solid fa-chevron-right"></i></span>
@@ -115,7 +111,6 @@
                             <div class="dropdown-header">
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <h3>Notifications</h3>
-                                    <button id="closeNotifBtn" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:16px; padding:4px; border-radius:4px;" class="icon-btn-hover" title="Close"><i class="fa-solid fa-xmark"></i></button>
                                 </div>
                                 <div style="display:flex; gap:16px; margin-top:12px;">
                                     <button id="markReadBtn" style="background:none; border:none; color:var(--color-primary); cursor:pointer; font-size:13px; font-weight:500; display:flex; align-items:center; gap:6px;" class="action-btn-hover"><i class="fa-solid fa-check-double"></i> Mark All Read</button>
@@ -212,6 +207,10 @@
                             </div>
                             <input type="hidden" id="sortFilter" value="">
                         </div>
+                        <div class="view-toggle" style="display: flex; gap: 8px; margin-right: 8px; background: #EEF2F6; padding: 6px 12px; border-radius: 8px;">
+                            <button class="icon-btn active" id="listViewBtn" title="List View" style="border-radius: 6px; width: 44px;"><i class="fa-solid fa-list"></i></button>
+                            <button class="icon-btn" id="gridViewBtn" title="Grid View" style="border-radius: 6px; width: 44px;"><i class="fa-solid fa-border-all"></i></button>
+                        </div>
                         <button class="btn btn-outline" id="refreshBtn">
                             <i class="fa-solid fa-rotate-right"></i> Refresh
                         </button>
@@ -239,6 +238,13 @@
                     </table>
                 </div>
 
+                <!-- Product Grid -->
+                <div class="product-grid-container" id="productGridContainer" style="display: none;">
+                    <div class="product-grid" id="productGridBody">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
                 <!-- Pagination -->
                 <div class="pagination-container">
                     <div class="pagination-info" id="paginationInfo">
@@ -261,7 +267,6 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Add Product</h2>
-                <button class="close-modal"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
                 <form id="addProductForm">
@@ -326,7 +331,6 @@
         <div class="modal-content small-modal">
             <div class="modal-header">
                 <h2>Add New Category</h2>
-                <button class="close-nested-modal"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -346,7 +350,6 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Edit Product</h2>
-                <button class="close-modal"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
                 <form id="editProductForm">
@@ -412,7 +415,6 @@
         <div class="modal-content view-modal">
             <div class="modal-header">
                 <h2>Product Details</h2>
-                <button class="close-modal"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body view-details">
                 <div style="text-align: center; margin-bottom: 24px;">
@@ -441,7 +443,6 @@
         <div class="modal-content small-modal">
             <div class="modal-header">
                 <h2>Delete Product</h2>
-                <button class="close-modal"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
                 <p>Are you sure you want to delete this product? This action cannot be undone.</p>

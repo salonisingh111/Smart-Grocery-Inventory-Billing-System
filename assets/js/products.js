@@ -47,9 +47,31 @@ let products = [
     { id: "PRD-032", name: "Haldiram Bhujia Sev", code: "PRD-032", category: "Snacks", unit: "Packet", purchasePrice: 45, sellingPrice: 55, desc: "Spicy Indian snack 200g.", imgUrl: "assets/images/products/PRD-032.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
     { id: "PRD-033", name: "Kurkure Masala Munch", code: "PRD-033", category: "Snacks", unit: "Packet", purchasePrice: 15, sellingPrice: 20, desc: "Crispy snack 90g.", imgUrl: "assets/images/products/PRD-033.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
     { id: "PRD-034", name: "Bingo Mad Angles", code: "PRD-034", category: "Snacks", unit: "Packet", purchasePrice: 15, sellingPrice: 20, desc: "Achaari Masti 80g.", imgUrl: "assets/images/products/PRD-034.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-035", name: "Balaji Wafers", code: "PRD-035", category: "Snacks", unit: "Packet", purchasePrice: 15, sellingPrice: 20, desc: "Cream & Onion chips 65g.", imgUrl: "assets/images/products/PRD-035.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+    { id: "PRD-035", name: "Balaji Wafers", code: "PRD-035", category: "Snacks", unit: "Packet", purchasePrice: 15, sellingPrice: 20, desc: "Cream & Onion chips 65g.", imgUrl: "assets/images/products/PRD-035.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+
+    // 8. Personal Care
+    { id: "PRD-036", name: "Colgate MaxFresh", code: "PRD-036", category: "Personal Care", unit: "Unit", purchasePrice: 85, sellingPrice: 95, desc: "Cool Mint toothpaste 150g.", imgUrl: "assets/images/products/PRD-036.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-037", name: "Dove Soap", code: "PRD-037", category: "Personal Care", unit: "Unit", purchasePrice: 40, sellingPrice: 48, desc: "Cream beauty bathing bar 100g.", imgUrl: "assets/images/products/PRD-037.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-038", name: "Head & Shoulders", code: "PRD-038", category: "Personal Care", unit: "Unit", purchasePrice: 140, sellingPrice: 160, desc: "Anti-dandruff shampoo 180ml.", imgUrl: "assets/images/products/PRD-038.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-039", name: "Gillette Mach 3", code: "PRD-039", category: "Personal Care", unit: "Unit", purchasePrice: 210, sellingPrice: 235, desc: "Shaving razor + 1 cartridge.", imgUrl: "assets/images/products/PRD-039.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-040", name: "Nivea Body Lotion", code: "PRD-040", category: "Personal Care", unit: "Unit", purchasePrice: 195, sellingPrice: 220, desc: "Nourishing body lotion 200ml.", imgUrl: "assets/images/products/PRD-040.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+
+    // 9. Cleaning & Household
+    { id: "PRD-041", name: "Surf Excel Matic", code: "PRD-041", category: "Cleaning", unit: "Kg", purchasePrice: 200, sellingPrice: 225, desc: "Top load detergent powder 1Kg.", imgUrl: "assets/images/products/PRD-041.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-042", name: "Vim Dishwash Gel", code: "PRD-042", category: "Cleaning", unit: "Litre", purchasePrice: 130, sellingPrice: 145, desc: "Lemon dishwash gel 750ml.", imgUrl: "assets/images/products/PRD-042.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-043", name: "Lizol Floor Cleaner", code: "PRD-043", category: "Cleaning", unit: "Litre", purchasePrice: 155, sellingPrice: 175, desc: "Citrus floor cleaner 1L.", imgUrl: "assets/images/products/PRD-043.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-044", name: "Harpic Toilet Cleaner", code: "PRD-044", category: "Cleaning", unit: "Litre", purchasePrice: 135, sellingPrice: 150, desc: "Original power plus 1L.", imgUrl: "assets/images/products/PRD-044.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-045", name: "Colin Glass Cleaner", code: "PRD-045", category: "Cleaning", unit: "Unit", purchasePrice: 85, sellingPrice: 95, desc: "Glass and surface cleaner 500ml.", imgUrl: "assets/images/products/PRD-045.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+
+    // 10. Fresh Produce (Sample)
+    { id: "PRD-046", name: "Farm Fresh Apples", code: "PRD-046", category: "Produce", unit: "Kg", purchasePrice: 120, sellingPrice: 140, desc: "Fresh Washington apples.", imgUrl: "assets/images/products/PRD-046.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-047", name: "Organic Bananas", code: "PRD-047", category: "Produce", unit: "Kg", purchasePrice: 40, sellingPrice: 55, desc: "Robusta bananas 1Kg.", imgUrl: "assets/images/products/PRD-047.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-048", name: "Red Onions", code: "PRD-048", category: "Produce", unit: "Kg", purchasePrice: 25, sellingPrice: 35, desc: "Fresh red onions.", imgUrl: "assets/images/products/PRD-048.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-049", name: "Russet Potatoes", code: "PRD-049", category: "Produce", unit: "Kg", purchasePrice: 20, sellingPrice: 28, desc: "Premium quality potatoes.", imgUrl: "assets/images/products/PRD-049.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-050", name: "Fresh Tomatoes", code: "PRD-050", category: "Produce", unit: "Kg", purchasePrice: 30, sellingPrice: 45, desc: "Farm fresh tomatoes.", imgUrl: "assets/images/products/PRD-050.jpg", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
 ];
 
+// 
 // Initialize mock quantities
 products.forEach(p => {
     if (p.currentQuantity === undefined) {
@@ -62,6 +84,9 @@ let categories = [];
 // Pagination State
 let currentPage = 1;
 const itemsPerPage = 10;
+let currentViewMode = 'list';
+const PIXABAY_API_KEY = 'YOUR_API_KEY';
+const pixabayCache = {};
 
 // DOM Elements
 const tbody = document.getElementById('productTableBody');
@@ -138,8 +163,31 @@ function populateCategoryDropdowns() {
     }
 }
 
+// Pixabay API
+async function resolveImage(productName, imgElement) {
+    if (pixabayCache[productName]) {
+        imgElement.src = pixabayCache[productName];
+        return;
+    }
+    if (!PIXABAY_API_KEY || PIXABAY_API_KEY === 'YOUR_API_KEY') return;
+    try {
+        const res = await fetch(`https://pixabay.com/api/?key=${PIXABAY_API_KEY}&q=${encodeURIComponent(productName)}&image_type=photo&per_page=3`);
+        const data = await res.json();
+        if (data.hits && data.hits.length > 0) {
+            const url = data.hits[0].previewURL;
+            pixabayCache[productName] = url;
+            imgElement.src = url;
+        }
+    } catch(e) {
+        console.error("Pixabay fetch failed", e);
+    }
+}
+
 // Render Engine
 function renderTable() {
+    // Clean up any detached menus in body to prevent leaks
+    document.querySelectorAll('body > .action-menu-dropdown').forEach(m => m.remove());
+
     let filtered = products;
 
     // Search filter
@@ -198,35 +246,111 @@ function renderTable() {
     }
 
     tbody.innerHTML = '';
+    const gridBody = document.getElementById('productGridBody');
+    if (gridBody) gridBody.innerHTML = '';
+
+    const tableContainer = document.querySelector('.table-container');
+    const gridContainer = document.getElementById('productGridContainer');
+
+    if (currentViewMode === 'grid') {
+        if (tableContainer) tableContainer.style.display = 'none';
+        if (gridContainer) gridContainer.style.display = 'block';
+    } else {
+        if (tableContainer) tableContainer.style.display = 'block';
+        if (gridContainer) gridContainer.style.display = 'none';
+    }
 
     if (paginatedItems.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 24px; color: #64748b;">
-            <div style="font-weight: 600; font-size: 15px; color: #334155;">No products found.</div>
-            <div style="font-size: 13px; margin-top: 4px;">Try another search or reset filters.</div>
-        </td></tr>`;
+        if (currentViewMode === 'list') {
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 24px; color: #64748b;">
+                <div style="font-weight: 600; font-size: 15px; color: #334155;">No products found.</div>
+                <div style="font-size: 13px; margin-top: 4px;">Try another search or reset filters.</div>
+            </td></tr>`;
+        } else if (gridBody) {
+            gridBody.innerHTML = `<div style="grid-column: 1 / -1; text-align:center; padding: 40px; color: #64748b;">
+                <div style="font-weight: 600; font-size: 15px; color: #334155;">No products found.</div>
+                <div style="font-size: 13px; margin-top: 4px;">Try another search or reset filters.</div>
+            </div>`;
+        }
         return;
     }
 
     paginatedItems.forEach((p, index) => {
-        const tr = document.createElement('tr');
-        tr.style.animationDelay = `${index * 50}ms`;
-        tr.innerHTML = `
-            <td><img src="${p.imgUrl || 'assets/images/products/fallback.png'}" alt="${p.name}" class="product-thumb" onerror="this.src='assets/images/products/fallback.png'"></td>
-            <td title="${p.name}"><span class="product-name-trunc">${p.name}</span></td>
-            <td>${p.code}</td>
-            <td>${p.category}</td>
-            <td><span style="font-weight:600; color:var(--color-primary);">${p.currentQuantity}</span> ${p.unit}</td>
-            <td style="text-align: right;">₹${p.purchasePrice.toFixed(2)}</td>
-            <td style="text-align: right;">₹${p.sellingPrice.toFixed(2)}</td>
-            <td style="text-align: center;">
-                <div class="action-buttons" style="justify-content: center; gap: 8px;">
-                    <a href="javascript:void(0)" class="action-icon view" title="View" onclick="openViewModal('${p.id}')"><i class="fa-solid fa-eye"></i></a>
-                    <a href="javascript:void(0)" class="action-icon edit" title="Edit" onclick="openEditModal('${p.id}')"><i class="fa-solid fa-pen"></i></a>
-                    <a href="javascript:void(0)" class="action-icon delete" title="Delete" onclick="openDeleteModal('${p.id}')"><i class="fa-solid fa-trash"></i></a>
+        const fallbackSrc = 'assets/images/products/fallback.png';
+        const imgSrc = p.imgUrl || fallbackSrc;
+        const needsPixabay = imgSrc.includes(fallbackSrc) || imgSrc.includes('PRD-');
+
+        if (currentViewMode === 'list') {
+            const tr = document.createElement('tr');
+            tr.style.animationDelay = `${index * 50}ms`;
+            tr.innerHTML = `
+                <td><img src="${imgSrc}" alt="${p.name}" class="product-thumb" onerror="this.src='${fallbackSrc}'"></td>
+                <td title="${p.name}"><span class="product-name-trunc">${p.name}</span></td>
+                <td>${p.code}</td>
+                <td>${p.category}</td>
+                <td><span style="font-weight:600; color:var(--color-primary);">${p.currentQuantity}</span> ${p.unit}</td>
+                <td style="text-align: right;">₹${p.purchasePrice.toFixed(2)}</td>
+                <td style="text-align: right;">₹${p.sellingPrice.toFixed(2)}</td>
+                <td style="text-align: center;">
+                    <div class="action-menu-container">
+                        <button class="action-menu-btn" onclick="toggleActionMenu('${p.id}', event)">
+                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+                        <div class="action-menu-dropdown" id="action-menu-${p.id}">
+                            <a href="javascript:void(0)" onclick="openViewModal('${p.id}')"><i class="fa-solid fa-eye"></i> View</a>
+                            <a href="javascript:void(0)" onclick="openEditModal('${p.id}')"><i class="fa-solid fa-pen"></i> Edit</a>
+                            <a href="javascript:void(0)" class="delete-action" onclick="openDeleteModal('${p.id}')"><i class="fa-solid fa-trash"></i> Delete</a>
+                        </div>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+            if (needsPixabay) {
+                const imgEl = tr.querySelector('img');
+                resolveImage(p.name, imgEl);
+            }
+        } else if (gridBody) {
+            const card = document.createElement('div');
+            card.className = 'grid-card';
+            card.style.animation = `fadeSlideUp 0.3s ease forwards ${index * 50}ms`;
+            card.innerHTML = `
+                <div class="grid-card-img">
+                    <img src="${imgSrc}" alt="${p.name}" onerror="this.src='${fallbackSrc}'">
+                    <div class="grid-card-badge">${p.category}</div>
+                    <div class="grid-card-menu" onclick="toggleActionMenu('${p.id}', event)">
+                        <i class="fa-solid fa-ellipsis-vertical" style="color: #64748b;"></i>
+                    </div>
                 </div>
-            </td>
-        `;
-        tbody.appendChild(tr);
+                <div class="grid-card-body">
+                    <div class="grid-card-title" title="${p.name}">${p.name}</div>
+                    <div class="grid-card-subtitle">${p.code} • ${p.unit}</div>
+                    <div class="grid-card-stats">
+                        <div class="grid-card-stat">
+                            <span class="grid-card-stat-label">Stock</span>
+                            <span class="grid-card-stat-val" style="color: var(--color-primary);">${p.currentQuantity}</span>
+                        </div>
+                        <div class="grid-card-stat" style="align-items: flex-end;">
+                            <span class="grid-card-stat-label">Buy Price</span>
+                            <span class="grid-card-stat-val">₹${p.purchasePrice.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <div class="grid-card-price">
+                        <small>Sell Price</small>
+                        <span>₹${p.sellingPrice.toFixed(2)}</span>
+                    </div>
+                </div>
+                <div class="action-menu-dropdown" id="action-menu-${p.id}" style="display: none; position: absolute; top: 40px; right: 8px;">
+                    <a href="javascript:void(0)" onclick="openViewModal('${p.id}')"><i class="fa-solid fa-eye"></i> View</a>
+                    <a href="javascript:void(0)" onclick="openEditModal('${p.id}')"><i class="fa-solid fa-pen"></i> Edit</a>
+                    <a href="javascript:void(0)" class="delete-action" onclick="openDeleteModal('${p.id}')"><i class="fa-solid fa-trash"></i> Delete</a>
+                </div>
+            `;
+            gridBody.appendChild(card);
+            if (needsPixabay) {
+                const imgEl = card.querySelector('img');
+                resolveImage(p.name, imgEl);
+            }
+        }
     });
 }
 
@@ -452,6 +576,24 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTable();
         showToast('Products refreshed successfully.');
     });
+
+    // View Toggle Listeners
+    const listViewBtn = document.getElementById('listViewBtn');
+    const gridViewBtn = document.getElementById('gridViewBtn');
+    if (listViewBtn && gridViewBtn) {
+        listViewBtn.addEventListener('click', () => {
+            currentViewMode = 'list';
+            listViewBtn.classList.add('active');
+            gridViewBtn.classList.remove('active');
+            renderTable();
+        });
+        gridViewBtn.addEventListener('click', () => {
+            currentViewMode = 'grid';
+            gridViewBtn.classList.add('active');
+            listViewBtn.classList.remove('active');
+            renderTable();
+        });
+    }
 
     prevPageBtn.addEventListener('click', () => {
         if (currentPage > 1) { currentPage--; renderTable(); }
@@ -720,3 +862,69 @@ window.openDeleteModal = function(id) {
     document.getElementById('deleteProductId').value = id;
     openModal(deleteConfirmModal);
 };
+
+window.toggleActionMenu = function(id, event) {
+    event.stopPropagation();
+    
+    // Reset all row z-indexes
+    document.querySelectorAll('.data-table tbody tr').forEach(tr => {
+        tr.style.zIndex = '';
+    });
+
+    const allMenus = document.querySelectorAll('.action-menu-dropdown');
+    allMenus.forEach(menu => {
+        if (menu.id !== `action-menu-${id}`) {
+            menu.classList.remove('show');
+            menu.style.display = '';
+        }
+    });
+    
+    const menu = document.getElementById(`action-menu-${id}`);
+    if (menu) {
+        menu.classList.toggle('show');
+        if (menu.classList.contains('show')) {
+            // Move menu to the body to escape all overflow and backdrop-filter clipping containers
+            if (menu.parentElement !== document.body) {
+                document.body.appendChild(menu);
+            }
+
+            const btn = event.currentTarget;
+            const btnRect = btn.getBoundingClientRect();
+            
+            menu.style.display = 'flex'; // Make visible to measure height
+            const menuRect = menu.getBoundingClientRect();
+            
+            // Default downwards
+            let topPos = btnRect.bottom;
+            
+            // If it goes off the bottom of the screen, flip upwards
+            if (topPos + menuRect.height > window.innerHeight) {
+                topPos = btnRect.top - menuRect.height;
+            }
+            
+            menu.style.top = `${topPos}px`;
+            // Align right edge of menu to right edge of button
+            menu.style.left = `${btnRect.right - menuRect.width}px`;
+            
+            // Elevate row visually just in case
+            const tr = document.querySelector(`.action-menu-dropdown[id="action-menu-${id}"]`)?.closest('tr');
+            if (tr) tr.style.zIndex = '999';
+        } else {
+            menu.style.display = '';
+        }
+    }
+};
+
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('.action-menu-container')) {
+        const allMenus = document.querySelectorAll('.action-menu-dropdown');
+        allMenus.forEach(menu => {
+            menu.classList.remove('show');
+            menu.style.display = '';
+        });
+        // Reset all row z-indexes
+        document.querySelectorAll('.data-table tbody tr').forEach(tr => {
+            tr.style.zIndex = '';
+        });
+    }
+});

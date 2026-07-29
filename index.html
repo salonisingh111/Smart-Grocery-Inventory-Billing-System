@@ -17,15 +17,25 @@
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <img src="assets/images/logo.jpeg" alt="SmartBilling Logo" class="brand-logo">
-                    <div class="brand-text">
-                        <span class="brand-name">SmartBilling</span>
-                        <span class="brand-tagline">Smart Inventory. Seamless Billing. Better Business.</span>
-                    </div>
+            <div class="sidebar-header" style="height: 80px; display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; padding: 0 18px !important; border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important; flex-shrink: 0 !important;">
+                <div class="brand-icon" style="width: 38px !important; height: 38px !important; flex-shrink: 0 !important; margin-right: 12px !important; display: flex !important; align-items: center !important; justify-content: center !important;">
+                    <svg width="38" height="38" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 38px; height: 38px; display: block;">
+                        <rect width="40" height="40" rx="10" fill="url(#sidebar_cart_grad)" />
+                        <path d="M10 13H13.5L16.2 24.5C16.38 25.28 17.07 25.84 17.87 25.84H28.5C29.28 25.84 29.96 25.31 30.16 24.55L32.2 16.5C32.32 16.05 31.98 15.6 31.51 15.6H14.2" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="18.5" cy="30.5" r="2.2" fill="#FFFFFF"/>
+                        <circle cx="27.5" cy="30.5" r="2.2" fill="#FFFFFF"/>
+                        <defs>
+                            <linearGradient id="sidebar_cart_grad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#2563EB"/>
+                                <stop offset="1" stop-color="#1D4ED8"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
                 </div>
-
+                <div class="brand-text" style="display: flex !important; flex-direction: column !important; justify-content: center !important; overflow: hidden !important; min-width: 0 !important; flex: 1 !important;">
+                    <div class="brand-name" style="font-size: 19px !important; font-weight: 700 !important; line-height: 1.2 !important; letter-spacing: -0.3px !important; display: flex !important; flex-direction: row !important; align-items: center !important; white-space: nowrap !important;"><span class="brand-name-dark" style="color: #ffffff !important;">Smart</span><span class="brand-name-blue" style="color: #3b82f6 !important; margin-left: 1px !important;">Billing</span></div>
+                    <div class="brand-tagline" style="font-size: 10px !important; font-weight: 400 !important; color: #94a3b8 !important; line-height: 1.2 !important; margin-top: 2px !important; letter-spacing: -0.2px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;">Smart Inventory. Seamless Billing.</div>
+                </div>
             </div>
             
             <nav class="sidebar-nav">
@@ -211,9 +221,15 @@
                             </div>
                             <input type="hidden" id="sortFilter" value="">
                         </div>
-                        <div class="view-toggle" style="display: flex; gap: 8px; margin-right: 8px; background: #EEF2F6; padding: 6px 12px; border-radius: 8px;">
-                            <button class="icon-btn active" id="listViewBtn" title="List View" style="border-radius: 6px; width: 44px;"><i class="fa-solid fa-list"></i></button>
-                            <button class="icon-btn" id="gridViewBtn" title="Grid View" style="border-radius: 6px; width: 44px;"><i class="fa-solid fa-border-all"></i></button>
+                        <div class="view-toggle-container">
+                            <button class="view-toggle-btn active" id="listViewBtn" title="List View (Table)">
+                                <i class="fa-solid fa-table-list"></i>
+                                <span>List View</span>
+                            </button>
+                            <button class="view-toggle-btn" id="gridViewBtn" title="Cards View (Grid)">
+                                <i class="fa-solid fa-table-cells-large"></i>
+                                <span>Grid View</span>
+                            </button>
                         </div>
                         <button class="btn btn-outline" id="refreshBtn">
                             <i class="fa-solid fa-rotate-right"></i> Refresh
@@ -250,17 +266,10 @@
                     </div>
                 </div>
 
-                <!-- Pagination -->
+                <!-- Product Info Bar -->
                 <div class="pagination-container">
                     <div class="pagination-info" id="paginationInfo">
-                        Showing 0–0 of 0 Products
-                    </div>
-                    <div class="pagination-controls">
-                        <button class="btn btn-outline" id="prevPageBtn">Previous</button>
-                        <div class="page-numbers" id="pageNumbers">
-                            <!-- Populated by JS -->
-                        </div>
-                        <button class="btn btn-outline" id="nextPageBtn">Next</button>
+                        Showing 0 Products
                     </div>
                 </div>
             </main>

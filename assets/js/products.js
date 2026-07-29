@@ -2,8 +2,8 @@
 let products = [
     // 1. Atta & Flour
     { id: "PRD-001", name: "Aashirvaad Whole Wheat Atta", code: "PRD-001", category: "Atta & Flour", unit: "Kg", purchasePrice: 190, sellingPrice: 210, desc: "Premium whole wheat flour.", imgUrl: "assets/images/products/gen_atta.png", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-002", name: "Fortune Chakki Fresh Atta", code: "PRD-002", category: "Atta & Flour", unit: "Kg", purchasePrice: 380, sellingPrice: 420, desc: "100% Atta, 0% Maida.", imgUrl: "https://images.unsplash.com/photo-1608686207856-001b95cf60ca?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-003", name: "Pillsbury Gold Atta", code: "PRD-003", category: "Atta & Flour", unit: "Kg", purchasePrice: 220, sellingPrice: 240, desc: "Premium quality wheat flour.", imgUrl: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-002", name: "Fortune Chakki Fresh Atta", code: "PRD-002", category: "Atta & Flour", unit: "Kg", purchasePrice: 380, sellingPrice: 420, desc: "100% Atta, 0% Maida.", imgUrl: "assets/images/products/fortune_atta.png", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-003", name: "Pillsbury Gold Atta", code: "PRD-003", category: "Atta & Flour", unit: "Kg", purchasePrice: 220, sellingPrice: 240, desc: "Premium quality wheat flour.", imgUrl: "assets/images/products/gen_atta.png", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
     { id: "PRD-004", name: "Rajdhani Besan", code: "PRD-004", category: "Atta & Flour", unit: "Packet", purchasePrice: 45, sellingPrice: 55, desc: "Gram flour (Besan) 500g.", imgUrl: "https://images.unsplash.com/photo-1627485937980-221c88ab04f9?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
     { id: "PRD-005", name: "Nature Fresh Maida", code: "PRD-005", category: "Atta & Flour", unit: "Kg", purchasePrice: 50, sellingPrice: 60, desc: "Refined wheat flour 1Kg.", imgUrl: "https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 
@@ -50,11 +50,11 @@ let products = [
     { id: "PRD-035", name: "Balaji Wafers", code: "PRD-035", category: "Snacks", unit: "Packet", purchasePrice: 15, sellingPrice: 20, desc: "Cream & Onion chips 65g.", imgUrl: "https://images.unsplash.com/photo-1528751014936-863e6e7a319c?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 
     // 8. Personal Care
-    { id: "PRD-036", name: "Colgate MaxFresh", code: "PRD-036", category: "Personal Care", unit: "Unit", purchasePrice: 85, sellingPrice: 95, desc: "Cool Mint toothpaste 150g.", imgUrl: "https://images.unsplash.com/photo-1559598467-f8b76c8155d0?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-037", name: "Dove Soap", code: "PRD-037", category: "Personal Care", unit: "Unit", purchasePrice: 40, sellingPrice: 48, desc: "Cream beauty bathing bar 100g.", imgUrl: "https://images.unsplash.com/photo-1607006482172-3d5f3089d5f0?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-038", name: "Head & Shoulders", code: "PRD-038", category: "Personal Care", unit: "Unit", purchasePrice: 140, sellingPrice: 160, desc: "Anti-dandruff shampoo 180ml.", imgUrl: "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-039", name: "Gillette Mach 3", code: "PRD-039", category: "Personal Care", unit: "Unit", purchasePrice: 210, sellingPrice: 235, desc: "Shaving razor + 1 cartridge.", imgUrl: "https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-040", name: "Nivea Body Lotion", code: "PRD-040", category: "Personal Care", unit: "Unit", purchasePrice: 195, sellingPrice: 220, desc: "Nourishing body lotion 200ml.", imgUrl: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-036", name: "Colgate MaxFresh", code: "PRD-036", category: "Personal Care", unit: "Unit", purchasePrice: 85, sellingPrice: 95, desc: "Cool Mint toothpaste 150g.", imgUrl: "assets/images/products/colgate_toothpaste.png", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-037", name: "Dove Soap", code: "PRD-037", category: "Personal Care", unit: "Unit", purchasePrice: 40, sellingPrice: 48, desc: "Cream beauty bathing bar 100g.", imgUrl: "assets/images/products/dove_soap.png", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-038", name: "Head & Shoulders", code: "PRD-038", category: "Personal Care", unit: "Unit", purchasePrice: 140, sellingPrice: 160, desc: "Anti-dandruff shampoo 180ml.", imgUrl: "assets/images/products/head_shoulders_shampoo.png", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-039", name: "Gillette Mach 3", code: "PRD-039", category: "Personal Care", unit: "Unit", purchasePrice: 210, sellingPrice: 235, desc: "Shaving razor + 1 cartridge.", imgUrl: "assets/images/products/gillette_razor.png", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-040", name: "Nivea Body Lotion", code: "PRD-040", category: "Personal Care", unit: "Unit", purchasePrice: 195, sellingPrice: 220, desc: "Nourishing body lotion 200ml.", imgUrl: "assets/images/products/nivea_lotion.png", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 
     // 9. Cleaning & Household
     { id: "PRD-041", name: "Surf Excel Matic", code: "PRD-041", category: "Cleaning", unit: "Kg", purchasePrice: 200, sellingPrice: 225, desc: "Top load detergent powder 1Kg.", imgUrl: "https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
@@ -64,19 +64,19 @@ let products = [
     { id: "PRD-045", name: "Colin Glass Cleaner", code: "PRD-045", category: "Cleaning", unit: "Unit", purchasePrice: 85, sellingPrice: 95, desc: "Glass and surface cleaner 500ml.", imgUrl: "https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 
     // 10. Fresh Produce (Sample)
-    { id: "PRD-046", name: "Farm Fresh Apples", code: "PRD-046", category: "Produce", unit: "Kg", purchasePrice: 120, sellingPrice: 140, desc: "Fresh Washington apples.", imgUrl: "assets/images/products/gen_apples.png", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-046", name: "Farm Fresh Apples", code: "PRD-046", category: "Produce", unit: "Kg", purchasePrice: 120, sellingPrice: 140, desc: "Fresh Washington apples.", imgUrl: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
     { id: "PRD-047", name: "Organic Bananas", code: "PRD-047", category: "Produce", unit: "Kg", purchasePrice: 40, sellingPrice: 55, desc: "Robusta bananas 1Kg.", imgUrl: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
     { id: "PRD-048", name: "Red Onions", code: "PRD-048", category: "Produce", unit: "Kg", purchasePrice: 25, sellingPrice: 35, desc: "Fresh red onions.", imgUrl: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
     { id: "PRD-049", name: "Russet Potatoes", code: "PRD-049", category: "Produce", unit: "Kg", purchasePrice: 20, sellingPrice: 28, desc: "Premium quality potatoes.", imgUrl: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
     { id: "PRD-050", name: "Fresh Tomatoes", code: "PRD-050", category: "Produce", unit: "Kg", purchasePrice: 30, sellingPrice: 45, desc: "Farm fresh tomatoes.", imgUrl: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 
     // 11. Newly Added Products
-    { id: "PRD-051", name: "Harpic Toilet Cleaner", code: "PRD-051", category: "Cleaning", unit: "Bottle", purchasePrice: 145, sellingPrice: 170, currentQuantity: 42, desc: "Harpic Toilet Cleaner", imgUrl: "https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-051", name: "Harpic Toilet Cleaner", code: "PRD-051", category: "Cleaning", unit: "Bottle", purchasePrice: 145, sellingPrice: 170, currentQuantity: 42, desc: "Harpic Toilet Cleaner", imgUrl: "https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
     { id: "PRD-052", name: "Lizol Floor Cleaner", code: "PRD-052", category: "Cleaning", unit: "Bottle", purchasePrice: 165, sellingPrice: 195, currentQuantity: 38, desc: "Lizol Floor Cleaner", imgUrl: "https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-053", name: "Surf Excel Easy Wash", code: "PRD-053", category: "Household Essentials", unit: "Pack", purchasePrice: 185, sellingPrice: 220, currentQuantity: 47, desc: "Surf Excel Easy Wash", imgUrl: "https://images.unsplash.com/photo-1582735689369-4fe89db7114c?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-054", name: "Vim Dishwash Liquid", code: "PRD-054", category: "Household Essentials", unit: "Bottle", purchasePrice: 95, sellingPrice: 120, currentQuantity: 56, desc: "Vim Dishwash Liquid", imgUrl: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-055", name: "Colgate Strong Teeth Toothpaste", code: "PRD-055", category: "Personal Care", unit: "Tube", purchasePrice: 82, sellingPrice: 99, currentQuantity: 64, desc: "Colgate Strong Teeth Toothpaste", imgUrl: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "PRD-056", name: "Dove Beauty Soap (Pack of 4)", code: "PRD-056", category: "Personal Care", unit: "Pack", purchasePrice: 165, sellingPrice: 195, currentQuantity: 35, desc: "Dove Beauty Soap (Pack of 4)", imgUrl: "https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+    { id: "PRD-053", name: "Surf Excel Easy Wash", code: "PRD-053", category: "Household Essentials", unit: "Pack", purchasePrice: 185, sellingPrice: 220, currentQuantity: 47, desc: "Surf Excel Easy Wash", imgUrl: "https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-054", name: "Vim Dishwash Liquid", code: "PRD-054", category: "Household Essentials", unit: "Bottle", purchasePrice: 95, sellingPrice: 120, currentQuantity: 56, desc: "Vim Dishwash Liquid", imgUrl: "https://images.unsplash.com/photo-1585830810419-7ac6e4f8442b?auto=format&fit=crop&w=400&q=80", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-055", name: "Colgate Strong Teeth Toothpaste", code: "PRD-055", category: "Personal Care", unit: "Tube", purchasePrice: 82, sellingPrice: 99, currentQuantity: 64, desc: "Colgate Strong Teeth Toothpaste", imgUrl: "assets/images/products/colgate_toothpaste.png", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "PRD-056", name: "Dove Beauty Soap (Pack of 4)", code: "PRD-056", category: "Personal Care", unit: "Pack", purchasePrice: 165, sellingPrice: 195, currentQuantity: 35, desc: "Dove Beauty Soap (Pack of 4)", imgUrl: "assets/images/products/dove_soap.png", status: "Available", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
 ];
 
 // 
@@ -89,9 +89,7 @@ products.forEach(p => {
 
 let categories = [];
 
-// Pagination State
-let currentPage = 1;
-const itemsPerPage = 10;
+// View Mode & Cache State
 let currentViewMode = 'list';
 const PIXABAY_API_KEY = 'YOUR_API_KEY';
 const pixabayCache = {};
@@ -103,9 +101,6 @@ const categoryFilter = document.getElementById('categoryFilter');
 const sortFilter = document.getElementById('sortFilter');
 const refreshBtn = document.getElementById('refreshBtn');
 
-const prevPageBtn = document.getElementById('prevPageBtn');
-const nextPageBtn = document.getElementById('nextPageBtn');
-const pageNumbers = document.getElementById('pageNumbers');
 const paginationInfo = document.getElementById('paginationInfo');
 const toastContainer = document.getElementById('toastContainer');
 
@@ -164,7 +159,6 @@ function populateCategoryDropdowns() {
                 document.querySelector('#categorySelected span').textContent = opt.querySelector('span').textContent;
                 
                 document.getElementById('categoryDropdown').classList.remove('open');
-                currentPage = 1;
                 renderTable();
             });
         });
@@ -174,9 +168,10 @@ function populateCategoryDropdowns() {
 // Product-Accurate Image Dictionary Map
 const PRODUCT_IMAGE_MAP = {
     'atta': 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=400&q=80',
+    'flour': 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=400&q=80',
     'besan': 'https://images.unsplash.com/photo-1627485937980-221c88ab04f9?auto=format&fit=crop&w=400&q=80',
-    'maida': 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=400&q=80',
-    'bread': 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=400&q=80',
+    'maida': 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=400&q=80',
+    'bread': 'https://images.unsplash.com/photo-1549931319-a545dcf3bc73?auto=format&fit=crop&w=400&q=80',
     'buns': 'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=400&q=80',
     'garlic bread': 'https://images.unsplash.com/photo-1619535860434-ba1d8fa12536?auto=format&fit=crop&w=400&q=80',
     'coffee': 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=400&q=80',
@@ -203,9 +198,9 @@ const PRODUCT_IMAGE_MAP = {
     'chips': 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=400&q=80',
     'lays': 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=400&q=80',
     'bhujia': 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&w=400&q=80',
-    'kurkure': 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&w=400&q=80',
-    'bingo': 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=400&q=80',
-    'wafers': 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=400&q=80',
+    'kurkure': 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?auto=format&fit=crop&w=400&q=80',
+    'bingo': 'https://images.unsplash.com/photo-1613919113640-25732ec5e61f?auto=format&fit=crop&w=400&q=80',
+    'wafers': 'https://images.unsplash.com/photo-1528751014936-863e6e7a319c?auto=format&fit=crop&w=400&q=80',
     'colgate': 'https://images.unsplash.com/photo-1559598467-f8b76c8155d0?auto=format&fit=crop&w=400&q=80',
     'toothpaste': 'https://images.unsplash.com/photo-1559598467-f8b76c8155d0?auto=format&fit=crop&w=400&q=80',
     'soap': 'https://images.unsplash.com/photo-1607006482172-3d5f3089d5f0?auto=format&fit=crop&w=400&q=80',
@@ -213,16 +208,16 @@ const PRODUCT_IMAGE_MAP = {
     'shampoo': 'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=400&q=80',
     'razor': 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?auto=format&fit=crop&w=400&q=80',
     'gillette': 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?auto=format&fit=crop&w=400&q=80',
-    'lotion': 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=400&q=80',
-    'nivea': 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=400&q=80',
+    'lotion': 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=400&q=80',
+    'nivea': 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=400&q=80',
     'surf': 'https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&w=400&q=80',
     'detergent': 'https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&w=400&q=80',
     'vim': 'https://images.unsplash.com/photo-1585830810419-7ac6e4f8442b?auto=format&fit=crop&w=400&q=80',
     'dishwash': 'https://images.unsplash.com/photo-1585830810419-7ac6e4f8442b?auto=format&fit=crop&w=400&q=80',
     'lizol': 'https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=400&q=80',
     'floor cleaner': 'https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=400&q=80',
-    'harpic': 'https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=400&q=80',
-    'toilet cleaner': 'https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=400&q=80',
+    'harpic': 'https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&w=400&q=80',
+    'toilet cleaner': 'https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&w=400&q=80',
     'colin': 'https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?auto=format&fit=crop&w=400&q=80',
     'glass cleaner': 'https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?auto=format&fit=crop&w=400&q=80',
     'apples': 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80',
@@ -314,31 +309,9 @@ function renderTable() {
         filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
 
-    // Pagination
+    // Total Count & Display Info
     const totalItems = filtered.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
-    
-    if (currentPage > totalPages) currentPage = totalPages;
-    if (currentPage < 1) currentPage = 1;
-    
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
-    
-    const paginatedItems = filtered.slice(startIndex, endIndex);
-
-    // Update Pagination UI
-    paginationInfo.textContent = `Showing ${totalItems === 0 ? 0 : startIndex + 1}–${endIndex} of ${totalItems} Products`;
-    prevPageBtn.disabled = currentPage === 1;
-    nextPageBtn.disabled = currentPage === totalPages;
-    
-    pageNumbers.innerHTML = '';
-    for (let i = 1; i <= totalPages; i++) {
-        const btn = document.createElement('button');
-        btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-        btn.textContent = i;
-        btn.onclick = () => { currentPage = i; renderTable(); };
-        pageNumbers.appendChild(btn);
-    }
+    paginationInfo.textContent = totalItems === 1 ? 'Showing 1 Product' : `Showing ${totalItems} of ${totalItems} Products`;
 
     tbody.innerHTML = '';
     const gridBody = document.getElementById('productGridBody');
@@ -355,7 +328,7 @@ function renderTable() {
         if (gridContainer) gridContainer.style.display = 'none';
     }
 
-    if (paginatedItems.length === 0) {
+    if (filtered.length === 0) {
         if (currentViewMode === 'list') {
             tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 24px; color: #64748b;">
                 <div style="font-weight: 600; font-size: 15px; color: #334155;">No products found.</div>
@@ -370,7 +343,7 @@ function renderTable() {
         return;
     }
 
-    paginatedItems.forEach((p, index) => {
+    filtered.forEach((p, index) => {
         const fallbackSrc = 'assets/images/products/fallback.png';
         const imgSrc = p.imgUrl || fallbackSrc;
         const needsPixabay = imgSrc.includes(fallbackSrc) || imgSrc.includes('PRD-');
@@ -514,8 +487,7 @@ function addNotificationToDropdown(message) {
         });
         
         notifList.prepend(item);
-        
-        const count = parseInt(notifBadge.textContent) || 0;
+          const count = parseInt(notifBadge.textContent) || 0;
         notifBadge.textContent = count + 1;
         notifBadge.style.display = 'flex';
     }
@@ -611,7 +583,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 sortSelectedText.textContent = opt.querySelector('span').textContent;
                 
                 sortDropdown.classList.remove('open');
-                currentPage = 1;
                 renderTable();
             });
         });
@@ -626,12 +597,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    renderTable();
-
     // Listeners for Action Bar
     const clearSearchBtn = document.getElementById('clearSearchBtn');
-    const resetToPageOne = () => { 
-        currentPage = 1; 
+    const handleSearchInput = () => { 
         if (searchInput.value.trim() !== '') {
             clearSearchBtn.style.display = 'block';
         } else {
@@ -639,13 +607,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         renderTable(); 
     };
-    searchInput.addEventListener('input', resetToPageOne);
+    searchInput.addEventListener('input', handleSearchInput);
     clearSearchBtn.addEventListener('click', () => {
         searchInput.value = '';
-        resetToPageOne();
+        handleSearchInput();
     });
-    // Note: custom categoryDropdown calls renderTable() directly on option click.
-    // Note: custom sortDropdown calls renderTable() directly on option click.
+    
+    renderTable();
 
     refreshBtn.addEventListener('click', () => {
         const icon = refreshBtn.querySelector('i');
@@ -669,7 +637,6 @@ document.addEventListener('DOMContentLoaded', () => {
             defaultSortOpt.classList.add('selected');
             document.querySelector('#sortSelected span').textContent = 'Sort By';
         }
-        currentPage = 1;
         renderTable();
         showToast('Products refreshed successfully.');
     });
@@ -691,14 +658,6 @@ document.addEventListener('DOMContentLoaded', () => {
             renderTable();
         });
     }
-
-    prevPageBtn.addEventListener('click', () => {
-        if (currentPage > 1) { currentPage--; renderTable(); }
-    });
-    
-    nextPageBtn.addEventListener('click', () => {
-        currentPage++; renderTable();
-    });
 
     // Add Product Modal Opens
     document.getElementById('openAddProductModal').addEventListener('click', () => {
@@ -809,14 +768,11 @@ document.addEventListener('DOMContentLoaded', () => {
             populateCategoryDropdowns();
             closeModal(deleteConfirmModal);
             
-            // Adjust page if we deleted the last item on the current page
-            const totalPages = Math.ceil(products.length / itemsPerPage) || 1;
-            if (currentPage > totalPages) currentPage = totalPages;
-            
             renderTable();
             showUndoToast('Product Deleted Successfully');
         }
     });
+
 
     // Notification Actions
     document.getElementById('markReadBtn')?.addEventListener('click', () => {

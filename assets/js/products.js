@@ -88,6 +88,8 @@ products.forEach(p => {
 });
 
 let categories = [];
+let categoriesData = [];
+let activeCategoryModalContext = 'add'; // 'add' or 'edit'
 
 // View Mode & Cache State
 let currentViewMode = 'list';
@@ -111,15 +113,87 @@ const viewProductModal = document.getElementById('viewProductModal');
 const deleteConfirmModal = document.getElementById('deleteConfirmModal');
 const addCategoryModal = document.getElementById('addCategoryModal');
 
+function syncCategoriesData() {
+    const extracted = products.map(p => p.category).filter(Boolean);
+    const uniqueNames = [...new Set(extracted)];
+    
+    uniqueNames.forEach(name => {
+        const hasCat = categoriesData.some(c => c.name.toLowerCase() === name.toLowerCase());
+        if (!hasCat) {
+            categoriesData.push({
+                name: name,
+                description: '',
+                createdAt: new Date().toISOString()
+            });
+        }
+    });
+    
+    categories = categoriesData.map(c => c.name).sort((a, b) => a.localeCompare(b));
+}
+
+function renderCustomCategoryDropdown(prefix, selectedValue, filterQuery = '') {
+    const listEl = document.getElementById(`${prefix}CategoryOptions`);
+    const selectedEl = document.getElementById(`${prefix}CategorySelected`);
+    const nativeSelect = document.getElementById(`${prefix}Category`);
+    
+    if (!listEl || !selectedEl || !nativeSelect) return;
+
+    const displayVal = selectedValue || 'Select Category';
+    const spanEl = selectedEl.querySelector('span');
+    if (spanEl) {
+        spanEl.textContent = displayVal;
+        spanEl.style.color = selectedValue ? '#1e293b' : '#94a3b8';
+    }
+
+    const query = (filterQuery || '').trim().toLowerCase();
+    const filteredCategories = categories.filter(c => c.toLowerCase().includes(query));
+
+    let html = `<div class="cat-option-item ${selectedValue === '' ? 'selected' : ''}" data-value="">
+                    <span>Select Category</span>
+                    ${selectedValue === '' ? '<i class="fa-solid fa-check check-icon"></i>' : ''}
+                </div>`;
+
+    if (filteredCategories.length === 0) {
+        html += `<div style="padding: 12px 14px; text-align: center; color: #94a3b8; font-size: 13px;">No matching categories</div>`;
+    } else {
+        filteredCategories.forEach(cat => {
+            const isSelected = selectedValue === cat;
+            html += `<div class="cat-option-item ${isSelected ? 'selected' : ''}" data-value="${cat}">
+                        <span>${cat}</span>
+                        ${isSelected ? '<i class="fa-solid fa-check check-icon"></i>' : ''}
+                    </div>`;
+        });
+    }
+
+    listEl.innerHTML = html;
+
+    listEl.querySelectorAll('.cat-option-item').forEach(opt => {
+        opt.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const val = opt.getAttribute('data-value');
+            nativeSelect.value = val;
+            
+            if (spanEl) {
+                spanEl.textContent = val || 'Select Category';
+                spanEl.style.color = val ? '#1e293b' : '#94a3b8';
+            }
+            
+            renderCustomCategoryDropdown(prefix, val);
+
+            const container = document.getElementById(`${prefix}CategoryCustomDropdown`);
+            if (container) container.classList.remove('open');
+        });
+    });
+}
+
 function populateCategoryDropdowns() {
-    const extracted = products.map(p => p.category);
-    categories = [...new Set(extracted)].filter(Boolean).sort();
+    syncCategoriesData();
     
     const addCat = document.getElementById('addCategory');
     const editCat = document.getElementById('editCategory');
     
-    const currentAddVal = addCat.value;
-    const currentEditVal = editCat.value;
+    const currentAddVal = addCat ? addCat.value : '';
+    const currentEditVal = editCat ? editCat.value : '';
     
     if (addCat) addCat.innerHTML = '<option value="">Select Category</option>';
     if (editCat) editCat.innerHTML = '<option value="">Select Category</option>';
@@ -132,9 +206,12 @@ function populateCategoryDropdowns() {
     if (addCat) addCat.value = currentAddVal;
     if (editCat) editCat.value = currentEditVal;
 
+    renderCustomCategoryDropdown('add', currentAddVal);
+    renderCustomCategoryDropdown('edit', currentEditVal);
+
     const filterInput = document.getElementById('categoryFilter');
     const categoryOptions = document.getElementById('categoryOptions');
-    if(categoryOptions && filterInput) {
+    if (categoryOptions && filterInput) {
         const currentFilterVal = filterInput.value;
         let html = `<div class="dropdown-option ${currentFilterVal === '' ? 'selected' : ''}" data-value="">
                         <span>All Categories</span>
@@ -275,13 +352,21 @@ function handleImgError(imgEl, productName) {
 
 // Render Engine
 function renderTable() {
+    const tbody = document.getElementById('productTableBody');
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const sortFilter = document.getElementById('sortFilter');
+    const paginationInfo = document.getElementById('paginationInfo');
+
+    if (!tbody) return;
+
     // Clean up any detached menus in body to prevent leaks
     document.querySelectorAll('body > .action-menu-dropdown').forEach(m => m.remove());
 
     let filtered = products;
 
     // Search filter
-    const term = searchInput.value.toLowerCase();
+    const term = searchInput && searchInput.value ? searchInput.value.toLowerCase() : '';
     if (term) {
         filtered = filtered.filter(p => 
             p.name.toLowerCase().includes(term) || 
@@ -290,13 +375,13 @@ function renderTable() {
     }
 
     // Category filter
-    const cat = categoryFilter.value;
+    const cat = categoryFilter ? categoryFilter.value : '';
     if (cat) {
         filtered = filtered.filter(p => p.category === cat);
     }
 
     // Sorting
-    const sort = sortFilter.value;
+    const sort = sortFilter ? sortFilter.value : '';
     if (sort === 'name-asc') {
         filtered.sort((a, b) => a.name.localeCompare(b.name));
     } else if (sort === 'name-desc') {
@@ -311,7 +396,9 @@ function renderTable() {
 
     // Total Count & Display Info
     const totalItems = filtered.length;
-    paginationInfo.textContent = totalItems === 1 ? 'Showing 1 Product' : `Showing ${totalItems} of ${totalItems} Products`;
+    if (paginationInfo) {
+        paginationInfo.textContent = totalItems === 1 ? 'Showing 1 Product' : `Showing ${totalItems} of ${totalItems} Products`;
+    }
 
     tbody.innerHTML = '';
     const gridBody = document.getElementById('productGridBody');
@@ -598,48 +685,62 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Listeners for Action Bar
-    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    const searchInputEl = document.getElementById('searchInput');
+    const clearSearchBtnEl = document.getElementById('clearSearchBtn');
+    const refreshBtnEl = document.getElementById('refreshBtn');
+
     const handleSearchInput = () => { 
-        if (searchInput.value.trim() !== '') {
-            clearSearchBtn.style.display = 'block';
+        if (searchInputEl && searchInputEl.value.trim() !== '') {
+            if (clearSearchBtnEl) clearSearchBtnEl.style.display = 'block';
         } else {
-            clearSearchBtn.style.display = 'none';
+            if (clearSearchBtnEl) clearSearchBtnEl.style.display = 'none';
         }
         renderTable(); 
     };
-    searchInput.addEventListener('input', handleSearchInput);
-    clearSearchBtn.addEventListener('click', () => {
-        searchInput.value = '';
-        handleSearchInput();
-    });
+
+    if (searchInputEl) {
+        searchInputEl.addEventListener('input', handleSearchInput);
+    }
+    if (clearSearchBtnEl) {
+        clearSearchBtnEl.addEventListener('click', () => {
+            if (searchInputEl) searchInputEl.value = '';
+            handleSearchInput();
+        });
+    }
     
     renderTable();
 
-    refreshBtn.addEventListener('click', () => {
-        const icon = refreshBtn.querySelector('i');
-        if (icon) {
-            icon.classList.add('rotating');
-            setTimeout(() => icon.classList.remove('rotating'), 500);
-        }
-        searchInput.value = '';
-        if(clearSearchBtn) clearSearchBtn.style.display = 'none';
-        if(categoryFilter) categoryFilter.value = '';
-        const defaultCatOpt = document.querySelector('#categoryOptions .dropdown-option[data-value=""]');
-        if(defaultCatOpt) {
-            document.querySelectorAll('#categoryOptions .dropdown-option').forEach(o => o.classList.remove('selected'));
-            defaultCatOpt.classList.add('selected');
-            document.querySelector('#categorySelected span').textContent = 'All Categories';
-        }
-        if(sortFilter) sortFilter.value = '';
-        const defaultSortOpt = document.querySelector('#sortOptions .dropdown-option[data-value=""]');
-        if(defaultSortOpt) {
-            document.querySelectorAll('#sortOptions .dropdown-option').forEach(o => o.classList.remove('selected'));
-            defaultSortOpt.classList.add('selected');
-            document.querySelector('#sortSelected span').textContent = 'Sort By';
-        }
-        renderTable();
-        showToast('Products refreshed successfully.');
-    });
+    if (refreshBtnEl) {
+        refreshBtnEl.addEventListener('click', () => {
+            const icon = refreshBtnEl.querySelector('i');
+            if (icon) {
+                icon.classList.add('rotating');
+                setTimeout(() => icon.classList.remove('rotating'), 500);
+            }
+            if (searchInputEl) searchInputEl.value = '';
+            if (clearSearchBtnEl) clearSearchBtnEl.style.display = 'none';
+            const catFilterInput = document.getElementById('categoryFilter');
+            if (catFilterInput) catFilterInput.value = '';
+            const defaultCatOpt = document.querySelector('#categoryOptions .dropdown-option[data-value=""]');
+            if (defaultCatOpt) {
+                document.querySelectorAll('#categoryOptions .dropdown-option').forEach(o => o.classList.remove('selected'));
+                defaultCatOpt.classList.add('selected');
+                const catSpan = document.querySelector('#categorySelected span');
+                if (catSpan) catSpan.textContent = 'All Categories';
+            }
+            const sortFilterInput = document.getElementById('sortFilter');
+            if (sortFilterInput) sortFilterInput.value = '';
+            const defaultSortOpt = document.querySelector('#sortOptions .dropdown-option[data-value=""]');
+            if (defaultSortOpt) {
+                document.querySelectorAll('#sortOptions .dropdown-option').forEach(o => o.classList.remove('selected'));
+                defaultSortOpt.classList.add('selected');
+                const sortSpan = document.querySelector('#sortSelected span');
+                if (sortSpan) sortSpan.textContent = 'Sort By';
+            }
+            renderTable();
+            showToast('Products refreshed successfully.');
+        });
+    }
 
     // View Toggle Listeners
     const listViewBtn = document.getElementById('listViewBtn');
@@ -660,18 +761,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Add Product Modal Opens
-    document.getElementById('openAddProductModal').addEventListener('click', () => {
-        document.getElementById('addProductForm').reset();
-        // Generate SKU
-        let maxSku = 0;
-        products.forEach(p => {
-            const num = parseInt(p.code.replace('PRD-', ''), 10);
-            if (!isNaN(num) && num > maxSku) maxSku = num;
+    const openAddProductModalBtn = document.getElementById('openAddProductModal');
+    if (openAddProductModalBtn) {
+        openAddProductModalBtn.addEventListener('click', () => {
+            const form = document.getElementById('addProductForm');
+            if (form) form.reset();
+            const addCatSelect = document.getElementById('addCategory');
+            if (addCatSelect) addCatSelect.value = '';
+            renderCustomCategoryDropdown('add', '');
+
+            // Generate SKU
+            let maxSku = 0;
+            products.forEach(p => {
+                const num = parseInt(p.code.replace('PRD-', ''), 10);
+                if (!isNaN(num) && num > maxSku) maxSku = num;
+            });
+            const nextSku = `PRD-${String(maxSku + 1).padStart(3, '0')}`;
+            const addCodeEl = document.getElementById('addCode');
+            if (addCodeEl) addCodeEl.value = nextSku;
+            openModal(addProductModal);
         });
-        const nextSku = `PRD-${String(maxSku + 1).padStart(3, '0')}`;
-        document.getElementById('addCode').value = nextSku;
-        openModal(addProductModal);
-    });
+    }
 
     // Add Product Submit
     document.getElementById('addProductForm').addEventListener('submit', (e) => {
@@ -773,7 +883,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-
     // Notification Actions
     document.getElementById('markReadBtn')?.addEventListener('click', () => {
         const notifBadge = document.getElementById('notificationBadge');
@@ -813,29 +922,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Add Category Modal
-    document.getElementById('addCategoryLink').addEventListener('click', (e) => {
-        e.preventDefault();
-        openModal(addCategoryModal);
-    });
+    // Custom Category Dropdowns & Modal Listeners
+    setupCustomCategoryDropdowns();
 
-    document.getElementById('saveCategoryBtn').addEventListener('click', () => {
-        const newCat = document.getElementById('newCategoryName').value.trim();
-        if (newCat && !categories.includes(newCat)) {
-            categories.push(newCat);
-            populateCategoryDropdowns();
-            document.getElementById('newCategoryName').value = '';
-            showToast('Category Added Successfully');
-        }
-        closeModal(addCategoryModal);
-    });
+    const newCatNameInput = document.getElementById('newCategoryName');
+    if (newCatNameInput) {
+        newCatNameInput.addEventListener('input', validateCategoryInput);
+    }
+
+    const saveCatBtn = document.getElementById('saveCategoryBtn');
+    if (saveCatBtn) {
+        saveCatBtn.addEventListener('click', handleSaveCategory);
+    }
 
     // Modal Closing Logic
     document.querySelectorAll('.close-modal, .close-nested-modal').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             const modal = e.target.closest('.modal-overlay');
-            if(modal) closeModal(modal);
+            if (modal) closeModal(modal);
         });
     });
 
@@ -862,6 +967,157 @@ function openModal(modalEl) {
 
 function closeModal(modalEl) {
     if (modalEl) modalEl.classList.remove('active');
+}
+
+function validateCategoryInput() {
+    const nameInput = document.getElementById('newCategoryName');
+    const errorEl = document.getElementById('categoryNameError');
+    const saveBtn = document.getElementById('saveCategoryBtn');
+
+    if (!nameInput || !errorEl || !saveBtn) return false;
+
+    const rawVal = nameInput.value;
+    const trimmedVal = rawVal.trim();
+
+    if (rawVal.length > 0 && trimmedVal.length === 0) {
+        errorEl.textContent = 'Category name cannot consist of only spaces.';
+        errorEl.style.display = 'block';
+        saveBtn.disabled = true;
+        return false;
+    }
+
+    if (trimmedVal.length === 0) {
+        errorEl.textContent = '';
+        errorEl.style.display = 'none';
+        saveBtn.disabled = true;
+        return false;
+    }
+
+    const isDuplicate = categoriesData.some(c => c.name.toLowerCase() === trimmedVal.toLowerCase());
+    if (isDuplicate) {
+        errorEl.textContent = `Category "${trimmedVal}" already exists.`;
+        errorEl.style.display = 'block';
+        saveBtn.disabled = true;
+        return false;
+    }
+
+    errorEl.textContent = '';
+    errorEl.style.display = 'none';
+    saveBtn.disabled = false;
+    return true;
+}
+
+function openAddCategoryModal() {
+    const nameInput = document.getElementById('newCategoryName');
+    const descInput = document.getElementById('newCategoryDesc');
+    const errorEl = document.getElementById('categoryNameError');
+    const saveBtn = document.getElementById('saveCategoryBtn');
+
+    if (nameInput) nameInput.value = '';
+    if (descInput) descInput.value = '';
+    if (errorEl) {
+        errorEl.textContent = '';
+        errorEl.style.display = 'none';
+    }
+    if (saveBtn) saveBtn.disabled = true;
+
+    openModal(addCategoryModal);
+    setTimeout(() => {
+        if (nameInput) nameInput.focus();
+    }, 100);
+}
+
+function handleSaveCategory() {
+    if (!validateCategoryInput()) return;
+
+    const nameInput = document.getElementById('newCategoryName');
+    const descInput = document.getElementById('newCategoryDesc');
+    const newName = nameInput.value.trim();
+    const newDesc = descInput ? descInput.value.trim() : '';
+
+    const newCategoryObj = {
+        name: newName,
+        description: newDesc,
+        createdAt: new Date().toISOString()
+    };
+
+    categoriesData.push(newCategoryObj);
+    syncCategoriesData();
+
+    closeModal(addCategoryModal);
+    showToast('Category added successfully.');
+
+    populateCategoryDropdowns();
+
+    if (activeCategoryModalContext === 'edit') {
+        const editSelect = document.getElementById('editCategory');
+        if (editSelect) editSelect.value = newName;
+        renderCustomCategoryDropdown('edit', newName);
+    } else {
+        const addSelect = document.getElementById('addCategory');
+        if (addSelect) addSelect.value = newName;
+        renderCustomCategoryDropdown('add', newName);
+    }
+}
+
+function setupCustomCategoryDropdowns() {
+    ['add', 'edit'].forEach(prefix => {
+        const container = document.getElementById(`${prefix}CategoryCustomDropdown`);
+        const searchInput = document.getElementById(`${prefix}CategorySearch`);
+        const nativeSelect = document.getElementById(`${prefix}Category`);
+
+        if (container) {
+            container.addEventListener('click', (e) => {
+                if (e.target.closest('.category-dropdown-panel')) return;
+                
+                e.stopPropagation();
+                const otherPrefix = prefix === 'add' ? 'edit' : 'add';
+                const otherContainer = document.getElementById(`${otherPrefix}CategoryCustomDropdown`);
+                if (otherContainer) otherContainer.classList.remove('open');
+
+                container.classList.toggle('open');
+                
+                if (container.classList.contains('open') && searchInput) {
+                    searchInput.value = '';
+                    renderCustomCategoryDropdown(prefix, nativeSelect ? nativeSelect.value : '');
+                    setTimeout(() => searchInput.focus(), 50);
+                }
+            });
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const val = nativeSelect ? nativeSelect.value : '';
+                renderCustomCategoryDropdown(prefix, val, e.target.value);
+            });
+            
+            searchInput.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+    });
+
+    document.querySelectorAll('.trigger-add-category-modal').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            
+            const container = btn.closest('.custom-category-select');
+            if (container && container.id.startsWith('edit')) {
+                activeCategoryModalContext = 'edit';
+            } else {
+                activeCategoryModalContext = 'add';
+            }
+
+            document.querySelectorAll('.custom-category-select').forEach(c => c.classList.remove('open'));
+            openAddCategoryModal();
+        });
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.custom-category-select')) {
+            document.querySelectorAll('.custom-category-select').forEach(c => c.classList.remove('open'));
+        }
+    });
 }
 
 function formatDate(isoStr) {
@@ -903,6 +1159,7 @@ window.openEditModal = function(id) {
     document.getElementById('editName').value = p.name;
     document.getElementById('editCode').value = p.code;
     document.getElementById('editCategory').value = p.category;
+    renderCustomCategoryDropdown('edit', p.category);
     document.getElementById('editUnit').value = p.unit;
     document.getElementById('editQuantity').value = `${p.currentQuantity || 0} ${p.unit}`;
     document.getElementById('editPurchase').value = p.purchasePrice;
@@ -936,7 +1193,6 @@ window.toggleActionMenu = function(id, event) {
     if (menu) {
         menu.classList.toggle('show');
         if (menu.classList.contains('show')) {
-            // Move menu to the body to escape all overflow and backdrop-filter clipping containers
             if (menu.parentElement !== document.body) {
                 document.body.appendChild(menu);
             }
@@ -944,22 +1200,17 @@ window.toggleActionMenu = function(id, event) {
             const btn = event.currentTarget;
             const btnRect = btn.getBoundingClientRect();
             
-            menu.style.display = 'flex'; // Make visible to measure height
+            menu.style.display = 'flex';
             const menuRect = menu.getBoundingClientRect();
             
-            // Default downwards
             let topPos = btnRect.bottom;
-            
-            // If it goes off the bottom of the screen, flip upwards
             if (topPos + menuRect.height > window.innerHeight) {
                 topPos = btnRect.top - menuRect.height;
             }
             
             menu.style.top = `${topPos}px`;
-            // Align right edge of menu to right edge of button
             menu.style.left = `${btnRect.right - menuRect.width}px`;
             
-            // Elevate row visually just in case
             const tr = document.querySelector(`.action-menu-dropdown[id="action-menu-${id}"]`)?.closest('tr');
             if (tr) tr.style.zIndex = '999';
         } else {
@@ -975,7 +1226,6 @@ document.addEventListener('click', function(event) {
             menu.classList.remove('show');
             menu.style.display = '';
         });
-        // Reset all row z-indexes
         document.querySelectorAll('.data-table tbody tr').forEach(tr => {
             tr.style.zIndex = '';
         });

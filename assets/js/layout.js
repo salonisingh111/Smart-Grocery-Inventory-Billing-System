@@ -64,7 +64,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropdownLinks = document.querySelectorAll('.dropdown-link');
     dropdownLinks.forEach(link => {
         link.addEventListener('click', (e) => {
-            e.preventDefault();
+            // Only block navigation for placeholder '#' links
+            if (link.getAttribute('href') === '#') {
+                e.preventDefault();
+            }
             // Remove active class from all
             dropdownLinks.forEach(l => l.classList.remove('active'));
             // Add active class to clicked link

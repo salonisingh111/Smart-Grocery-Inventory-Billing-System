@@ -1,43 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartBilling | Manage Products</title>
-    <link rel="icon" type="image/jpeg" href="assets/images/logo.jpeg">
+    <link rel="icon" type="image/jpeg" href="../assets/images/logo.jpeg">
     <!-- Google Fonts: Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="assets/css/layout.css">
-    <link rel="stylesheet" href="assets/css/products.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/products.css">
 </head>
+
 <body>
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header" style="height: 80px; display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; padding: 0 18px !important; border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important; flex-shrink: 0 !important;">
-                <div class="brand-icon" style="width: 38px !important; height: 38px !important; flex-shrink: 0 !important; margin-right: 12px !important; display: flex !important; align-items: center !important; justify-content: center !important;">
-                    <svg width="38" height="38" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 38px; height: 38px; display: block;">
+            <div class="sidebar-header"
+                style="height: 80px; display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; padding: 0 18px !important; border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important; flex-shrink: 0 !important;">
+                <div class="brand-icon"
+                    style="width: 38px !important; height: 38px !important; flex-shrink: 0 !important; margin-right: 12px !important; display: flex !important; align-items: center !important; justify-content: center !important;">
+                    <svg width="38" height="38" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"
+                        style="width: 38px; height: 38px; display: block;">
                         <rect width="40" height="40" rx="10" fill="url(#sidebar_cart_grad)" />
-                        <path d="M10 13H13.5L16.2 24.5C16.38 25.28 17.07 25.84 17.87 25.84H28.5C29.28 25.84 29.96 25.31 30.16 24.55L32.2 16.5C32.32 16.05 31.98 15.6 31.51 15.6H14.2" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="18.5" cy="30.5" r="2.2" fill="#FFFFFF"/>
-                        <circle cx="27.5" cy="30.5" r="2.2" fill="#FFFFFF"/>
+                        <path
+                            d="M10 13H13.5L16.2 24.5C16.38 25.28 17.07 25.84 17.87 25.84H28.5C29.28 25.84 29.96 25.31 30.16 24.55L32.2 16.5C32.32 16.05 31.98 15.6 31.51 15.6H14.2"
+                            stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="18.5" cy="30.5" r="2.2" fill="#FFFFFF" />
+                        <circle cx="27.5" cy="30.5" r="2.2" fill="#FFFFFF" />
                         <defs>
-                            <linearGradient id="sidebar_cart_grad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#2563EB"/>
-                                <stop offset="1" stop-color="#1D4ED8"/>
+                            <linearGradient id="sidebar_cart_grad" x1="0" y1="0" x2="40" y2="40"
+                                gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#2563EB" />
+                                <stop offset="1" stop-color="#1D4ED8" />
                             </linearGradient>
                         </defs>
                     </svg>
                 </div>
-                <div class="brand-text" style="display: flex !important; flex-direction: column !important; justify-content: center !important; overflow: hidden !important; min-width: 0 !important; flex: 1 !important;">
-                    <div class="brand-name" style="font-size: 19px !important; font-weight: 700 !important; line-height: 1.2 !important; letter-spacing: -0.3px !important; display: flex !important; flex-direction: row !important; align-items: center !important; white-space: nowrap !important;"><span class="brand-name-dark" style="color: #ffffff !important;">Smart</span><span class="brand-name-blue" style="color: #3b82f6 !important; margin-left: 1px !important;">Billing</span></div>
-                    <div class="brand-tagline" style="font-size: 10px !important; font-weight: 400 !important; color: #94a3b8 !important; line-height: 1.2 !important; margin-top: 2px !important; letter-spacing: -0.2px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;">Smart Inventory. Seamless Billing.</div>
+                <div class="brand-text"
+                    style="display: flex !important; flex-direction: column !important; justify-content: center !important; overflow: hidden !important; min-width: 0 !important; flex: 1 !important;">
+                    <div class="brand-name"
+                        style="font-size: 19px !important; font-weight: 700 !important; line-height: 1.2 !important; letter-spacing: -0.3px !important; display: flex !important; flex-direction: row !important; align-items: center !important; white-space: nowrap !important;">
+                        <span class="brand-name-dark" style="color: #ffffff !important;">Smart</span><span
+                            class="brand-name-blue"
+                            style="color: #3b82f6 !important; margin-left: 1px !important;">Billing</span></div>
+                    <div class="brand-tagline"
+                        style="font-size: 10px !important; font-weight: 400 !important; color: #94a3b8 !important; line-height: 1.2 !important; margin-top: 2px !important; letter-spacing: -0.2px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;">
+                        Smart Inventory. Seamless Billing.</div>
                 </div>
             </div>
-            
+
             <nav class="sidebar-nav">
                 <ul class="nav-list">
                     <li class="nav-item">
@@ -52,15 +68,15 @@
                             <span class="nav-text">User Management</span>
                         </a>
                     </li>
-                    <li class="nav-item has-dropdown">
+                    <li class="nav-item has-dropdown open" id="inventoryNavItem">
                         <a href="#" class="nav-link dropdown-toggle" id="inventoryToggle">
                             <i class="fa-solid fa-boxes-stacked"></i>
                             <span class="nav-text">Inventory Management</span>
                             <i class="fa-solid fa-chevron-right indicator-icon"></i>
                         </a>
                         <ul class="dropdown-menu" id="inventoryDropdown">
-                            <li class="dropdown-item"><a href="#" class="dropdown-link">Products</a></li>
-                            <li class="dropdown-item"><a href="#" class="dropdown-link">Suppliers</a></li>
+                            <li class="dropdown-item"><a href="products.html" class="dropdown-link active" id="navProducts">Products</a></li>
+                            <li class="dropdown-item"><a href="suppliers.html" class="dropdown-link" id="navSuppliers">Suppliers</a></li>
                             <li class="dropdown-item"><a href="#" class="dropdown-link">Stock Management</a></li>
                             <li class="dropdown-item"><a href="#" class="dropdown-link">Stock History</a></li>
                         </ul>
@@ -78,7 +94,7 @@
                         </a>
                     </li>
                 </ul>
-                
+
                 <div class="sidebar-bottom">
                     <ul class="nav-list">
                         <li class="nav-item">
@@ -97,7 +113,7 @@
                 </div>
             </nav>
         </aside>
-        
+
         <!-- Sidebar Overlay for Mobile -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
@@ -113,7 +129,7 @@
                         <span class="current">Products</span>
                     </nav>
                 </div>
-                
+
                 <div class="navbar-right">
 
                     <div class="notification-wrapper">
@@ -127,8 +143,14 @@
                                     <h3>Notifications</h3>
                                 </div>
                                 <div style="display:flex; gap:16px; margin-top:12px;">
-                                    <button id="markReadBtn" style="background:none; border:none; color:var(--color-primary); cursor:pointer; font-size:13px; font-weight:500; display:flex; align-items:center; gap:6px;" class="action-btn-hover"><i class="fa-solid fa-check-double"></i> Mark All Read</button>
-                                    <button id="clearNotifBtn" style="background:none; border:none; color:var(--color-danger); cursor:pointer; font-size:13px; font-weight:500; display:flex; align-items:center; gap:6px;" class="action-btn-hover"><i class="fa-solid fa-trash-can"></i> Clear All</button>
+                                    <button id="markReadBtn"
+                                        style="background:none; border:none; color:var(--color-primary); cursor:pointer; font-size:13px; font-weight:500; display:flex; align-items:center; gap:6px;"
+                                        class="action-btn-hover"><i class="fa-solid fa-check-double"></i> Mark All
+                                        Read</button>
+                                    <button id="clearNotifBtn"
+                                        style="background:none; border:none; color:var(--color-danger); cursor:pointer; font-size:13px; font-weight:500; display:flex; align-items:center; gap:6px;"
+                                        class="action-btn-hover"><i class="fa-solid fa-trash-can"></i> Clear
+                                        All</button>
                                 </div>
                             </div>
                             <div class="dropdown-content scrollable" id="notificationList">
@@ -136,21 +158,23 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="user-profile" id="userProfileBtn">
                         <div class="avatar">
-                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=2563EB&color=fff" alt="User Avatar">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=2563EB&color=fff"
+                                alt="User Avatar">
                         </div>
                         <div class="user-info">
                             <span class="user-name">Admin User</span>
                         </div>
                         <i class="fa-solid fa-chevron-down profile-arrow"></i>
-                        
+
                         <div class="dropdown-menu-wrapper profile-dropdown" id="profileDropdown">
                             <ul>
                                 <li><a href="#"><i class="fa-regular fa-user"></i> My Profile</a></li>
                                 <li><a href="#"><i class="fa-solid fa-gear"></i> Settings</a></li>
-                                <li class="logout"><a href="#"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a></li>
+                                <li class="logout"><a href="#"><i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                        Logout</a></li>
                             </ul>
                         </div>
                     </div>
@@ -179,7 +203,8 @@
                     <div class="search-box">
                         <i class="fa-solid fa-magnifying-glass search-icon-input"></i>
                         <input type="text" id="searchInput" placeholder="Search Products...">
-                        <i class="fa-solid fa-xmark clear-search" id="clearSearchBtn" style="display:none; cursor:pointer;"></i>
+                        <i class="fa-solid fa-xmark clear-search" id="clearSearchBtn"
+                            style="display:none; cursor:pointer;"></i>
                     </div>
                     <div class="filter-group">
                         <div class="custom-dropdown" id="categoryDropdown" tabindex="0">
@@ -291,7 +316,8 @@
                         </div>
                         <div class="form-group">
                             <label>Product Name <span style="color:red">*</span></label>
-                            <input type="text" id="addName" class="form-control" placeholder="Enter product name" required>
+                            <input type="text" id="addName" class="form-control" placeholder="Enter product name"
+                                required>
                         </div>
                         <div class="form-group category-group">
                             <label>Category <span style="color:red">*</span></label>
@@ -306,7 +332,8 @@
                                 <div class="category-dropdown-panel" id="addCategoryPanel">
                                     <div class="category-search-wrapper">
                                         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                                        <input type="text" id="addCategorySearch" placeholder="Search category..." autocomplete="off">
+                                        <input type="text" id="addCategorySearch" placeholder="Search category..."
+                                            autocomplete="off">
                                     </div>
                                     <div class="category-options-list" id="addCategoryOptions">
                                         <!-- Populated dynamically -->
@@ -321,7 +348,8 @@
                         </div>
                         <div class="form-group">
                             <label>Product Code (SKU) <span style="color:red">*</span></label>
-                            <input type="text" id="addCode" class="form-control" placeholder="Auto Generated" required readonly style="background-color: #f1f5f9; cursor: not-allowed;">
+                            <input type="text" id="addCode" class="form-control" placeholder="Auto Generated" required
+                                readonly style="background-color: #f1f5f9; cursor: not-allowed;">
                         </div>
                         <div class="form-group">
                             <label>Unit <span style="color:red">*</span></label>
@@ -339,7 +367,8 @@
                         </div>
                         <div class="form-group">
                             <label>Purchase Price <span style="color:red">*</span></label>
-                            <input type="number" id="addPurchase" class="form-control" placeholder="0.00" required min="0">
+                            <input type="number" id="addPurchase" class="form-control" placeholder="0.00" required
+                                min="0">
                         </div>
                         <div class="form-group">
                             <label>Selling Price <span style="color:red">*</span></label>
@@ -347,7 +376,8 @@
                         </div>
                         <div class="form-group full-width">
                             <label>Description</label>
-                            <textarea id="addDesc" class="form-control" rows="3" placeholder="Enter product description"></textarea>
+                            <textarea id="addDesc" class="form-control" rows="3"
+                                placeholder="Enter product description"></textarea>
                         </div>
                     </div>
                 </form>
@@ -369,12 +399,15 @@
                 <form id="addCategoryForm" onsubmit="return false;">
                     <div class="form-group">
                         <label>Category Name <span style="color:red">*</span></label>
-                        <input type="text" id="newCategoryName" class="form-control" placeholder="Enter category name" required autocomplete="off">
+                        <input type="text" id="newCategoryName" class="form-control" placeholder="Enter category name"
+                            required autocomplete="off">
                         <div id="categoryNameError" class="field-error-msg" style="display:none;"></div>
                     </div>
                     <div class="form-group" style="margin-top: 16px;">
-                        <label>Category Description <span style="color: #94a3b8; font-weight: 400;">(Optional)</span></label>
-                        <textarea id="newCategoryDesc" class="form-control" rows="3" placeholder="Enter category description"></textarea>
+                        <label>Category Description <span
+                                style="color: #94a3b8; font-weight: 400;">(Optional)</span></label>
+                        <textarea id="newCategoryDesc" class="form-control" rows="3"
+                            placeholder="Enter category description"></textarea>
                     </div>
                 </form>
             </div>
@@ -416,7 +449,8 @@
                                 <div class="category-dropdown-panel" id="editCategoryPanel">
                                     <div class="category-search-wrapper">
                                         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                                        <input type="text" id="editCategorySearch" placeholder="Search category..." autocomplete="off">
+                                        <input type="text" id="editCategorySearch" placeholder="Search category..."
+                                            autocomplete="off">
                                     </div>
                                     <div class="category-options-list" id="editCategoryOptions">
                                         <!-- Populated dynamically -->
@@ -445,8 +479,10 @@
                         </div>
                         <div class="form-group">
                             <label>Current Quantity</label>
-                            <input type="text" id="editQuantity" class="form-control" readonly style="background-color: #f1f5f9; cursor: not-allowed;">
-                            <small style="color: #64748b; font-size: 11px; display: block; margin-top: 4px;">To update stock quantity, use the Stock Management module.</small>
+                            <input type="text" id="editQuantity" class="form-control" readonly
+                                style="background-color: #f1f5f9; cursor: not-allowed;">
+                            <small style="color: #64748b; font-size: 11px; display: block; margin-top: 4px;">To update
+                                stock quantity, use the Stock Management module.</small>
                         </div>
                         <div class="form-group">
                             <label>Purchase Price <span style="color:red">*</span></label>
@@ -478,7 +514,9 @@
             </div>
             <div class="modal-body view-details">
                 <div style="text-align: center; margin-bottom: 24px;">
-                    <img id="viewImg" src="" alt="Product Image" style="width: 150px; height: 150px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);" onerror="this.src='assets/images/products/fallback.png'">
+                    <img id="viewImg" src="" alt="Product Image"
+                        style="width: 150px; height: 150px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);"
+                        onerror="this.src='assets/images/products/fallback.png'">
                 </div>
                 <div class="detail-row"><strong>Product Name</strong> <span id="viewName"></span></div>
                 <div class="detail-row"><strong>SKU / Product Code</strong> <span id="viewCode"></span></div>
@@ -510,7 +548,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline close-modal">Cancel</button>
-                <button type="button" class="btn btn-primary" style="background-color: #ef4444;" id="confirmDeleteBtn">Delete</button>
+                <button type="button" class="btn btn-primary" style="background-color: #ef4444;"
+                    id="confirmDeleteBtn">Delete</button>
             </div>
         </div>
     </div>
@@ -519,7 +558,8 @@
     <div id="toastContainer" class="toast-container"></div>
 
     <!-- Custom JS -->
-    <script src="assets/js/layout.js"></script>
-    <script src="assets/js/products.js"></script>
+    <script src="../assets/js/layout.js"></script>
+    <script src="../assets/js/products.js"></script>
 </body>
+
 </html>

@@ -98,6 +98,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const markReadBtn = document.getElementById('markReadBtn');
+    if (markReadBtn) {
+        markReadBtn.addEventListener('click', () => {
+            const badge = document.getElementById('notificationBadge');
+            if (badge) {
+                badge.textContent = '0';
+                badge.style.display = 'none';
+            }
+            document.querySelectorAll('.notification-item.unread').forEach(item => {
+                item.classList.remove('unread');
+                const dot = item.querySelector('.unread-dot');
+                if (dot) dot.style.display = 'none';
+            });
+        });
+    }
+
+    const clearNotifBtn = document.getElementById('clearNotifBtn');
+    if (clearNotifBtn) {
+        clearNotifBtn.addEventListener('click', () => {
+            const notifList = document.getElementById('notificationList');
+            const badge = document.getElementById('notificationBadge');
+            if (badge) {
+                badge.textContent = '0';
+                badge.style.display = 'none';
+            }
+            if (notifList) {
+                notifList.innerHTML = '<p class="empty-state" style="padding:20px; text-align:center; color:#94a3b8; font-size:13px;">No notifications available.</p>';
+            }
+        });
+    }
+
     if (userProfileBtn && profileDropdown) {
         userProfileBtn.addEventListener('click', (e) => {
             e.stopPropagation();

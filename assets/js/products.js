@@ -511,85 +511,9 @@ function renderTable() {
     });
 }
 
-// Toast System
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    
-    const icon = type === 'success' ? '<i class="fa-solid fa-circle-check toast-icon"></i>' : '<i class="fa-solid fa-circle-xmark toast-icon"></i>';
-    
-    toast.innerHTML = `
-        ${icon}
-        <span class="toast-msg">${message}</span>
-    `;
-    
-    toastContainer.appendChild(toast);
-    
-    // Animate in
-    setTimeout(() => { toast.classList.add('show'); }, 10);
-    
-    // Auto remove
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-
-    // Add to Notification Dropdown
-    if (type === 'success' || type === 'undo') {
-        addNotificationToDropdown(message);
-    }
-}
-
-function addNotificationToDropdown(message) {
-    const notifList = document.getElementById('notificationList');
-    const notifBadge = document.getElementById('notificationBadge');
-    if (notifList && notifBadge) {
-        const emptyState = notifList.querySelector('.empty-state');
-        if (emptyState) emptyState.remove();
-
-        const item = document.createElement('div');
-        item.className = 'notification-item';
-        
-        const timeString = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute:'2-digit' });
-        
-        item.innerHTML = `
-            <div class="unread-dot"></div>
-            <div class="notification-icon">
-                <i class="fa-solid fa-bell"></i>
-            </div>
-            <div class="notification-text" style="flex:1;">
-                <p>${message}</p>
-                <small>${timeString}</small>
-            </div>
-            <i class="fa-solid fa-xmark dismiss-notif" title="Dismiss"></i>
-        `;
-        
-        item.querySelector('.dismiss-notif').addEventListener('click', (e) => {
-            e.stopPropagation();
-            item.classList.add('notif-dismissing');
-            setTimeout(() => {
-                item.remove();
-                checkEmptyNotifications();
-            }, 300);
-        });
-        
-        notifList.prepend(item);
-          const count = parseInt(notifBadge.textContent) || 0;
-        notifBadge.textContent = count + 1;
-        notifBadge.style.display = 'flex';
-    }
-}
-
-function checkEmptyNotifications() {
-    const notifList = document.getElementById('notificationList');
-    if (notifList && !notifList.querySelector('.notification-item')) {
-        notifList.innerHTML = `
-            <div class="empty-state" style="padding:48px 24px; text-align:center; color:#94a3b8;">
-                <i class="fa-regular fa-bell-slash" style="font-size:32px; margin-bottom:12px; color:#cbd5e1;"></i>
-                <div style="font-size:15px; font-weight:500; color:#475569;">No notifications available.</div>
-                <div style="font-size:13px; margin-top:4px;">You're all caught up!</div>
-            </div>
-        `;
+function triggerToast(message, type = 'success') {
+    if (typeof window.showToast === 'function') {
+        window.showToast(message, type);
     }
 }
 
@@ -598,6 +522,9 @@ let deletedProductData = null;
 let deletedProductIndex = -1;
 
 function showUndoToast(message) {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+
     const toast = document.createElement('div');
     toast.className = `toast toast-success`;
     
@@ -607,7 +534,7 @@ function showUndoToast(message) {
         <button id="undoDeleteBtn" style="background:none; border:none; color:var(--color-primary); font-weight:600; cursor:pointer;">UNDO</button>
     `;
     
-    toastContainer.appendChild(toast);
+    container.appendChild(toast);
     setTimeout(() => { toast.classList.add('show'); }, 10);
     
     let hideTimeout = setTimeout(() => {
@@ -627,11 +554,15 @@ function showUndoToast(message) {
             deletedProductData = null;
             populateCategoryDropdowns();
             renderTable();
-            showToast('Product Restored', 'undo');
+            if (typeof window.showToast === 'function') {
+                window.showToast('Product Restored', 'undo');
+            }
         }
     });
     
-    addNotificationToDropdown(message);
+    if (typeof window.addNotificationToDropdown === 'function') {
+        window.addNotificationToDropdown(message);
+    }
 }
 
 // Initial Render

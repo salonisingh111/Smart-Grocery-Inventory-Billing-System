@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Dashboard Overview</h1>
+    <p class="page-subtitle">Real-time inventory metrics and sales analytics</p>
+  </div>
+</div>
+
+<!-- Metrics Cards Row 1 -->
+<div class="metrics-grid">
+  <div class="metric-card">
+    <div class="metric-info">
+      <p>Today's Sales</p>
+      <h3>{{ currency_symbol }}{{ "%.2f"|format(todays_sales) }}</h3>
+    </div>
+    <div class="metric-icon icon-blue"><i class="fas fa-calendar-day"></i></div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-info">
+      <p>Monthly Sales</p>
+      <h3>{{ currency_symbol }}{{ "%.2f"|format(monthly_sales) }}</h3>
+    </div>
+    <div class="metric-icon icon-green"><i class="fas fa-chart-line"></i></div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-info">
+      <p>Total Revenue</p>
+      <h3>{{ currency_symbol }}{{ "%.2f"|format(total_revenue) }}</h3>
+    </div>
+    <div class="metric-icon icon-amber"><i class="fas fa-coins"></i></div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-info">
+      <p>Total Products</p>
+      <h3>{{ total_products }}</h3>
+    </div>
+    <div class="metric-icon icon-blue"><i class="fas fa-boxes-stacked"></i></div>
+  </div>
+</div>
+
+<!-- Metrics Cards Row 2 (Stock Alerts) -->
+<div class="metrics-grid">
+  <div class="metric-card">
+    <div class="metric-info">
+      <p>Low Stock Items</p>
+      <h3 style="color: var(--warning);">{{ low_stock_count }}</h3>
+    </div>
+    <div class="metric-icon icon-amber"><i class="fas fa-triangle-exclamation"></i></div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-info">
+      <p>Out of Stock</p>
+      <h3 style="color: var(--danger);">{{ out_of_stock_count }}</h3>
+    </div>
+    <div class="metric-icon icon-red"><i class="fas fa-circle-xmark"></i></div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-info">
+      <p>Expired Products</p>
+      <h3 style="color: var(--danger);">{{ expired_count }}</h3>
+    </div>
+    <div class="metric-icon icon-red"><i class="fas fa-clock-rotate-left"></i></div>
+  </div>
+</div>
+
+<!-- Charts Row -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 32px;">
+  <div class="card-table" style="padding: 24px;">
+    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 16px;">Sales & Revenue Analytics (7 Days)</h3>
+    <canvas id="salesChart" height="120"></canvas>
+  </div>
+  <div class="card-table" style="padding: 24px;">
+    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 16px;">Category Distribution</h3>
+    <canvas id="categoryChart" height="180"></canvas>
+  </div>
+</div>
+
+<!-- Tables Row -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+  <!-- Recent Bills -->
+  <div class="card-table">
+    <div class="table-header">
+      <h3 style="font-size: 1rem; font-weight: 700;">Recent Transactions</h3>
+      <a href="{{ url_for('report.index') }}" class="btn btn-sm btn-secondary">View All</a>
+    </div>
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Bill No</th>
+          <th>Customer</th>
+          <th>Amount</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in recent_bills %}
+        <tr>
+          <td><strong>{{ b.bill_number }}</strong></td>
+          <td>{{ b.customer.name if b.customer else 'Walk-in' }}</td>
+          <td>{{ currency_symbol }}{{ "%.2f"|format(b.net_amount) }}</td>
+          <td>
+            <a href="{{ url_for('billing.view_invoice', id=b.id) }}" class="btn btn-sm btn-secondary">
+              <i class="fas fa-print"></i>
+            </a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center">No transactions recorded yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Latest Inventory Logs -->
+  <div class="card-table">
+    <div class="table-header">
+      <h3 style="font-size: 1rem; font-weight: 700;">Latest Inventory Updates</h3>
+      <a href="{{ url_for('inventory.index') }}" class="btn btn-sm btn-secondary">Audit Logs</a>
+    </div>
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Type</th>
+          <th>Qty</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in latest_inventory_logs %}
+        <tr>
+          <td><strong>{{ log.product.name if log.product else 'Deleted' }}</strong></td>
+          <td>
+            {% if log.quantity_changed > 0 %}
+              <span class="badge badge-success">+{{ log.quantity_changed }}</span>
+            {% else %}
+              <span class="badge badge-danger">{{ log.quantity_changed }}</span>
+            {% endif %}
+          </td>
+          <td>{{ log.remaining_quantity }}</td>
+          <td style="font-size: 0.8rem; color: var(--text-muted);">{{ log.reason or '' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center">No inventory history logs.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endblock %}

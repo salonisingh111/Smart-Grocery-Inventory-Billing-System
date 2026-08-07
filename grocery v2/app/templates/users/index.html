@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}User Management{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">User Management</h1>
+    <p class="page-subtitle">Manage system accounts, assign roles (Admin, Manager, Cashier), and toggle active access</p>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
+  <!-- Add User Form -->
+  <div class="card-table" style="padding: 24px;">
+    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 20px;">Add New System User</h3>
+    <form method="POST" action="{{ url_for('user.create') }}">
+      {{ form.csrf_token }}
+      <div class="form-group">
+        <label class="form-label">Full Name *</label>
+        {{ form.full_name(class="form-control", placeholder="e.g. Rahul Sharma") }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Username *</label>
+        {{ form.username(class="form-control", placeholder="e.g. rahul_admin") }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address *</label>
+        {{ form.email(class="form-control", placeholder="e.g. rahul@grocery.com") }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Default Password</label>
+        {{ form.password(class="form-control", placeholder="Leave blank for 'grocery123'") }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Role *</label>
+        {{ form.role(class="form-control") }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Account Status</label>
+        {{ form.status(class="form-control") }}
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%;">
+        <i class="fas fa-user-plus"></i> Create System User
+      </button>
+    </form>
+  </div>
+
+  <!-- Users Table -->
+  <div class="card-table">
+    <div class="table-header">
+      <h3 style="font-size: 1rem; font-weight: 700;">Registered System Users</h3>
+      <form method="GET" style="display: flex; gap: 8px;">
+        <input type="text" name="search" class="form-control" style="width: 180px;" placeholder="Search user..." value="{{ search }}">
+        <select name="role" class="form-control" style="width: 130px;" onchange="this.form.submit()">
+          <option value="">All Roles</option>
+          <option value="Admin" {% if role_filter == 'Admin' %}selected{% endif %}>Admin</option>
+          <option value="Manager" {% if role_filter == 'Manager' %}selected{% endif %}>Manager</option>
+          <option value="Cashier" {% if role_filter == 'Cashier' %}selected{% endif %}>Cashier</option>
+        </select>
+        <button type="submit" class="btn btn-sm btn-secondary"><i class="fas fa-search"></i></button>
+      </form>
+    </div>
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>User Info</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Joined</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>
+            <div style="font-weight: 600;">{{ u.full_name }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">@{{ u.username }} &bull; {{ u.email }}</div>
+          </td>
+          <td>
+            {% if u.role == 'Admin' %}
+              <span class="badge badge-danger"><i class="fas fa-user-shield"></i> Admin</span>
+            {% elif u.role == 'Manager' %}
+              <span class="badge badge-primary"><i class="fas fa-user-tie"></i> Manager</span>
+            {% else %}
+              <span class="badge badge-secondary"><i class="fas fa-cash-register"></i> Cashier</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if u.status == 'Active' %}
+              <span class="badge badge-success">Active</span>
+            {% else %}
+              <span class="badge badge-danger">Inactive</span>
+            {% endif %}
+          </td>
+          <td style="font-size: 0.85rem;">{{ u.created_at.strftime('%Y-%m-%d') if u.created_at else '' }}</td>
+          <td>
+            {% if u.id != current_user.id %}
+            <div style="display: flex; gap: 6px;">
+              <!-- Toggle Active / Inactive -->
+              <form method="POST" action="{{ url_for('user.toggle_status', user_id=u.id) }}" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                {% if u.status == 'Active' %}
+                  <button type="submit" class="btn btn-sm btn-warning" title="Deactivate User Account">
+                    <i class="fas fa-user-slash"></i> Deactivate
+                  </button>
+                {% else %}
+                  <button type="submit" class="btn btn-sm btn-success" title="Activate User Account">
+                    <i class="fas fa-user-check"></i> Activate
+                  </button>
+                {% endif %}
+              </form>
+
+              <!-- Delete User -->
+              <form method="POST" action="{{ url_for('user.delete', user_id=u.id) }}" style="display: inline;" onsubmit="event.preventDefault(); promptPasswordConfirmation(this, 'Confirm Delete User: {{ u.full_name }} (@{{ u.username }})');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-danger" title="Delete User">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </form>
+            </div>
+            {% else %}
+            <span class="badge badge-secondary" style="font-size: 0.75rem;"><i class="fas fa-shield-halved"></i> Logged in</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center p-4">No system users found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

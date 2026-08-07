@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Customers Management{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Customer CRM</h1>
+    <p class="page-subtitle">Customer profiles, total purchase metrics, and transaction histories</p>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
+  <!-- Add Customer Form -->
+  <div class="card-table" style="padding: 24px;">
+    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 20px;">Register New Customer</h3>
+    <form method="POST" action="{{ url_for('customer.index') }}">
+      {{ form.csrf_token }}
+      <div class="form-group">
+        <label class="form-label">Full Name *</label>
+        {{ form.name(class="form-control", placeholder="e.g. Rahul Sharma") }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Phone Number *</label>
+        {{ form.phone(class="form-control", placeholder="9876543210") }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        {{ form.email(class="form-control", placeholder="rahul@example.com") }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        {{ form.address(class="form-control", rows="2") }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        {{ form.status(class="form-control") }}
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%;">
+        <i class="fas fa-plus"></i> Save Customer
+      </button>
+    </form>
+  </div>
+
+  <!-- Customers List -->
+  <div class="card-table">
+    <div class="table-header">
+      <h3 style="font-size: 1rem; font-weight: 700;">Customers Database</h3>
+      <form method="GET" style="display: flex; gap: 8px;">
+        <input type="text" name="search" class="form-control" style="width: 200px;" placeholder="Search customer..." value="{{ search }}">
+        <button type="submit" class="btn btn-sm btn-secondary"><i class="fas fa-search"></i></button>
+      </form>
+    </div>
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Customer Name</th>
+          <th>Phone</th>
+          <th>Total Spent</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in customers %}
+        <tr>
+          <td>
+            <strong>{{ c.name }}</strong>
+            {% if c.email %}<div style="font-size: 0.75rem; color: var(--text-muted);">{{ c.email }}</div>{% endif %}
+          </td>
+          <td>{{ c.phone }}</td>
+          <td><strong>{{ currency_symbol }}{{ "%.2f"|format(c.total_purchases or 0.0) }}</strong></td>
+          <td>
+            {% if c.status == 'Active' %}
+              <span class="badge badge-success">Active</span>
+            {% else %}
+              <span class="badge badge-secondary">Inactive</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if c.phone != '0000000000' %}
+            <form method="POST" action="{{ url_for('customer.delete', id=c.id) }}" style="display: inline;" onsubmit="event.preventDefault(); promptPasswordConfirmation(this, 'Confirm Delete Customer: {{ c.name }}');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </form>
+            {% else %}
+            <span class="badge badge-secondary">System Record</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center p-4">No customers registered.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

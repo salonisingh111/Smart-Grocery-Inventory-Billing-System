@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Categories Management{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Category Management</h1>
+    <p class="page-subtitle">Organize products into grocery categories and track items count</p>
+  </div>
+</div>
+
+<!-- In-Page Inventory Management Navigation Tabs -->
+<div class="inpage-nav-tabs">
+  <a href="{{ url_for('product.index') }}" class="inpage-tab">
+    <i class="fas fa-boxes-stacked"></i> Products Catalog
+  </a>
+  <a href="{{ url_for('category.index') }}" class="inpage-tab active">
+    <i class="fas fa-tags"></i> Categories
+  </a>
+  <a href="{{ url_for('inventory.index') }}" class="inpage-tab">
+    <i class="fas fa-arrows-rotate"></i> Stock Adjustments & Logs
+  </a>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 24px;">
+  <!-- Add Category Form (Top Horizontal Card) -->
+  <div class="card-table" style="padding: 24px;">
+    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+      <i class="fas fa-folder-plus" style="color: var(--primary);"></i> Add New Category
+    </h3>
+    <form method="POST" action="{{ url_for('category.index') }}">
+      {{ form.csrf_token }}
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: end;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Category Name *</label>
+          {{ form.name(class="form-control", placeholder="e.g. Spices & Pulses") }}
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Category Code *</label>
+          {{ form.code(class="form-control", placeholder="e.g. CAT-SPC") }}
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Description</label>
+          {{ form.description(class="form-control", placeholder="Brief description...") }}
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Status</label>
+          {{ form.status(class="form-control") }}
+        </div>
+
+        <div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; height: 42px;">
+            <i class="fas fa-plus"></i> Save Category
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Categories Table (Main Content Below) -->
+  <div class="card-table">
+    <div class="table-header">
+      <h3 style="font-size: 1rem; font-weight: 700;">Categories List</h3>
+      <form method="GET" style="display: flex; gap: 8px;">
+        <input type="text" name="search" class="form-control" style="width: 200px;" placeholder="Search category..." value="{{ search }}">
+        <button type="submit" class="btn btn-sm btn-secondary"><i class="fas fa-search"></i></button>
+      </form>
+    </div>
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Name</th>
+          <th>Products Count</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cat in categories %}
+        <tr>
+          <td><code>{{ cat.code }}</code></td>
+          <td><strong>{{ cat.name }}</strong></td>
+          <td><span class="badge badge-secondary">{{ cat.products|length }} products</span></td>
+          <td>
+            {% if cat.status == 'Active' %}
+              <span class="badge badge-success">Active</span>
+            {% else %}
+              <span class="badge badge-secondary">Inactive</span>
+            {% endif %}
+          </td>
+          <td>
+            <form method="POST" action="{{ url_for('category.delete', id=cat.id) }}" style="display: inline;" onsubmit="event.preventDefault(); promptPasswordConfirmation(this, 'Confirm Delete Category: {{ cat.name }}');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center p-4">No categories registered yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

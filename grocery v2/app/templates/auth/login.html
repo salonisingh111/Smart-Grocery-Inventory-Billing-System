@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div style="min-height: calc(100vh - 80px); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 0;">
+  <div class="card-table" style="width: 100%; max-width: 420px; padding: 36px 32px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 1px solid var(--border);">
+    <div style="text-align: center; margin-bottom: 28px;">
+      <div class="brand-icon" style="margin: 0 auto 16px; width: 56px; height: 56px; font-size: 1.75rem; border-radius: 14px;">
+        <i class="fas fa-shopping-basket"></i>
+      </div>
+      <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-main);">Grocery Admin Login</h2>
+      <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 4px;">Sign in to access your inventory & POS portal</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('auth.login') }}">
+      {{ form.csrf_token }}
+      <div class="form-group">
+        <label class="form-label">Username or Email</label>
+        {{ form.username(class="form-control", placeholder="admin", autofocus=true) }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        {{ form.password(class="form-control", placeholder="••••••••") }}
+      </div>
+
+      <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.875rem; cursor: pointer; color: var(--text-muted);">
+          {{ form.remember_me() }} Remember me
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; height: 46px; font-size: 1rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <i class="fas fa-right-to-bracket"></i> Sign In
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px dashed var(--border); font-size: 0.825rem; color: var(--text-muted);">
+      Default Admin Credentials: <strong style="color: var(--text-main);">admin</strong> / <strong style="color: var(--text-main);">admin123</strong>
+    </div>
+  </div>
+</div>
+{% endblock %}

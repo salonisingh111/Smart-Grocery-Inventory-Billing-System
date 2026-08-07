@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+{% block title %}POS Terminal{% endblock %}
+
+{% block extra_css %}
+<style>
+.pos-container {
+  display: block;
+  width: 100%;
+  padding-bottom: 90px;
+}
+.pos-products-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: calc(100vh - 140px);
+}
+.pos-cat-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+}
+.cat-chip {
+  white-space: nowrap;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: var(--background);
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 180ms ease-in-out;
+}
+.cat-chip.active, .cat-chip:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+.pos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 16px;
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 4px;
+}
+.pos-product-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  cursor: pointer;
+  transition: all 180ms ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 220px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+.pos-product-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.15);
+}
+.pos-product-card.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.pos-prod-img-wrap {
+  position: relative;
+  width: 100%;
+  height: 100px;
+  background: var(--background);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.pos-prod-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px;
+  transition: transform 200ms ease;
+}
+.pos-product-card:hover .pos-prod-img-wrap img {
+  transform: scale(1.06);
+}
+.pos-cat-badge-overlay {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 5;
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+.pos-prod-details {
+  margin-top: 8px;
+}
+.pos-prod-brand {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.pos-prod-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.25;
+  margin-top: 2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.pos-prod-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+}
+.pos-prod-price {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+.stock-pill {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.stock-pill.stock-ok { background: #ecfdf5; color: #10b981; }
+.stock-pill.stock-low { background: #fffbeb; color: #f59e0b; }
+.stock-pill.stock-out { background: #fef2f2; color: #ef4444; }
+
+.cart-qty-ctrl { display: flex; align-items: center; gap: 6px; }
+.payment-btn { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--background); font-weight: 600; cursor: pointer; text-align: center; }
+.payment-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pos-container">
+  <!-- Full-Width Product Selector Screen -->
+  <div class="pos-products-panel">
+    <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+      <div style="flex: 1; position: relative;">
+        <input type="search" id="posSearchInput" name="product_search_no_autofill" class="form-control" style="height: 48px; font-size: 1rem;" placeholder="Scan Barcode or Search Product by Name/SKU..." autocomplete="one-time-code" data-lpignore="true" data-form-type="other" spellcheck="false" readonly onfocus="this.removeAttribute('readonly');">
+      </div>
+    </div>
+
+    <!-- Category Filter Chips -->
+    <div class="pos-cat-chips" id="posCategoryChips">
+      <button class="cat-chip active" onclick="posSystem.handleSearch('')">All Items</button>
+      <button class="cat-chip" onclick="posSystem.handleSearch('Dairy')">Dairy & Bakery</button>
+      <button class="cat-chip" onclick="posSystem.handleSearch('Beverages')">Beverages</button>
+      <button class="cat-chip" onclick="posSystem.handleSearch('Snacks')">Snacks</button>
+      <button class="cat-chip" onclick="posSystem.handleSearch('Fruits')">Fresh Produce</button>
+      <button class="cat-chip" onclick="posSystem.handleSearch('Staples')">Staples & Grains</button>
+      <button class="cat-chip" onclick="posSystem.handleSearch('Cleaning')">Care & Household</button>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="pos-grid" id="posProductGrid">
+      {% for p in products %}
+      <div class="pos-product-card {% if p.quantity <= 0 %}disabled{% endif %}" onclick="posSystem.addToCartById({{ p.id }})">
+        <span class="pos-cat-badge-overlay">{{ p.category_name or 'Grocery' }}</span>
+        <div class="pos-prod-img-wrap">
+          {% if p.image %}
+            <img src="{{ url_for('static', filename=p.image) }}" alt="{{ p.name }}">
+          {% else %}
+            <div class="pos-prod-icon" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); width: 44px; height: 44px; border-radius: var(--radius-sm); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+              <i class="fas fa-shopping-basket"></i>
+            </div>
+          {% endif %}
+        </div>
+        <div class="pos-prod-details">
+          <div class="pos-prod-brand">{{ p.brand or 'Grocery' }}</div>
+          <div class="pos-prod-name" title="{{ p.name }}">{{ p.name }}</div>
+        </div>
+        <div class="pos-prod-footer">
+          <div class="pos-prod-price">{{ currency }}{{ "%.2f"|format(p.selling_price) }}</div>
+          {% if p.quantity <= 0 %}
+            <span class="stock-pill stock-out"><i class="fas fa-circle-xmark"></i> Out</span>
+          {% elif p.quantity <= p.min_stock %}
+            <span class="stock-pill stock-low"><i class="fas fa-triangle-exclamation"></i> {{ p.quantity }} {{ p.unit }}</span>
+          {% else %}
+            <span class="stock-pill stock-ok"><i class="fas fa-check-circle"></i> {{ p.quantity }} {{ p.unit }}</span>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Floating Summary Bar & Expandable Chosen Products Drawer -->
+<div class="pos-bottom-bar" id="posBottomBar" style="display: none;">
+  <!-- Main Bar Header Row -->
+  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 16px; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <div class="cart-total-badge">
+        <i class="fas fa-shopping-cart"></i> <span id="bottomItemCount">0 Items</span>
+      </div>
+      <div style="font-size: 1.25rem; font-weight: 700; color: var(--text-main);">
+        Total: <span id="bottomTotalAmount" style="color: var(--primary);">{{ currency }}0.00</span>
+      </div>
+      <button class="btn btn-sm btn-secondary" onclick="posSystem.toggleCartDrawer()">
+        <i class="fas fa-list-check"></i> View Chosen Products <i class="fas fa-chevron-up" id="drawerChevron"></i>
+      </button>
+      <button class="btn btn-sm btn-secondary" style="color: var(--danger);" onclick="posSystem.cart=[]; posSystem.renderCart();">
+        <i class="fas fa-trash"></i> Clear
+      </button>
+    </div>
+
+    <button id="posProceedBtn" class="btn btn-primary" style="height: 46px; padding: 0 28px; font-size: 1.05rem;" onclick="posSystem.openCheckoutModal()">
+      Proceed to Checkout <i class="fas fa-arrow-right"></i>
+    </button>
+  </div>
+
+  <!-- Expandable Chosen Products Drawer -->
+  <div id="posCartDrawer" style="display: none; width: 100%; margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border);">
+    <div style="max-height: 200px; overflow-y: auto;">
+      <table class="custom-table" style="font-size: 0.85rem;">
+        <thead>
+          <tr>
+            <th>Chosen Item</th>
+            <th>Unit Price</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="posCartTableBody">
+          <tr><td colspan="5" class="text-center p-3 text-muted">No items chosen yet</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Customer Order & Checkout Modal Screen -->
+<div class="modal-backdrop" id="posCheckoutModal">
+  <div class="modal-card" style="max-width: 680px; padding: 28px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
+      <div>
+        <h3 style="font-size: 1.25rem; font-weight: 700;"><i class="fas fa-receipt"></i> Customer Order & Checkout</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Review items, select customer, enter discount, and choose payment mode</p>
+      </div>
+      <button class="sidebar-toggle" onclick="posSystem.closeCheckoutModal()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- Customer Selection & Discount Inputs -->
+    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; margin-bottom: 20px;">
+      <div class="form-group" style="margin-bottom: 0;">
+        <label class="form-label">Select Customer (Optional)</label>
+        <select id="posCustomerSelect" class="form-control">
+          <option value="">Walk-in Customer (Default)</option>
+          {% for cust in customers %}
+            <option value="{{ cust.id }}">{{ cust.name }} ({{ cust.phone }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      {% if enable_discount %}
+      <div class="form-group" style="margin-bottom: 0;">
+        <label class="form-label">Order Discount ({{ currency }})</label>
+        <input type="number" id="posDiscountInput" class="form-control" value="0.00" step="0.5" min="0">
+      </div>
+      {% else %}
+      <input type="hidden" id="posDiscountInput" value="0.00">
+      {% endif %}
+    </div>
+
+    <!-- Payable Amount Breakdown -->
+    <div style="background: var(--background); padding: 16px 20px; border-radius: var(--radius-md); margin-bottom: 20px; border: 1px solid var(--border);">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem;">
+        <span class="text-muted">Items Subtotal:</span>
+        <strong id="modalSubtotal">{{ currency }}0.00</strong>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem;">
+        <span class="text-muted">Tax Calculation:</span>
+        <strong id="modalTaxTotal">{{ currency }}0.00</strong>
+      </div>
+      <hr style="border: 0; border-top: 1px solid var(--border); margin: 10px 0;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 1rem; font-weight: 700; color: var(--text-main);">Net Amount Payable:</span>
+        <strong id="modalNetTotal" style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">{{ currency }}0.00</strong>
+      </div>
+    </div>
+
+    <!-- Payment Mode Options -->
+    <div style="margin-bottom: 24px;">
+      <label class="form-label" style="font-weight: 700;">Select Payment Mode *</label>
+      <div style="display: flex; gap: 12px; margin-top: 10px;">
+        <button class="payment-btn active" data-method="Cash" onclick="posSystem.selectPaymentMethod('Cash', this)">
+          <i class="fas fa-money-bill-wave" style="font-size: 1.3rem; margin-bottom: 4px;"></i><br>Cash Payment
+        </button>
+        <button class="payment-btn" data-method="UPI" onclick="posSystem.selectPaymentMethod('UPI', this)">
+          <i class="fas fa-qrcode" style="font-size: 1.3rem; margin-bottom: 4px;"></i><br>UPI QR / Online
+        </button>
+        <button class="payment-btn" data-method="Card" onclick="posSystem.selectPaymentMethod('Card', this)">
+          <i class="fas fa-credit-card" style="font-size: 1.3rem; margin-bottom: 4px;"></i><br>Credit / Debit Card
+        </button>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 12px;">
+      <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="posSystem.closeCheckoutModal()">Back to Selection</button>
+      <button type="button" class="btn btn-success" style="flex: 2; height: 50px; font-size: 1.05rem;" onclick="posSystem.start3SecPaymentAnimation()">
+        <i class="fas fa-lock"></i> Confirm Payment & Save Order
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 3-Second Payment Animation Overlay -->
+<div class="payment-overlay" id="paymentOverlay">
+  <div id="paymentSpinner" class="payment-spinner"></div>
+  <div id="paymentCheckmark" class="payment-checkmark" style="display: none;">
+    <i class="fas fa-check"></i>
+  </div>
+  <h2 id="paymentTitle" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 8px;">Processing Payment...</h2>
+  <p id="paymentSub" style="font-size: 0.95rem; color: #cbd5e1;">Securing payment transaction via <span id="paymentMethodName">Cash</span></p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  window.posProducts = {{ products|tojson }};
+  window.posCurrency = "{{ currency }}";
+</script>
+<script src="{{ url_for('static', filename='js/pos.js') }}"></script>
+{% endblock %}

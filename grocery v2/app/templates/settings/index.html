@@ -1,0 +1,389 @@
+{% extends "base.html" %}
+{% block title %}System Settings{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">System Settings</h1>
+    <p class="page-subtitle">Configure store identity, appearance, billing rules, inventory thresholds, and security</p>
+  </div>
+</div>
+
+<form id="settingsForm" method="POST" action="{{ url_for('setting.index') }}" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div style="max-width: 960px;">
+
+    <!-- 1. Appearance Section -->
+    <div class="settings-section-card">
+      <div class="settings-section-header">
+        <div class="settings-section-icon"><i class="fas fa-palette"></i></div>
+        <div class="settings-section-title">Appearance</div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Dark Mode / Light Mode</h4>
+          <p>Switch interface between clean light theme and low-light dark mode</p>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="dark_mode" {% if settings.dark_mode %}checked{% endif %}>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Accent Theme Color</h4>
+          <p>Select primary color palette for buttons, badges, and active elements</p>
+        </div>
+        <div class="theme-selector-group">
+          <label class="theme-option {% if settings.theme_color == 'blue' %}active{% endif %}">
+            <input type="radio" name="theme_color" value="blue" {% if settings.theme_color == 'blue' %}checked{% endif %} style="display:none;">
+            <span class="theme-color-dot theme-dot-blue"></span> Blue
+          </label>
+          <label class="theme-option {% if settings.theme_color == 'green' %}active{% endif %}">
+            <input type="radio" name="theme_color" value="green" {% if settings.theme_color == 'green' %}checked{% endif %} style="display:none;">
+            <span class="theme-color-dot theme-dot-green"></span> Green
+          </label>
+          <label class="theme-option {% if settings.theme_color == 'purple' %}active{% endif %}">
+            <input type="radio" name="theme_color" value="purple" {% if settings.theme_color == 'purple' %}checked{% endif %} style="display:none;">
+            <span class="theme-color-dot theme-dot-purple"></span> Purple
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Compact Sidebar</h4>
+          <p>Collapse sidebar into compact icon mode for greater screen workspace</p>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="compact_sidebar" {% if settings.compact_sidebar %}checked{% endif %}>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 2. Store Information Section -->
+    <div class="settings-section-card">
+      <div class="settings-section-header">
+        <div class="settings-section-icon"><i class="fas fa-store"></i></div>
+        <div class="settings-section-title">Store Information</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 16px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Store Display Name *</label>
+          <input type="text" name="store_name" class="form-control" value="{{ settings.store_name }}" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Store Contact Number *</label>
+          <input type="text" name="store_phone" class="form-control" value="{{ settings.store_phone }}" required>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 16px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">GST Registration Number</label>
+          <input type="text" name="gst_number" class="form-control" value="{{ settings.gst_number }}" placeholder="e.g. 27AAACG1234F1Z5">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Store Logo</label>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            {% if settings.store_logo %}
+              <img src="{{ url_for('static', filename=settings.store_logo) }}" alt="Logo" style="height: 40px; border-radius: 6px; border: 1px solid var(--border);">
+            {% endif %}
+            <input type="file" name="store_logo" class="form-control" accept="image/*">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 0;">
+        <label class="form-label">Store Full Address</label>
+        <textarea name="store_address" class="form-control" rows="2" placeholder="Street, City, State, Pincode">{{ settings.store_address }}</textarea>
+      </div>
+    </div>
+
+    <!-- 3. Billing Section -->
+    <div class="settings-section-card">
+      <div class="settings-section-header">
+        <div class="settings-section-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+        <div class="settings-section-title">Billing & Sales</div>
+      </div>
+
+      <div class="form-group" style="max-width: 300px; margin-bottom: 16px;">
+        <label class="form-label">Invoice Number Prefix *</label>
+        <input type="text" name="invoice_prefix" class="form-control" value="{{ settings.invoice_prefix }}" required>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Enable Tax Calculation</h4>
+          <p>Automatically calculate tax percentage on customer checkout bills</p>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="enable_tax" {% if settings.enable_tax %}checked{% endif %}>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Enable Custom Item Discounts</h4>
+          <p>Allow cashier to input custom bill discounts during checkout</p>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="enable_discount" {% if settings.enable_discount %}checked{% endif %}>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Print Logo on Invoice</h4>
+          <p>Include uploaded store logo header on thermal and PDF invoice receipts</p>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="print_logo_on_invoice" {% if settings.print_logo_on_invoice %}checked{% endif %}>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 4. Inventory Section -->
+    <div class="settings-section-card">
+      <div class="settings-section-header">
+        <div class="settings-section-icon"><i class="fas fa-boxes-stacked"></i></div>
+        <div class="settings-section-title">Inventory Controls</div>
+      </div>
+
+      <div class="form-group" style="max-width: 300px; margin-bottom: 16px;">
+        <label class="form-label">Default Low Stock Alert Threshold</label>
+        <input type="number" name="low_stock_threshold" class="form-control" value="{{ settings.low_stock_threshold }}" min="1">
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Enable Expiry Date Tracking</h4>
+          <p>Track manufacturing and expiration dates for perishable items</p>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="enable_expiry_tracking" {% if settings.enable_expiry_tracking %}checked{% endif %}>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Auto Generate Product SKU Codes</h4>
+          <p>Automatically generate SKU codes when adding new grocery products</p>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="auto_generate_sku" {% if settings.auto_generate_sku %}checked{% endif %}>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 5. Security Section -->
+    <div class="settings-section-card">
+      <div class="settings-section-header">
+        <div class="settings-section-icon"><i class="fas fa-shield-halved"></i></div>
+        <div class="settings-section-title">Security & Password</div>
+      </div>
+
+      <div class="setting-row" style="margin-bottom: 16px;">
+        <div class="setting-info">
+          <h4>Require Password Confirmation for Delete Operations</h4>
+          <p>Prompt security password modal before executing sensitive delete actions</p>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="require_pwd_confirm_delete" {% if settings.require_pwd_confirm_delete %}checked{% endif %}>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div style="border-top: 1px dashed var(--border); padding-top: 16px;">
+        <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">Change Admin Password</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Current Password</label>
+            <input type="password" name="current_password" class="form-control" placeholder="••••••••" autocomplete="off">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">New Password</label>
+            <input type="password" name="new_password" class="form-control" placeholder="••••••••" autocomplete="off">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Confirm New Password</label>
+            <input type="password" name="confirm_password" class="form-control" placeholder="••••••••" autocomplete="off">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Notifications Section -->
+    <div class="settings-section-card">
+      <div class="settings-section-header">
+        <div class="settings-section-icon"><i class="fas fa-bell"></i></div>
+        <div class="settings-section-title">Notifications</div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Low Stock Level Alerts</h4>
+          <p>Display dashboard notifications when items reach or drop below minimum stock</p>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="notif_low_stock" {% if settings.notif_low_stock %}checked{% endif %}>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Expiry Date Warnings</h4>
+          <p>Notify when products approach or exceed expiration dates</p>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" name="notif_expiry" {% if settings.notif_expiry %}checked{% endif %}>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 7. About Section -->
+    <div class="settings-section-card">
+      <div class="settings-section-header">
+        <div class="settings-section-icon"><i class="fas fa-circle-info"></i></div>
+        <div class="settings-section-title">About Application</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+        <div>
+          <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">System Version</div>
+          <div style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-top: 4px;">{{ settings.app_version }}</div>
+        </div>
+        <div>
+          <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Developer Information</div>
+          <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-main); margin-top: 4px;">{{ settings.developer_info }}</div>
+        </div>
+        <div>
+          <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Database Engine</div>
+          <div style="font-size: 0.95rem; font-weight: 600; color: var(--success); margin-top: 4px;">
+            <i class="fas fa-database"></i> {{ settings.db_status }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Actions Bar -->
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border);">
+      <button type="button" class="btn btn-secondary" onclick="openResetModal()">
+        <i class="fas fa-rotate-left"></i> Reset to Default
+      </button>
+
+      <button type="submit" id="saveSettingsBtn" class="btn btn-primary" style="height: 48px; padding: 0 28px; font-size: 1rem;">
+        <i class="fas fa-floppy-disk"></i> Save Changes
+      </button>
+    </div>
+
+  </div>
+</form>
+
+<!-- Reset Confirmation Modal -->
+<div class="modal-backdrop" id="resetModalBackdrop">
+  <div class="modal-card">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+      <div class="metric-icon icon-amber" style="width: 40px; height: 40px; font-size: 1.1rem;">
+        <i class="fas fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 700;">Reset System Settings?</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">Are you sure you want to reset all settings to default values?</p>
+      </div>
+    </div>
+    <p style="font-size: 0.85rem; color: var(--text-main); margin-bottom: 20px;">
+      This action will restore default store settings, threshold levels, and preferences. Custom values will be reverted.
+    </p>
+    <div style="display: flex; justify-content: flex-end; gap: 12px;">
+      <button type="button" class="btn btn-secondary" onclick="closeResetModal()">Cancel</button>
+      <form method="POST" action="{{ url_for('setting.reset') }}" style="display: inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-danger"><i class="fas fa-rotate-left"></i> Confirm Reset</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  let isFormDirty = false;
+
+  const settingsForm = document.getElementById('settingsForm');
+  if (settingsForm) {
+    settingsForm.addEventListener('change', () => { isFormDirty = true; });
+    settingsForm.addEventListener('input', () => { isFormDirty = true; });
+    settingsForm.addEventListener('submit', () => { 
+      isFormDirty = false; 
+      window.onbeforeunload = null; 
+    });
+  }
+
+  window.addEventListener('beforeunload', (e) => {
+    if (isFormDirty) {
+      e.preventDefault();
+      e.returnValue = 'You have unsaved changes! Are you sure you want to leave?';
+      return e.returnValue;
+    }
+  });
+
+  function openResetModal() {
+    document.getElementById('resetModalBackdrop').classList.add('show');
+  }
+
+  function closeResetModal() {
+    document.getElementById('resetModalBackdrop').classList.remove('show');
+  }
+
+  // Theme color radio selection & instant live preview
+  document.querySelectorAll('.theme-option').forEach(option => {
+    option.addEventListener('click', function(e) {
+      document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
+      this.classList.add('active');
+      const radio = this.querySelector('input[type="radio"]');
+      if (radio) {
+        radio.checked = true;
+        document.body.setAttribute('data-color', radio.value);
+        isFormDirty = true;
+      }
+    });
+  });
+
+  // Dark Mode instant live preview
+  const darkSwitch = document.querySelector('input[name="dark_mode"]');
+  if (darkSwitch) {
+    darkSwitch.addEventListener('change', function() {
+      document.body.setAttribute('data-theme', this.checked ? 'dark' : 'light');
+      isFormDirty = true;
+    });
+  }
+
+  // Compact Sidebar instant live preview
+  const compactSwitch = document.querySelector('input[name="compact_sidebar"]');
+  if (compactSwitch) {
+    compactSwitch.addEventListener('change', function() {
+      const sidebar = document.querySelector('.app-sidebar');
+      if (sidebar) {
+        if (this.checked) sidebar.classList.add('compact');
+        else sidebar.classList.remove('compact');
+      }
+      isFormDirty = true;
+    });
+  }
+</script>
+{% endblock %}

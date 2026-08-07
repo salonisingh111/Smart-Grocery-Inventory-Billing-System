@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice #{{ bill.bill_number }} - {{ store_name }}</title>
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; padding: 20px; }
+    .invoice-card { background: white; max-width: 800px; margin: 0 auto; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .invoice-header { display: flex; justify-content: space-between; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 24px; }
+    .table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+    .table th { background: #f1f5f9; padding: 12px; text-align: left; font-size: 0.8rem; text-transform: uppercase; color: #64748b; }
+    .table td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; }
+    .totals-table { margin-left: auto; width: 300px; margin-top: 24px; }
+    .totals-table td { padding: 8px 12px; }
+    @media print {
+      body { background: white; padding: 0; }
+      .invoice-card { box-shadow: none; max-width: 100%; padding: 0; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="no-print" style="max-width: 800px; margin: 0 auto 20px; display: flex; justify-content: space-between;">
+  <a href="{{ url_for('billing.pos') }}" style="text-decoration: none; font-weight: 600; color: #2563eb;">← Back to POS</a>
+  <button onclick="window.print()" style="background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+    Print Invoice
+  </button>
+</div>
+
+<div class="invoice-card">
+  <div class="invoice-header">
+    <div style="display: flex; gap: 16px; align-items: center;">
+      {% if print_logo_on_invoice and store_logo %}
+        <img src="{{ url_for('static', filename=store_logo) }}" alt="Store Logo" style="height: 50px; border-radius: 6px;">
+      {% endif %}
+      <div>
+        <h1 style="margin: 0; font-size: 1.5rem; color: var(--primary, #2563eb);">{{ store_name or 'Smart Grocery Supermarket' }}</h1>
+        {% if store_address %}<p style="margin: 4px 0; font-size: 0.85rem; color: #64748b;">{{ store_address }}</p>{% endif %}
+        <p style="margin: 2px 0; font-size: 0.85rem; color: #64748b;">
+          {% if gst_number %}GSTIN: {{ gst_number }} &bull; {% endif %}
+          {% if store_phone %}Phone: {{ store_phone }}{% endif %}
+          {% if store_email %} &bull; Email: {{ store_email }}{% endif %}
+        </p>
+      </div>
+    </div>
+    <div style="text-align: right;">
+      <h2 style="margin: 0; font-size: 1.25rem;">TAX INVOICE</h2>
+      <p style="margin: 4px 0; font-size: 0.9rem; font-weight: 700;">#{{ bill.bill_number }}</p>
+      <p style="margin: 2px 0; font-size: 0.85rem; color: #64748b;">Date: {{ bill.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+    </div>
+  </div>
+
+  <div style="display: flex; justify-content: space-between; margin-bottom: 24px; font-size: 0.9rem;">
+    <div>
+      <strong>Billed To:</strong><br>
+      {{ bill.customer.name if bill.customer else 'Walk-in Customer' }}<br>
+      {% if bill.customer and bill.customer.phone %}{{ bill.customer.phone }}<br>{% endif %}
+      {% if bill.customer and bill.customer.address %}{{ bill.customer.address }}{% endif %}
+    </div>
+    <div style="text-align: right;">
+      <strong>Payment Mode:</strong> {{ bill.payment_method }}<br>
+      <strong>Billed By:</strong> {{ bill.user.full_name if bill.user else 'Counter' }}
+    </div>
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Item Description</th>
+        <th>Unit Price</th>
+        <th>Qty</th>
+        <th>Tax %</th>
+        <th style="text-align: right;">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in bill.items %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td><strong>{{ item.product_name }}</strong></td>
+        <td>{{ currency }}{{ "%.2f"|format(item.unit_price) }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.tax_percent }}%</td>
+        <td style="text-align: right;">{{ currency }}{{ "%.2f"|format(item.total_price) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <table class="totals-table">
+    <tr>
+      <td>Subtotal:</td>
+      <td style="text-align: right;">{{ currency }}{{ "%.2f"|format(bill.total_amount) }}</td>
+    </tr>
+    <tr>
+      <td>Tax Amount:</td>
+      <td style="text-align: right;">{{ currency }}{{ "%.2f"|format(bill.tax_amount) }}</td>
+    </tr>
+    <tr>
+      <td>Discount:</td>
+      <td style="text-align: right;">-{{ currency }}{{ "%.2f"|format(bill.discount_amount) }}</td>
+    </tr>
+    <tr>
+      <td>Round Off:</td>
+      <td style="text-align: right;">{{ currency }}{{ "%.2f"|format(bill.round_off) }}</td>
+    </tr>
+    <tr style="font-weight: 700; font-size: 1.1rem; border-top: 2px solid #1e293b;">
+      <td>Net Payable:</td>
+      <td style="text-align: right; color: #2563eb;">{{ currency }}{{ "%.2f"|format(bill.net_amount) }}</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 40px; text-align: center; font-size: 0.85rem; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+    Thank you for shopping with us! Please come again.
+  </div>
+</div>
+
+</body>
+</html>

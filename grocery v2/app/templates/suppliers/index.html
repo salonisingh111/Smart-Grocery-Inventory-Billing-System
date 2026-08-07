@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Suppliers Management{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Supplier Management</h1>
+    <p class="page-subtitle">Track wholesale suppliers, contact information, and GST numbers</p>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
+  <!-- Add Supplier Form -->
+  <div class="card-table" style="padding: 24px;">
+    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 20px;">Add New Supplier</h3>
+    <form method="POST" action="{{ url_for('supplier.index') }}">
+      {{ form.csrf_token }}
+      <div class="form-group">
+        <label class="form-label">Supplier Name *</label>
+        {{ form.name(class="form-control", placeholder="e.g. National Wholesalers") }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Phone Number *</label>
+        {{ form.phone(class="form-control", placeholder="+91 98765 00000") }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        {{ form.email(class="form-control", placeholder="supplier@domain.com") }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">GST Number</label>
+        {{ form.gst_number(class="form-control", placeholder="27AAAAA0000A1Z5") }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        {{ form.address(class="form-control", rows="2") }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        {{ form.status(class="form-control") }}
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%;">
+        <i class="fas fa-plus"></i> Save Supplier
+      </button>
+    </form>
+  </div>
+
+  <!-- Suppliers List -->
+  <div class="card-table">
+    <div class="table-header">
+      <h3 style="font-size: 1rem; font-weight: 700;">Suppliers List</h3>
+      <form method="GET" style="display: flex; gap: 8px;">
+        <input type="text" name="search" class="form-control" style="width: 200px;" placeholder="Search supplier..." value="{{ search }}">
+        <button type="submit" class="btn btn-sm btn-secondary"><i class="fas fa-search"></i></button>
+      </form>
+    </div>
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Supplier Name</th>
+          <th>Contact Info</th>
+          <th>GSTIN</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sup in suppliers %}
+        <tr>
+          <td>
+            <strong>{{ sup.name }}</strong>
+            {% if sup.address %}<div style="font-size: 0.75rem; color: var(--text-muted);">{{ sup.address }}</div>{% endif %}
+          </td>
+          <td>
+            <div><i class="fas fa-phone" style="font-size: 0.75rem;"></i> {{ sup.phone }}</div>
+            {% if sup.email %}<div style="font-size: 0.75rem; color: var(--text-muted);"><i class="fas fa-envelope"></i> {{ sup.email }}</div>{% endif %}
+          </td>
+          <td><code>{{ sup.gst_number or 'N/A' }}</code></td>
+          <td>
+            {% if sup.status == 'Active' %}
+              <span class="badge badge-success">Active</span>
+            {% else %}
+              <span class="badge badge-secondary">Inactive</span>
+            {% endif %}
+          </td>
+          <td>
+            <form method="POST" action="{{ url_for('supplier.delete', id=sup.id) }}" style="display: inline;" onsubmit="event.preventDefault(); promptPasswordConfirmation(this, 'Confirm Delete Supplier: {{ sup.name }}');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center p-4">No suppliers registered.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

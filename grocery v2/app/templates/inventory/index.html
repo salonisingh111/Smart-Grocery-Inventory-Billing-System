@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Inventory Audit Logs{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Inventory Tracking & Stock Audit</h1>
+    <p class="page-subtitle">Real-time stock movement history, manual adjustments, and audit trail</p>
+  </div>
+</div>
+
+<!-- In-Page Inventory Management Navigation Tabs -->
+<div class="inpage-nav-tabs">
+  <a href="{{ url_for('product.index') }}" class="inpage-tab">
+    <i class="fas fa-boxes-stacked"></i> Products Catalog
+  </a>
+  <a href="{{ url_for('category.index') }}" class="inpage-tab">
+    <i class="fas fa-tags"></i> Categories
+  </a>
+  <a href="{{ url_for('inventory.index') }}" class="inpage-tab active">
+    <i class="fas fa-arrows-rotate"></i> Stock Adjustments & Logs
+  </a>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 24px;">
+  <!-- Manual Stock Adjustment Form (Horizontal Top Card) -->
+  <div class="card-table" style="padding: 24px;">
+    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+      <i class="fas fa-boxes-stacked" style="color: var(--primary-color, #2563eb);"></i> Manual Stock Adjustment
+    </h3>
+    <form method="POST" action="{{ url_for('inventory.index') }}">
+      {{ form.csrf_token }}
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; align-items: end;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Select Product *</label>
+          <select name="product_id" class="form-control" required>
+            {% for p in products %}
+              <option value="{{ p.id }}">{{ p.name }} (Current: {{ p.quantity }} {{ p.unit }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Adjustment Type *</label>
+          {{ form.change_type(class="form-control") }}
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Quantity Difference *</label>
+          {{ form.quantity_changed(class="form-control", placeholder="e.g. 10") }}
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Reason / Remark *</label>
+          {{ form.reason(class="form-control", placeholder="e.g. Stock Arrival") }}
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Password Confirmation *</label>
+          {{ form.confirm_password(class="form-control", placeholder="••••••••") }}
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <button type="submit" class="btn btn-primary" style="width: 100%; height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fas fa-arrows-rotate"></i> Submit Adjustment
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Audit Logs Table (Full Width Main Area) -->
+  <div class="card-table" style="width: 100%;">
+    <div class="table-header">
+      <h3 style="font-size: 1rem; font-weight: 700;">Stock Audit Logs</h3>
+      <form method="GET" style="display: flex; gap: 8px;">
+        <input type="text" name="search" class="form-control" style="width: 250px;" placeholder="Search audit logs..." value="{{ search }}">
+        <button type="submit" class="btn btn-sm btn-secondary"><i class="fas fa-search"></i> Search</button>
+      </form>
+    </div>
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Date & Time</th>
+          <th>Product</th>
+          <th>Type</th>
+          <th>Qty Changed</th>
+          <th>Remaining Qty</th>
+          <th>Performed By</th>
+          <th>Reason / Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+        <tr>
+          <td style="font-size: 0.85rem; color: var(--text-muted);">{{ log.created_at.strftime('%Y-%m-%d %H:%M') if log.created_at else '' }}</td>
+          <td><strong>{{ log.product.name if log.product else 'Deleted Product' }}</strong></td>
+          <td><span class="badge badge-secondary">{{ log.change_type }}</span></td>
+          <td>
+            {% if log.quantity_changed > 0 %}
+              <span class="badge badge-success">+{{ log.quantity_changed }}</span>
+            {% else %}
+              <span class="badge badge-danger">{{ log.quantity_changed }}</span>
+            {% endif %}
+          </td>
+          <td><strong>{{ log.remaining_quantity }}</strong></td>
+          <td>{{ log.user.full_name if log.user else 'System' }}</td>
+          <td style="font-size: 0.85rem; color: var(--text-muted);">{{ log.reason or '-' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center p-4">No stock adjustment logs found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

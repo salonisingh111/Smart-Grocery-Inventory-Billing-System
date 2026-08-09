@@ -163,7 +163,10 @@
 {% endblock %}
 
 {% block content %}
-<div class="pos-container">
+<div class="pos-container" style="padding-top: 16px;">
+  <!-- Sub-Modules Pill Navigation Tabs -->
+  {% include "billing/_nav_tabs.html" %}
+
   <!-- Full-Width Product Selector Screen -->
   <div class="pos-products-panel">
     <div style="display: flex; gap: 12px; margin-bottom: 16px;">
@@ -174,13 +177,13 @@
 
     <!-- Category Filter Chips -->
     <div class="pos-cat-chips" id="posCategoryChips">
-      <button class="cat-chip active" onclick="posSystem.handleSearch('')">All Items</button>
-      <button class="cat-chip" onclick="posSystem.handleSearch('Dairy')">Dairy & Bakery</button>
-      <button class="cat-chip" onclick="posSystem.handleSearch('Beverages')">Beverages</button>
-      <button class="cat-chip" onclick="posSystem.handleSearch('Snacks')">Snacks</button>
-      <button class="cat-chip" onclick="posSystem.handleSearch('Fruits')">Fresh Produce</button>
-      <button class="cat-chip" onclick="posSystem.handleSearch('Staples')">Staples & Grains</button>
-      <button class="cat-chip" onclick="posSystem.handleSearch('Cleaning')">Care & Household</button>
+      <button class="cat-chip active" onclick="posSystem.filterByCategory('', this)">All Items</button>
+      <button class="cat-chip" onclick="posSystem.filterByCategory('Dairy', this)">Dairy & Bakery</button>
+      <button class="cat-chip" onclick="posSystem.filterByCategory('Beverages', this)">Beverages & Drinks</button>
+      <button class="cat-chip" onclick="posSystem.filterByCategory('Snacks', this)">Snacks & Packaged Food</button>
+      <button class="cat-chip" onclick="posSystem.filterByCategory('Fruits', this)">Fruits & Vegetables</button>
+      <button class="cat-chip" onclick="posSystem.filterByCategory('Staples', this)">Staples & Grains</button>
+      <button class="cat-chip" onclick="posSystem.filterByCategory('Cleaning', this)">Cleaning & Care</button>
     </div>
 
     <!-- Product Grid -->
@@ -225,8 +228,8 @@
       <div class="cart-total-badge">
         <i class="fas fa-shopping-cart"></i> <span id="bottomItemCount">0 Items</span>
       </div>
-      <div style="font-size: 1.25rem; font-weight: 700; color: var(--text-main);">
-        Total: <span id="bottomTotalAmount" style="color: var(--primary);">{{ currency }}0.00</span>
+      <div style="font-size: 1.25rem; font-weight: 700; color: #ffffff;">
+        Total: <span id="bottomTotalAmount" style="color: #10b981;">{{ currency }}0.00</span>
       </div>
       <button class="btn btn-sm btn-secondary" onclick="posSystem.toggleCartDrawer()">
         <i class="fas fa-list-check"></i> View Chosen Products <i class="fas fa-chevron-up" id="drawerChevron"></i>
@@ -276,7 +279,12 @@
     <!-- Customer Selection & Discount Inputs -->
     <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; margin-bottom: 20px;">
       <div class="form-group" style="margin-bottom: 0;">
-        <label class="form-label">Select Customer (Optional)</label>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <label class="form-label" style="margin: 0;">Select Customer (Optional)</label>
+          <button type="button" class="btn btn-sm btn-secondary" style="font-size: 0.75rem; padding: 2px 8px;" onclick="document.getElementById('posNewCustomerModal').classList.add('show')">
+            <i class="fas fa-user-plus"></i> Add New
+          </button>
+        </div>
         <select id="posCustomerSelect" class="form-control">
           <option value="">Walk-in Customer (Default)</option>
           {% for cust in customers %}
@@ -345,6 +353,32 @@
   </div>
   <h2 id="paymentTitle" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 8px;">Processing Payment...</h2>
   <p id="paymentSub" style="font-size: 0.95rem; color: #cbd5e1;">Securing payment transaction via <span id="paymentMethodName">Cash</span></p>
+<!-- Quick Add Customer Modal -->
+<div class="modal-backdrop" id="posNewCustomerModal">
+  <div class="modal-card" style="max-width: 440px; padding: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 style="font-size: 1.1rem; font-weight: 700;"><i class="fas fa-user-plus" style="color: var(--primary);"></i> Add New Customer</h3>
+      <button class="sidebar-toggle" onclick="document.getElementById('posNewCustomerModal').classList.remove('show')"><i class="fas fa-times"></i></button>
+    </div>
+    <form id="quickCustomerForm" onsubmit="event.preventDefault(); posSystem.saveQuickCustomer();">
+      <div class="form-group">
+        <label class="form-label">Full Name *</label>
+        <input type="text" id="quickCustName" class="form-control" required placeholder="John Doe">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone Number *</label>
+        <input type="text" id="quickCustPhone" class="form-control" required placeholder="+91 98765 43210">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email (Optional)</label>
+        <input type="email" id="quickCustEmail" class="form-control" placeholder="john@example.com">
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="document.getElementById('posNewCustomerModal').classList.remove('show')">Cancel</button>
+        <button type="submit" class="btn btn-primary" style="flex: 1;">Save & Select</button>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}
 

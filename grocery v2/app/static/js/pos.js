@@ -12,6 +12,7 @@ class POSBilling {
     this.currentTax = 0.0;
     this.currentNet = 0.0;
 
+    this.activeCategoryFilter = '';
     this.init();
   }
 
@@ -21,7 +22,7 @@ class POSBilling {
       const resetSearch = () => {
         if (searchInput.value === 'admin' || searchInput.value === 'amul' || searchInput.matches(':-webkit-autofill')) {
           searchInput.value = '';
-          this.handleSearch('');
+          this.applyFilters();
         }
       };
       searchInput.value = '';
@@ -40,7 +41,7 @@ class POSBilling {
   bindEvents() {
     const searchInput = document.getElementById('posSearchInput');
     if (searchInput) {
-      searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
+      searchInput.addEventListener('input', () => this.applyFilters());
       
       // Barcode scanner auto submit on Enter
       searchInput.addEventListener('keydown', (e) => {
@@ -67,18 +68,46 @@ class POSBilling {
     }
   }
 
-  handleSearch(query) {
+  filterByCategory(catQuery, btnElement) {
+    this.activeCategoryFilter = catQuery ? catQuery.toLowerCase().trim() : '';
+
+    if (btnElement) {
+      document.querySelectorAll('#posCategoryChips .cat-chip').forEach(b => b.classList.remove('active'));
+      btnElement.classList.add('active');
+    }
+
+    this.applyFilters();
+  }
+
+  applyFilters() {
     const grid = document.getElementById('posProductGrid');
     if (!grid) return;
 
-    const q = query.toLowerCase().trim();
-    const filtered = this.products.filter(p => 
-      p.name.toLowerCase().includes(q) || 
-      (p.sku && p.sku.toLowerCase().includes(q)) || 
-      (p.barcode && p.barcode.includes(q))
-    );
+    const searchInput = document.getElementById('posSearchInput');
+    const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    const cat = this.activeCategoryFilter;
+
+    const filtered = this.products.filter(p => {
+      const matchSearch = !q || (
+        p.name.toLowerCase().includes(q) ||
+        (p.sku && p.sku.toLowerCase().includes(q)) ||
+        (p.barcode && p.barcode.includes(q)) ||
+        (p.brand && p.brand.toLowerCase().includes(q))
+      );
+
+      const categoryName = (p.category_name || '').toLowerCase();
+      const matchCat = !cat || categoryName.includes(cat);
+
+      return matchSearch && matchCat;
+    });
 
     this.renderProductGrid(filtered);
+  }
+
+  handleSearch(query) {
+    const searchInput = document.getElementById('posSearchInput');
+    if (searchInput) searchInput.value = query;
+    this.applyFilters();
   }
 
   handleBarcodeScan(code) {
@@ -375,6 +404,48 @@ class POSBilling {
       const overlay = document.getElementById('paymentOverlay');
       if (overlay) overlay.classList.remove('show');
       showToast('Network or server error occurred during checkout.', 'danger');
+    }
+  }
+
+  async saveQuickCustomer() {
+    const name = document.getElementById('quickCustName')?.value.trim();
+    const phone = document.getElementById('quickCustPhone')?.value.trim();
+    const email = document.getElementById('quickCustEmail')?.value.trim();
+
+    if (!name || !phone) {
+      showToast('Customer Name and Phone Number are required.', 'warning');
+      return;
+    }
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    try {
+      const response = await fetch('/billing/api/quick-create-customer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ name, phone, email })
+      });
+
+      const res = await response.json();
+      if (res.success) {
+        const custSelect = document.getElementById('posCustomerSelect');
+        if (custSelect && res.customer) {
+          const opt = document.createElement('option');
+          opt.value = res.customer.id;
+          opt.textContent = `${res.customer.name} (${res.customer.phone})`;
+          opt.selected = true;
+          custSelect.appendChild(opt);
+          this.selectedCustomerId = res.customer.id;
+        }
+        document.getElementById('posNewCustomerModal')?.classList.remove('show');
+        showToast(res.message || 'Customer saved and selected!', 'success');
+      } else {
+        showToast(res.message || 'Failed to save customer', 'danger');
+      }
+    } catch (e) {
+      showToast('Error saving quick customer.', 'danger');
     }
   }
 }

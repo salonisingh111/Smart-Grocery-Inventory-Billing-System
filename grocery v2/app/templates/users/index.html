@@ -63,15 +63,14 @@
           <option value="Manager" {% if role_filter == 'Manager' %}selected{% endif %}>Manager</option>
           <option value="Cashier" {% if role_filter == 'Cashier' %}selected{% endif %}>Cashier</option>
         </select>
-        <button type="submit" class="btn btn-sm btn-secondary"><i class="fas fa-search"></i></button>
-      </form>
-    </div>
-    <table class="custom-table">
+    <div class="table-scroll-container">
+      <table class="custom-table">
       <thead>
         <tr>
           <th>User Info</th>
           <th>Role</th>
           <th>Status</th>
+          <th>Last Login</th>
           <th>Joined</th>
           <th>Action</th>
         </tr>
@@ -97,6 +96,13 @@
               <span class="badge badge-success">Active</span>
             {% else %}
               <span class="badge badge-danger">Inactive</span>
+            {% endif %}
+          </td>
+          <td style="font-size: 0.825rem; color: var(--text-muted);">
+            {% if u.last_login_at %}
+              {{ u.last_login_at.strftime('%Y-%m-%d %H:%M') }}
+            {% else %}
+              <span style="opacity: 0.6;">Never</span>
             {% endif %}
           </td>
           <td style="font-size: 0.85rem;">{{ u.created_at.strftime('%Y-%m-%d') if u.created_at else '' }}</td>
@@ -136,5 +142,6 @@
       </tbody>
     </table>
   </div>
+</div>
 </div>
 {% endblock %}

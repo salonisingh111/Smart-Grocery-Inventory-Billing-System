@@ -10,6 +10,8 @@ from app.models.supplier import Supplier
 from app.validators.forms import ProductForm
 from app.services.auth_service import verify_sensitive_password
 from app.utils.helpers import save_uploaded_image
+from app.utils.logger import log_activity
+from app.utils.notifications import create_activity_notification, sync_stock_alerts_for_product
 
 product_bp = Blueprint('product', __name__, url_prefix='/products')
 
@@ -25,11 +27,12 @@ def index():
     query = Product.query
 
     if search:
+        search_term = f"%{search.strip()}%"
         query = query.filter(
-            (Product.name.like(f"%{search}%")) |
-            (Product.sku.like(f"%{search}%")) |
-            (Product.barcode.like(f"%{search}%")) |
-            (Product.brand.like(f"%{search}%"))
+            (Product.name.ilike(search_term)) |
+            (Product.sku.ilike(search_term)) |
+            (Product.barcode.ilike(search_term)) |
+            (Product.brand.ilike(search_term))
         )
 
     if category_id:
@@ -46,24 +49,16 @@ def index():
     else:
         items = all_items
 
-    # Manual Pagination calculation for filtered lists
     total_count = len(items)
-    start = (page - 1) * per_page
-    end = start + per_page
-    paginated_products = items[start:end]
-    total_pages = (total_count + per_page - 1) // per_page if total_count > 0 else 1
-
     categories = Category.query.filter_by(status='Active').all()
 
     return render_template(
         'products/index.html',
-        products=paginated_products,
+        products=items,
         categories=categories,
         search=search,
         selected_category=category_id,
         stock_status=stock_status,
-        page=page,
-        total_pages=total_pages,
         total_count=total_count
     )
 
@@ -113,7 +108,9 @@ def add():
 
         db.session.add(product)
         db.session.commit()
-
+        log_activity('Add Product', f'Product "{product.name}" (SKU: {product.sku}) added to inventory')
+        create_activity_notification('Add Product', f'Product "{product.name}" (SKU: {product.sku}) added to inventory', created_by=current_user.full_name)
+        sync_stock_alerts_for_product(product.id)
         flash(f"Product '{product.name}' added successfully!", 'success')
         return redirect(url_for('product.index'))
 
@@ -165,6 +162,9 @@ def edit(id):
         product.notes = form.notes.data
 
         db.session.commit()
+        log_activity('Edit Product', f'Product "{product.name}" (SKU: {product.sku}) updated')
+        create_activity_notification('Edit Product', f'Product "{product.name}" (SKU: {product.sku}) updated', created_by=current_user.full_name)
+        sync_stock_alerts_for_product(product.id)
         flash(f"Product '{product.name}' updated successfully!", 'success')
         return redirect(url_for('product.index'))
 
@@ -181,9 +181,12 @@ def delete(id):
         return redirect(url_for('product.index'))
 
     prod_name = product.name
+    prod_id   = product.id
     db.session.delete(product)
     db.session.commit()
-
+    log_activity('Delete Product', f'Product "{prod_name}" removed from inventory')
+    create_activity_notification('Delete Product', f'Product "{prod_name}" removed from inventory', created_by=current_user.full_name)
+    sync_stock_alerts_for_product(prod_id)
     flash(f"Product '{prod_name}' deleted successfully.", 'info')
     return redirect(url_for('product.index'))
 

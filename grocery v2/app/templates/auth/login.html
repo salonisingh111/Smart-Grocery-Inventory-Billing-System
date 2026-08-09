@@ -12,16 +12,20 @@
       <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 4px;">Sign in to access your inventory & POS portal</p>
     </div>
 
-    <form method="POST" action="{{ url_for('auth.login') }}">
+    <form method="POST" action="{{ url_for('auth.login') }}" autocomplete="off">
       {{ form.csrf_token }}
+      <!-- Dummy inputs to catch browser autofill -->
+      <input type="text" name="fake_usernameremembered" style="position: absolute; opacity: 0; top: -1000px; left: -1000px;" tabindex="-1" aria-hidden="true" />
+      <input type="password" name="fake_passwordremembered" style="position: absolute; opacity: 0; top: -1000px; left: -1000px;" tabindex="-1" aria-hidden="true" />
+
       <div class="form-group">
         <label class="form-label">Username or Email</label>
-        {{ form.username(class="form-control", placeholder="admin", autofocus=true) }}
+        {{ form.username(class="form-control", placeholder="Enter username or email", autocomplete="new-password", readonly=true, onfocus="this.removeAttribute('readonly');", id="username_field") }}
       </div>
 
       <div class="form-group">
         <label class="form-label">Password</label>
-        {{ form.password(class="form-control", placeholder="••••••••") }}
+        {{ form.password(class="form-control", placeholder="Enter password", autocomplete="new-password", readonly=true, onfocus="this.removeAttribute('readonly');", id="password_field") }}
       </div>
 
       <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
@@ -34,10 +38,31 @@
         <i class="fas fa-right-to-bracket"></i> Sign In
       </button>
     </form>
-
-    <div style="text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px dashed var(--border); font-size: 0.825rem; color: var(--text-muted);">
-      Default Admin Credentials: <strong style="color: var(--text-main);">admin</strong> / <strong style="color: var(--text-main);">admin123</strong>
-    </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const userField = document.getElementById('username_field');
+    const passField = document.getElementById('password_field');
+    
+    function resetFields() {
+      if (userField && !userField.getAttribute('data-user-typed')) userField.value = '';
+      if (passField && !passField.getAttribute('data-user-typed')) passField.value = '';
+    }
+
+    if (userField) {
+      userField.addEventListener('input', function() { userField.setAttribute('data-user-typed', 'true'); });
+      userField.addEventListener('click', function() { this.removeAttribute('readonly'); });
+    }
+    if (passField) {
+      passField.addEventListener('input', function() { passField.setAttribute('data-user-typed', 'true'); });
+      passField.addEventListener('click', function() { this.removeAttribute('readonly'); });
+    }
+
+    resetFields();
+    setTimeout(resetFields, 100);
+    setTimeout(resetFields, 300);
+  });
+</script>
 {% endblock %}

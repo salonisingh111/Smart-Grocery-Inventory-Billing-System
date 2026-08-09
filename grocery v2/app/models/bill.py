@@ -52,6 +52,7 @@ class BillItem(db.Model):
     product_name = db.Column(db.String(150), nullable=False)
     unit_price = db.Column(db.Float, nullable=False, default=0.0)
     quantity = db.Column(db.Integer, nullable=False, default=1)
+    returned_quantity = db.Column(db.Integer, nullable=False, default=0)
     tax_percent = db.Column(db.Float, nullable=False, default=0.0)
     tax_amount = db.Column(db.Float, nullable=False, default=0.0)
     total_price = db.Column(db.Float, nullable=False, default=0.0)
@@ -66,10 +67,59 @@ class BillItem(db.Model):
             'product_name': self.product_name,
             'unit_price': self.unit_price,
             'quantity': self.quantity,
+            'returned_quantity': self.returned_quantity or 0,
+            'remaining_returnable_qty': max(0, self.quantity - (self.returned_quantity or 0)),
             'tax_percent': self.tax_percent,
             'tax_amount': self.tax_amount,
             'total_price': self.total_price
         }
+
+class BillReturn(db.Model):
+    __tablename__ = 'bill_returns'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    return_number = db.Column(db.String(50), unique=True, nullable=False, index=True)
+    bill_id = db.Column(db.Integer, db.ForeignKey('bills.id'), nullable=False)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    total_refund = db.Column(db.Float, nullable=False, default=0.0)
+    refund_method = db.Column(db.String(30), nullable=False, default='Cash') # Cash, UPI, Card
+    reason = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+
+    bill = db.relationship('Bill', backref='returns', lazy=True)
+    customer = db.relationship('Customer', backref='returns', lazy=True)
+    user = db.relationship('User', backref='returns', lazy=True)
+    items = db.relationship('BillReturnItem', backref='bill_return', lazy=True, cascade="all, delete-orphan")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'return_number': self.return_number,
+            'bill_id': self.bill_id,
+            'bill_number': self.bill.bill_number if self.bill else '',
+            'customer_name': self.customer.name if self.customer else (self.bill.customer.name if self.bill and self.bill.customer else 'Walk-in Customer'),
+            'total_refund': self.total_refund,
+            'refund_method': self.refund_method,
+            'reason': self.reason or 'Product Return',
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else '',
+            'item_count': len(self.items)
+        }
+
+class BillReturnItem(db.Model):
+    __tablename__ = 'bill_return_items'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    return_id = db.Column(db.Integer, db.ForeignKey('bill_returns.id'), nullable=False)
+    bill_item_id = db.Column(db.Integer, db.ForeignKey('bill_items.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+    product_name = db.Column(db.String(150), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False, default=1)
+    unit_price = db.Column(db.Float, nullable=False, default=0.0)
+    refund_amount = db.Column(db.Float, nullable=False, default=0.0)
+
+    product = db.relationship('Product', lazy=True)
 
 class PaymentMethod(db.Model):
     __tablename__ = 'payment_methods'

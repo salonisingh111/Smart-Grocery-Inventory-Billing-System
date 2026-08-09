@@ -1,7 +1,7 @@
 import os
 from app import create_app
 from app.database import db
-from app.models import User, Category, Supplier, Customer, Product, SystemSetting, PaymentMethod
+from app.models import User, Category, Supplier, Customer, Product, SystemSetting, PaymentMethod, UserNotification
 
 app = create_app()
 
@@ -11,7 +11,33 @@ def init_seed_data():
     os.makedirs(instance_path, exist_ok=True)
     
     with app.app_context():
+        # Dynamic schema migration for missing columns
+        try:
+            with db.engine.connect() as conn:
+                result = conn.execute(db.text("PRAGMA table_info(users)")).fetchall()
+                columns = [row[1] for row in result]
+                if 'last_login_at' not in columns:
+                    conn.execute(db.text("ALTER TABLE users ADD COLUMN last_login_at DATETIME"))
+                if 'last_login_ip' not in columns:
+                    conn.execute(db.text("ALTER TABLE users ADD COLUMN last_login_ip VARCHAR(45)"))
+                
+                # Check bill_items table
+                bitem_res = conn.execute(db.text("PRAGMA table_info(bill_items)")).fetchall()
+                bitem_cols = [r[1] for r in bitem_res]
+                if 'returned_quantity' not in bitem_cols and len(bitem_cols) > 0:
+                    conn.execute(db.text("ALTER TABLE bill_items ADD COLUMN returned_quantity INTEGER DEFAULT 0"))
+                conn.commit()
+        except Exception as e:
+            print("Schema migration check:", e)
+
         db.create_all()
+
+        # Sync stock alert notifications on startup
+        try:
+            from app.utils.notifications import initial_sync_all_stock_alerts
+            initial_sync_all_stock_alerts()
+        except Exception as e:
+            print(f"Notification sync skipped: {e}")
 
         # Seed Default Admin User
         if not User.query.filter_by(username='admin').first():
@@ -31,9 +57,31 @@ def init_seed_data():
             ('GST_NUMBER', '27AAACG1234F1Z5', 'GST Registration Number'),
             ('STORE_PHONE', '+91 98765 43210', 'Store Phone Number'),
             ('STORE_EMAIL', 'support@smartgrocery.com', 'Store Email Address'),
+            ('STORE_ADDRESS', '123 Main High Street, Market City', 'Store Full Address'),
+            ('CURRENCY_CODE', 'INR', 'Currency Code'),
             ('CURRENCY', '₹', 'Currency Symbol'),
+            ('TIMEZONE', 'Asia/Kolkata', 'System Timezone'),
+            ('DATE_FORMAT', 'DD/MM/YYYY', 'Date Format'),
+            ('TAX_PERCENTAGE', '5.0', 'Default Tax %'),
             ('INVOICE_PREFIX', 'INV', 'Invoice Prefix'),
-            ('TAX_PERCENTAGE', '5.0', 'Default Tax %')
+            ('NEXT_INVOICE_NUMBER', '1001', 'Next Invoice Serial Number'),
+            ('ENABLE_TAX', 'on', 'Enable Tax Calculation'),
+            ('ENABLE_DISCOUNT', 'on', 'Enable Item Discounts'),
+            ('PRINT_LOGO_ON_INVOICE', 'on', 'Print Logo on Invoice'),
+            ('INVOICE_FOOTER_MSG', 'Thank you for shopping with Smart Grocery Supermarket!', 'Invoice Footer Message'),
+            ('INVOICE_FORMAT', '80mm Thermal Receipt', 'Invoice Paper Format'),
+            ('DEFAULT_PAYMENT_METHOD', 'Cash', 'Default Checkout Payment Method'),
+            ('LOW_STOCK_THRESHOLD', '10', 'Low Stock Alert Threshold'),
+            ('ENABLE_EXPIRY_TRACKING', 'on', 'Enable Expiry Date Tracking'),
+            ('AUTO_GENERATE_SKU', 'on', 'Auto Generate SKU Codes'),
+            ('ALLOW_NEGATIVE_STOCK', 'off', 'Allow Negative Inventory Stock'),
+            ('DEFAULT_PRODUCT_UNIT', 'pcs', 'Default Product Unit'),
+            ('SESSION_TIMEOUT_MINS', '30', 'Session Timeout Minutes'),
+            ('REQUIRE_PWD_CONFIRM_DELETE', 'on', 'Require Password Confirmation for Delete'),
+            ('NOTIF_LOW_STOCK', 'on', 'Low Stock Alert Notifications'),
+            ('NOTIF_EXPIRY', 'on', 'Expiry Warning Notifications'),
+            ('NOTIF_SALES', 'on', 'Sales Milestone Notifications'),
+            ('NOTIF_SYSTEM', 'on', 'System Security Notifications')
         ]
         for key, val, desc in default_settings:
             if not SystemSetting.query.filter_by(setting_key=key).first():

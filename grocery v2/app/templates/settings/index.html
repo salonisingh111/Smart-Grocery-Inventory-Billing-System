@@ -1,319 +1,471 @@
 {% extends "base.html" %}
-{% block title %}System Settings{% endblock %}
+{% block title %}Admin Settings{% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <div>
-    <h1 class="page-title">System Settings</h1>
-    <p class="page-subtitle">Configure store identity, appearance, billing rules, inventory thresholds, and security</p>
-  </div>
-</div>
-
 <form id="settingsForm" method="POST" action="{{ url_for('setting.index') }}" enctype="multipart/form-data">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-  <div style="max-width: 960px;">
-
-    <!-- 1. Appearance Section -->
-    <div class="settings-section-card">
-      <div class="settings-section-header">
-        <div class="settings-section-icon"><i class="fas fa-palette"></i></div>
-        <div class="settings-section-title">Appearance</div>
+  <div style="max-width: 1180px; margin: 0 auto;">
+    <!-- Sticky Top Header & Action Bar -->
+    <div class="page-header" style="position: sticky; top: 16px; z-index: 80; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px 24px; margin-bottom: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;">
+      <div>
+        <h1 class="page-title" style="margin: 0; font-size: 1.45rem; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-sliders" style="color: var(--primary);"></i> Admin System Settings
+        </h1>
+        <p class="page-subtitle" style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 0.85rem;">
+          Configure store identity, regional business rules, billing preferences, inventory defaults, and security
+        </p>
       </div>
 
-      <div class="setting-row">
-        <div class="setting-info">
-          <h4>Dark Mode / Light Mode</h4>
-          <p>Switch interface between clean light theme and low-light dark mode</p>
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <div id="unsavedIndicator" style="display: none; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 0.85rem;" class="badge badge-warning">
+          <i class="fas fa-circle-dot fa-beat" style="color: #d97706;"></i> Unsaved changes
         </div>
-        <label class="toggle-switch">
-          <input type="checkbox" name="dark_mode" {% if settings.dark_mode %}checked{% endif %}>
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-info">
-          <h4>Accent Theme Color</h4>
-          <p>Select primary color palette for buttons, badges, and active elements</p>
-        </div>
-        <div class="theme-selector-group">
-          <label class="theme-option {% if settings.theme_color == 'blue' %}active{% endif %}">
-            <input type="radio" name="theme_color" value="blue" {% if settings.theme_color == 'blue' %}checked{% endif %} style="display:none;">
-            <span class="theme-color-dot theme-dot-blue"></span> Blue
-          </label>
-          <label class="theme-option {% if settings.theme_color == 'green' %}active{% endif %}">
-            <input type="radio" name="theme_color" value="green" {% if settings.theme_color == 'green' %}checked{% endif %} style="display:none;">
-            <span class="theme-color-dot theme-dot-green"></span> Green
-          </label>
-          <label class="theme-option {% if settings.theme_color == 'purple' %}active{% endif %}">
-            <input type="radio" name="theme_color" value="purple" {% if settings.theme_color == 'purple' %}checked{% endif %} style="display:none;">
-            <span class="theme-color-dot theme-dot-purple"></span> Purple
-          </label>
-        </div>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-info">
-          <h4>Compact Sidebar</h4>
-          <p>Collapse sidebar into compact icon mode for greater screen workspace</p>
-        </div>
-        <label class="toggle-switch">
-          <input type="checkbox" name="compact_sidebar" {% if settings.compact_sidebar %}checked{% endif %}>
-          <span class="toggle-slider"></span>
-        </label>
+        <button type="button" class="btn btn-secondary" onclick="openResetModal()" style="height: 42px; font-weight: 600;">
+          <i class="fas fa-rotate-left"></i> Reset Defaults
+        </button>
+        <button type="submit" id="saveSettingsBtn" class="btn btn-primary" style="height: 42px; padding: 0 26px; font-size: 0.92rem; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
+          <i class="fas fa-floppy-disk"></i> Save Changes
+        </button>
       </div>
     </div>
 
-    <!-- 2. Store Information Section -->
-    <div class="settings-section-card">
-      <div class="settings-section-header">
-        <div class="settings-section-icon"><i class="fas fa-store"></i></div>
-        <div class="settings-section-title">Store Information</div>
+    <!-- 2-Column Main Layout: Left Sub-Nav + Right Settings Panels -->
+    <div style="display: grid; grid-template-columns: 260px 1fr; gap: 24px; align-items: start;">
+      
+      <!-- Left Column: Quick Sub-Navigation Menu -->
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; position: sticky; top: 100px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+        <div style="font-size: 0.725rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 12px; padding-left: 8px;">
+          Configuration Menu
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <a href="#sec-store" class="settings-nav-item active" onclick="switchSettingsSection('sec-store', this)">
+            <i class="fas fa-store"></i> <span>Store Identity</span>
+          </a>
+          <a href="#sec-regional" class="settings-nav-item" onclick="switchSettingsSection('sec-regional', this)">
+            <i class="fas fa-globe"></i> <span>Regional & Tax</span>
+          </a>
+          <a href="#sec-billing" class="settings-nav-item" onclick="switchSettingsSection('sec-billing', this)">
+            <i class="fas fa-receipt"></i> <span>Billing & Invoice</span>
+          </a>
+          <a href="#sec-inventory" class="settings-nav-item" onclick="switchSettingsSection('sec-inventory', this)">
+            <i class="fas fa-boxes-stacked"></i> <span>Inventory Rules</span>
+          </a>
+          <a href="#sec-security" class="settings-nav-item" onclick="switchSettingsSection('sec-security', this)">
+            <i class="fas fa-shield-halved"></i> <span>Security & Auth</span>
+          </a>
+          <a href="#sec-notifications" class="settings-nav-item" onclick="switchSettingsSection('sec-notifications', this)">
+            <i class="fas fa-bell"></i> <span>Notifications</span>
+          </a>
+          <a href="#sec-diagnostics" class="settings-nav-item" onclick="switchSettingsSection('sec-diagnostics', this)">
+            <i class="fas fa-database"></i> <span>System Health</span>
+          </a>
+        </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 16px;">
-        <div class="form-group" style="margin-bottom: 0;">
-          <label class="form-label">Store Display Name *</label>
-          <input type="text" name="store_name" class="form-control" value="{{ settings.store_name }}" required>
-        </div>
+      <!-- Right Column: Settings Sections -->
+      <div style="display: flex; flex-direction: column; gap: 24px;">
 
-        <div class="form-group" style="margin-bottom: 0;">
-          <label class="form-label">Store Contact Number *</label>
-          <input type="text" name="store_phone" class="form-control" value="{{ settings.store_phone }}" required>
-        </div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 16px;">
-        <div class="form-group" style="margin-bottom: 0;">
-          <label class="form-label">GST Registration Number</label>
-          <input type="text" name="gst_number" class="form-control" value="{{ settings.gst_number }}" placeholder="e.g. 27AAACG1234F1Z5">
-        </div>
-
-        <div class="form-group" style="margin-bottom: 0;">
-          <label class="form-label">Store Logo</label>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            {% if settings.store_logo %}
-              <img src="{{ url_for('static', filename=settings.store_logo) }}" alt="Logo" style="height: 40px; border-radius: 6px; border: 1px solid var(--border);">
-            {% endif %}
-            <input type="file" name="store_logo" class="form-control" accept="image/*">
+        <!-- SECTION 1: STORE IDENTITY -->
+        <div id="sec-store" class="settings-section-card" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div class="metric-icon icon-blue" style="width: 40px; height: 40px; font-size: 1.1rem;"><i class="fas fa-store"></i></div>
+              <div>
+                <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0;">Store Identity & Branding</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 2px 0 0 0;">Public store display information, contact details, and receipt logo</p>
+              </div>
+            </div>
+            <span class="badge badge-info" style="font-size: 0.75rem;"><i class="fas fa-circle-info"></i> Public Info</span>
           </div>
-        </div>
-      </div>
 
-      <div class="form-group" style="margin-bottom: 0;">
-        <label class="form-label">Store Full Address</label>
-        <textarea name="store_address" class="form-control" rows="2" placeholder="Street, City, State, Pincode">{{ settings.store_address }}</textarea>
-      </div>
-    </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600;">Store Display Name *</label>
+              <div style="position: relative;">
+                <input type="text" name="store_name" class="form-control" value="{{ settings.store_name }}" required placeholder="e.g. Smart Grocery Supermarket">
+              </div>
+            </div>
 
-    <!-- 3. Billing Section -->
-    <div class="settings-section-card">
-      <div class="settings-section-header">
-        <div class="settings-section-icon"><i class="fas fa-file-invoice-dollar"></i></div>
-        <div class="settings-section-title">Billing & Sales</div>
-      </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600;">Store Phone Number *</label>
+              <div style="position: relative;">
+                <input type="text" name="store_phone" class="form-control" value="{{ settings.store_phone }}" required placeholder="e.g. +91 98765 43210">
+              </div>
+            </div>
+          </div>
 
-      <div class="form-group" style="max-width: 300px; margin-bottom: 16px;">
-        <label class="form-label">Invoice Number Prefix *</label>
-        <input type="text" name="invoice_prefix" class="form-control" value="{{ settings.invoice_prefix }}" required>
-      </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600;">Support Email Address *</label>
+              <input type="email" name="store_email" class="form-control" value="{{ settings.store_email }}" required placeholder="e.g. support@smartgrocery.com">
+            </div>
 
-      <div class="setting-row">
-        <div class="setting-info">
-          <h4>Enable Tax Calculation</h4>
-          <p>Automatically calculate tax percentage on customer checkout bills</p>
-        </div>
-        <label class="toggle-switch">
-          <input type="checkbox" name="enable_tax" {% if settings.enable_tax %}checked{% endif %}>
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600;">GSTIN / Registration Number</label>
+              <input type="text" name="gst_number" class="form-control" value="{{ settings.gst_number }}" placeholder="e.g. 27AAACG1234F1Z5">
+            </div>
+          </div>
 
-      <div class="setting-row">
-        <div class="setting-info">
-          <h4>Enable Custom Item Discounts</h4>
-          <p>Allow cashier to input custom bill discounts during checkout</p>
-        </div>
-        <label class="toggle-switch">
-          <input type="checkbox" name="enable_discount" {% if settings.enable_discount %}checked{% endif %}>
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label class="form-label" style="font-weight: 600;">Store Logo & Banner Upload</label>
+            <div style="display: flex; align-items: center; gap: 20px; background: var(--bg-body); border: 2px dashed var(--border); border-radius: var(--radius-md); padding: 16px;">
+              {% if settings.store_logo %}
+                <img src="{{ url_for('static', filename=settings.store_logo) }}" alt="Logo" style="height: 50px; border-radius: 8px; border: 1px solid var(--border); background: #fff; padding: 4px;">
+              {% else %}
+                <div class="metric-icon icon-amber" style="width: 50px; height: 50px; font-size: 1.25rem;"><i class="fas fa-image"></i></div>
+              {% endif %}
+              <div style="flex: 1;">
+                <input type="file" name="store_logo" class="form-control" accept="image/*">
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Recommended format: PNG or JPEG (Max size: 2MB). Printed on receipts and invoices.</div>
+              </div>
+            </div>
+          </div>
 
-      <div class="setting-row">
-        <div class="setting-info">
-          <h4>Print Logo on Invoice</h4>
-          <p>Include uploaded store logo header on thermal and PDF invoice receipts</p>
-        </div>
-        <label class="toggle-switch">
-          <input type="checkbox" name="print_logo_on_invoice" {% if settings.print_logo_on_invoice %}checked{% endif %}>
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-    </div>
-
-    <!-- 4. Inventory Section -->
-    <div class="settings-section-card">
-      <div class="settings-section-header">
-        <div class="settings-section-icon"><i class="fas fa-boxes-stacked"></i></div>
-        <div class="settings-section-title">Inventory Controls</div>
-      </div>
-
-      <div class="form-group" style="max-width: 300px; margin-bottom: 16px;">
-        <label class="form-label">Default Low Stock Alert Threshold</label>
-        <input type="number" name="low_stock_threshold" class="form-control" value="{{ settings.low_stock_threshold }}" min="1">
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-info">
-          <h4>Enable Expiry Date Tracking</h4>
-          <p>Track manufacturing and expiration dates for perishable items</p>
-        </div>
-        <label class="toggle-switch">
-          <input type="checkbox" name="enable_expiry_tracking" {% if settings.enable_expiry_tracking %}checked{% endif %}>
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-info">
-          <h4>Auto Generate Product SKU Codes</h4>
-          <p>Automatically generate SKU codes when adding new grocery products</p>
-        </div>
-        <label class="toggle-switch">
-          <input type="checkbox" name="auto_generate_sku" {% if settings.auto_generate_sku %}checked{% endif %}>
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-    </div>
-
-    <!-- 5. Security Section -->
-    <div class="settings-section-card">
-      <div class="settings-section-header">
-        <div class="settings-section-icon"><i class="fas fa-shield-halved"></i></div>
-        <div class="settings-section-title">Security & Password</div>
-      </div>
-
-      <div class="setting-row" style="margin-bottom: 16px;">
-        <div class="setting-info">
-          <h4>Require Password Confirmation for Delete Operations</h4>
-          <p>Prompt security password modal before executing sensitive delete actions</p>
-        </div>
-        <label class="toggle-switch">
-          <input type="checkbox" name="require_pwd_confirm_delete" {% if settings.require_pwd_confirm_delete %}checked{% endif %}>
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-
-      <div style="border-top: 1px dashed var(--border); padding-top: 16px;">
-        <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">Change Admin Password</h4>
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
           <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label">Current Password</label>
-            <input type="password" name="current_password" class="form-control" placeholder="••••••••" autocomplete="off">
-          </div>
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label">New Password</label>
-            <input type="password" name="new_password" class="form-control" placeholder="••••••••" autocomplete="off">
-          </div>
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label">Confirm New Password</label>
-            <input type="password" name="confirm_password" class="form-control" placeholder="••••••••" autocomplete="off">
+            <label class="form-label" style="font-weight: 600;">Store Full Address</label>
+            <textarea name="store_address" class="form-control" rows="2" placeholder="Street, City, State, Pincode">{{ settings.store_address }}</textarea>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- 6. Notifications Section -->
-    <div class="settings-section-card">
-      <div class="settings-section-header">
-        <div class="settings-section-icon"><i class="fas fa-bell"></i></div>
-        <div class="settings-section-title">Notifications</div>
-      </div>
+        <!-- SECTION 2: REGIONAL & BUSINESS SETTINGS -->
+        <div id="sec-regional" class="settings-section-card" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);">
+            <div class="metric-icon icon-purple" style="width: 40px; height: 40px; font-size: 1.1rem;"><i class="fas fa-globe"></i></div>
+            <div>
+              <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0;">Regional & Business Settings</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 2px 0 0 0;">Localization, currency symbol, timezone, and global tax rate defaults</p>
+            </div>
+          </div>
 
-      <div class="setting-row">
-        <div class="setting-info">
-          <h4>Low Stock Level Alerts</h4>
-          <p>Display dashboard notifications when items reach or drop below minimum stock</p>
-        </div>
-        <label class="toggle-switch">
-          <input type="checkbox" name="notif_low_stock" {% if settings.notif_low_stock %}checked{% endif %}>
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600;">Currency Code</label>
+              <select name="currency_code" class="form-control">
+                <option value="INR" {% if settings.currency_code == 'INR' %}selected{% endif %}>INR — Indian Rupee (₹)</option>
+                <option value="USD" {% if settings.currency_code == 'USD' %}selected{% endif %}>USD — US Dollar ($)</option>
+                <option value="EUR" {% if settings.currency_code == 'EUR' %}selected{% endif %}>EUR — Euro (€)</option>
+                <option value="GBP" {% if settings.currency_code == 'GBP' %}selected{% endif %}>GBP — British Pound (£)</option>
+                <option value="AED" {% if settings.currency_code == 'AED' %}selected{% endif %}>AED — UAE Dirham (AED)</option>
+              </select>
+            </div>
 
-      <div class="setting-row">
-        <div class="setting-info">
-          <h4>Expiry Date Warnings</h4>
-          <p>Notify when products approach or exceed expiration dates</p>
-        </div>
-        <label class="toggle-switch">
-          <input type="checkbox" name="notif_expiry" {% if settings.notif_expiry %}checked{% endif %}>
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-    </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600;">Currency Symbol *</label>
+              <input type="text" name="currency_symbol" class="form-control" value="{{ settings.currency_symbol }}" required placeholder="e.g. ₹">
+            </div>
+          </div>
 
-    <!-- 7. About Section -->
-    <div class="settings-section-card">
-      <div class="settings-section-header">
-        <div class="settings-section-icon"><i class="fas fa-circle-info"></i></div>
-        <div class="settings-section-title">About Application</div>
-      </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600;">System Time Zone</label>
+              <select name="timezone" class="form-control">
+                <option value="Asia/Kolkata" {% if settings.timezone == 'Asia/Kolkata' %}selected{% endif %}>Asia/Kolkata (IST +5:30)</option>
+                <option value="UTC" {% if settings.timezone == 'UTC' %}selected{% endif %}>UTC (Universal Time)</option>
+                <option value="America/New_York" {% if settings.timezone == 'America/New_York' %}selected{% endif %}>America/New_York (EST)</option>
+                <option value="Europe/London" {% if settings.timezone == 'Europe/London' %}selected{% endif %}>Europe/London (GMT/BST)</option>
+                <option value="Asia/Dubai" {% if settings.timezone == 'Asia/Dubai' %}selected{% endif %}>Asia/Dubai (GST +4:00)</option>
+              </select>
+            </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
-        <div>
-          <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">System Version</div>
-          <div style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-top: 4px;">{{ settings.app_version }}</div>
-        </div>
-        <div>
-          <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Developer Information</div>
-          <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-main); margin-top: 4px;">{{ settings.developer_info }}</div>
-        </div>
-        <div>
-          <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Database Engine</div>
-          <div style="font-size: 0.95rem; font-weight: 600; color: var(--success); margin-top: 4px;">
-            <i class="fas fa-database"></i> {{ settings.db_status }}
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600;">Date Display Format</label>
+              <select name="date_format" class="form-control">
+                <option value="DD/MM/YYYY" {% if settings.date_format == 'DD/MM/YYYY' %}selected{% endif %}>DD/MM/YYYY (08/08/2026)</option>
+                <option value="MM/DD/YYYY" {% if settings.date_format == 'MM/DD/YYYY' %}selected{% endif %}>MM/DD/YYYY (08/08/2026)</option>
+                <option value="YYYY-MM-DD" {% if settings.date_format == 'YYYY-MM-DD' %}selected{% endif %}>YYYY-MM-DD (2026-08-08)</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600;">Default Tax % *</label>
+              <input type="number" step="0.1" name="tax_percentage" class="form-control" value="{{ settings.tax_percentage }}" required placeholder="5.0">
+            </div>
           </div>
         </div>
+
+        <!-- SECTION 3: BILLING & INVOICE -->
+        <div id="sec-billing" class="settings-section-card" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);">
+            <div class="metric-icon icon-emerald" style="width: 40px; height: 40px; font-size: 1.1rem;"><i class="fas fa-receipt"></i></div>
+            <div>
+              <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0;">Billing & Invoice Configuration</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 2px 0 0 0;">Checkout invoice formatting, prefix rules, tax/discount toggles, and paper layout</p>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600;">Invoice Serial Prefix *</label>
+              <input type="text" name="invoice_prefix" class="form-control" value="{{ settings.invoice_prefix }}" required placeholder="INV">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600;">Next Serial Number</label>
+              <input type="number" name="next_invoice_number" class="form-control" value="{{ settings.next_invoice_number }}" placeholder="1001">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600;">Receipt Paper Format</label>
+              <select name="invoice_format" class="form-control">
+                <option value="80mm Thermal Receipt" {% if settings.invoice_format == '80mm Thermal Receipt' %}selected{% endif %}>80mm Thermal Receipt</option>
+                <option value="58mm Mini Thermal" {% if settings.invoice_format == '58mm Mini Thermal' %}selected{% endif %}>58mm Mini Thermal</option>
+                <option value="A4 Standard Document" {% if settings.invoice_format == 'A4 Standard Document' %}selected{% endif %}>A4 Standard Document</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600;">Default POS Payment Mode</label>
+              <select name="default_payment_method" class="form-control">
+                <option value="Cash" {% if settings.default_payment_method == 'Cash' %}selected{% endif %}>Cash</option>
+                <option value="UPI / QR Code" {% if settings.default_payment_method == 'UPI / QR Code' %}selected{% endif %}>UPI / QR Code</option>
+                <option value="Credit / Debit Card" {% if settings.default_payment_method == 'Credit / Debit Card' %}selected{% endif %}>Credit / Debit Card</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600;">Invoice Footer Thank-You Message</label>
+              <input type="text" name="invoice_footer_msg" class="form-control" value="{{ settings.invoice_footer_msg }}" placeholder="Thank you for shopping with us!">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; background: var(--bg-body); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+            <label class="toggle-card" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem;">Enable Tax Calculation</div>
+                <div style="font-size: 0.725rem; color: var(--text-muted);">Compute GST on checkout</div>
+              </div>
+              <input type="checkbox" name="enable_tax" {% if settings.enable_tax %}checked{% endif %} style="width: 18px; height: 18px;">
+            </label>
+
+            <label class="toggle-card" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem;">Item Discounts</div>
+                <div style="font-size: 0.725rem; color: var(--text-muted);">Allow cashier item discounts</div>
+              </div>
+              <input type="checkbox" name="enable_discount" {% if settings.enable_discount %}checked{% endif %} style="width: 18px; height: 18px;">
+            </label>
+
+            <label class="toggle-card" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem;">Print Store Logo</div>
+                <div style="font-size: 0.725rem; color: var(--text-muted);">Include logo on receipts</div>
+              </div>
+              <input type="checkbox" name="print_logo_on_invoice" {% if settings.print_logo_on_invoice %}checked{% endif %} style="width: 18px; height: 18px;">
+            </label>
+          </div>
+        </div>
+
+        <!-- SECTION 4: INVENTORY CONTROLS -->
+        <div id="sec-inventory" class="settings-section-card" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);">
+            <div class="metric-icon icon-amber" style="width: 40px; height: 40px; font-size: 1.1rem;"><i class="fas fa-boxes-stacked"></i></div>
+            <div>
+              <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0;">Inventory Controls & Rules</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 2px 0 0 0;">Stock threshold defaults, SKU auto-generation, and expiry date warnings</p>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600;">Default Low Stock Alert Threshold</label>
+              <input type="number" name="low_stock_threshold" class="form-control" value="{{ settings.low_stock_threshold }}" min="1">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600;">Default Product Unit</label>
+              <select name="default_product_unit" class="form-control">
+                <option value="pcs" {% if settings.default_product_unit == 'pcs' %}selected{% endif %}>pcs (Pieces)</option>
+                <option value="kg" {% if settings.default_product_unit == 'kg' %}selected{% endif %}>kg (Kilograms)</option>
+                <option value="g" {% if settings.default_product_unit == 'g' %}selected{% endif %}>g (Grams)</option>
+                <option value="liter" {% if settings.default_product_unit == 'liter' %}selected{% endif %}>liter (Liters)</option>
+                <option value="pkt" {% if settings.default_product_unit == 'pkt' %}selected{% endif %}>pkt (Packets)</option>
+                <option value="box" {% if settings.default_product_unit == 'box' %}selected{% endif %}>box (Boxes)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; background: var(--bg-body); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+            <label class="toggle-card" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem;">Expiry Date Tracking</div>
+                <div style="font-size: 0.725rem; color: var(--text-muted);">Perishable product alerts</div>
+              </div>
+              <input type="checkbox" name="enable_expiry_tracking" {% if settings.enable_expiry_tracking %}checked{% endif %} style="width: 18px; height: 18px;">
+            </label>
+
+            <label class="toggle-card" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem;">Auto Generate SKU</div>
+                <div style="font-size: 0.725rem; color: var(--text-muted);">Auto code assignment</div>
+              </div>
+              <input type="checkbox" name="auto_generate_sku" {% if settings.auto_generate_sku %}checked{% endif %} style="width: 18px; height: 18px;">
+            </label>
+
+            <label class="toggle-card" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem;">Allow Negative Stock</div>
+                <div style="font-size: 0.725rem; color: var(--text-muted);">Sell when stock is 0</div>
+              </div>
+              <input type="checkbox" name="allow_negative_stock" {% if settings.allow_negative_stock %}checked{% endif %} style="width: 18px; height: 18px;">
+            </label>
+          </div>
+        </div>
+
+        <!-- SECTION 5: SECURITY & AUTH -->
+        <div id="sec-security" class="settings-section-card" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);">
+            <div class="metric-icon icon-rose" style="width: 40px; height: 40px; font-size: 1.1rem;"><i class="fas fa-shield-halved"></i></div>
+            <div>
+              <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0;">Security & Authentication</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 2px 0 0 0;">Admin credentials, session timeouts, and password verification requirements</p>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-weight: 600;">Session Timeout (Minutes)</label>
+              <input type="number" name="session_timeout_mins" class="form-control" value="{{ settings.session_timeout_mins }}" min="5">
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-body); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem;">Require Delete Password Confirm</div>
+                <div style="font-size: 0.725rem; color: var(--text-muted);">Security check for sensitive actions</div>
+              </div>
+              <input type="checkbox" name="require_pwd_confirm_delete" {% if settings.require_pwd_confirm_delete %}checked{% endif %} style="width: 18px; height: 18px;">
+            </div>
+          </div>
+
+          <div style="border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px;">
+            <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 12px;">Change Admin Password</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.8rem;">Current Password</label>
+                <input type="password" name="current_password" class="form-control" placeholder="••••••••">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.8rem;">New Password</label>
+                <input type="password" name="new_password" class="form-control" placeholder="••••••••">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.8rem;">Confirm New Password</label>
+                <input type="password" name="confirm_password" class="form-control" placeholder="••••••••">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 6: NOTIFICATIONS -->
+        <div id="sec-notifications" class="settings-section-card" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);">
+            <div class="metric-icon icon-blue" style="width: 40px; height: 40px; font-size: 1.1rem;"><i class="fas fa-bell"></i></div>
+            <div>
+              <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0;">Notification & Alert Preferences</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 2px 0 0 0;">Manage top navigation bar notification alerts and system warnings</p>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-body); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem;">Low Stock Level Alerts</div>
+                <div style="font-size: 0.725rem; color: var(--text-muted);">Alert when inventory drops below threshold</div>
+              </div>
+              <input type="checkbox" name="notif_low_stock" {% if settings.notif_low_stock %}checked{% endif %} style="width: 18px; height: 18px;">
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-body); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem;">Expiry Date Warnings</div>
+                <div style="font-size: 0.725rem; color: var(--text-muted);">Alert on upcoming perishable expiration</div>
+              </div>
+              <input type="checkbox" name="notif_expiry" {% if settings.notif_expiry %}checked{% endif %} style="width: 18px; height: 18px;">
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-body); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem;">Sales Milestone Notifications</div>
+                <div style="font-size: 0.725rem; color: var(--text-muted);">Daily revenue target achievement alerts</div>
+              </div>
+              <input type="checkbox" name="notif_sales" {% if settings.notif_sales %}checked{% endif %} style="width: 18px; height: 18px;">
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-body); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem;">System Security Warnings</div>
+                <div style="font-size: 0.725rem; color: var(--text-muted);">Failed login and administrative log alerts</div>
+              </div>
+              <input type="checkbox" name="notif_system" {% if settings.notif_system %}checked{% endif %} style="width: 18px; height: 18px;">
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 7: SYSTEM DIAGNOSTICS & BACKUP -->
+        <div id="sec-diagnostics" class="settings-section-card" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);">
+            <div class="metric-icon icon-purple" style="width: 40px; height: 40px; font-size: 1.1rem;"><i class="fas fa-database"></i></div>
+            <div>
+              <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0;">Data & Backup Diagnostics</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 2px 0 0 0;">Live database engine status, connection health, and system backup exports</p>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+            <div style="background: var(--bg-body); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+              <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Database Engine</div>
+              <div style="font-size: 0.95rem; font-weight: 700; color: var(--primary); margin-top: 4px;"><i class="fas fa-database"></i> {{ settings.db_engine }}</div>
+            </div>
+
+            <div style="background: var(--bg-body); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+              <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Connection Status</div>
+              <div style="font-size: 0.95rem; font-weight: 700; color: var(--success); margin-top: 4px;"><i class="fas fa-circle-check"></i> {{ settings.db_status }}</div>
+            </div>
+
+            <div style="background: var(--bg-body); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+              <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Last Backup</div>
+              <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-top: 4px;">{{ settings.last_backup }}</div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-body); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+            <div>
+              <div style="font-weight: 700; font-size: 0.9rem;">Export System Configuration & Data Backup</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Download a structured JSON backup of system settings, store metadata, and catalog counters.</div>
+            </div>
+            <a href="{{ url_for('setting.export_backup') }}" class="btn btn-secondary" style="font-weight: 600; white-space: nowrap;">
+              <i class="fas fa-download"></i> Export Data Backup
+            </a>
+          </div>
+        </div>
+
       </div>
     </div>
-
-    <!-- Bottom Actions Bar -->
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border);">
-      <button type="button" class="btn btn-secondary" onclick="openResetModal()">
-        <i class="fas fa-rotate-left"></i> Reset to Default
-      </button>
-
-      <button type="submit" id="saveSettingsBtn" class="btn btn-primary" style="height: 48px; padding: 0 28px; font-size: 1rem;">
-        <i class="fas fa-floppy-disk"></i> Save Changes
-      </button>
-    </div>
-
   </div>
 </form>
 
 <!-- Reset Confirmation Modal -->
 <div class="modal-backdrop" id="resetModalBackdrop">
-  <div class="modal-card">
+  <div class="modal-card" style="max-width: 480px;">
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
       <div class="metric-icon icon-amber" style="width: 40px; height: 40px; font-size: 1.1rem;">
         <i class="fas fa-triangle-exclamation"></i>
       </div>
       <div>
-        <h3 style="font-size: 1.1rem; font-weight: 700;">Reset System Settings?</h3>
-        <p style="font-size: 0.8rem; color: var(--text-muted);">Are you sure you want to reset all settings to default values?</p>
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0;">Reset Settings to Default?</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 2px 0 0 0;">Revert custom settings back to standard system defaults.</p>
       </div>
     </div>
     <p style="font-size: 0.85rem; color: var(--text-main); margin-bottom: 20px;">
-      This action will restore default store settings, threshold levels, and preferences. Custom values will be reverted.
+      Are you sure you want to proceed? Custom store configurations, invoice prefixes, and alert preferences will be replaced.
     </p>
     <div style="display: flex; justify-content: flex-end; gap: 12px;">
       <button type="button" class="btn btn-secondary" onclick="closeResetModal()">Cancel</button>
       <form method="POST" action="{{ url_for('setting.reset') }}" style="display: inline;">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <button type="submit" class="btn btn-danger"><i class="fas fa-rotate-left"></i> Confirm Reset</button>
+        <button type="submit" class="btn btn-danger"><i class="fas fa-rotate-left"></i> Reset Settings</button>
       </form>
     </div>
   </div>
@@ -321,26 +473,58 @@
 {% endblock %}
 
 {% block extra_js %}
+<style>
+  .settings-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.15s ease;
+  }
+  .settings-nav-item i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+  }
+  .settings-nav-item:hover, .settings-nav-item.active {
+    background: var(--primary-light);
+    color: var(--primary);
+  }
+</style>
+
 <script>
   let isFormDirty = false;
-
   const settingsForm = document.getElementById('settingsForm');
+  const unsavedIndicator = document.getElementById('unsavedIndicator');
+
   if (settingsForm) {
-    settingsForm.addEventListener('change', () => { isFormDirty = true; });
-    settingsForm.addEventListener('input', () => { isFormDirty = true; });
+    function markDirty() {
+      isFormDirty = true;
+      if (unsavedIndicator) unsavedIndicator.style.display = 'inline-flex';
+    }
+
+    settingsForm.addEventListener('change', markDirty);
+    settingsForm.addEventListener('input', markDirty);
+
     settingsForm.addEventListener('submit', () => { 
       isFormDirty = false; 
       window.onbeforeunload = null; 
     });
   }
 
-  window.addEventListener('beforeunload', (e) => {
-    if (isFormDirty) {
-      e.preventDefault();
-      e.returnValue = 'You have unsaved changes! Are you sure you want to leave?';
-      return e.returnValue;
+  function switchSettingsSection(sectionId, element) {
+    document.querySelectorAll('.settings-nav-item').forEach(item => item.classList.remove('active'));
+    if (element) element.classList.add('active');
+    const target = document.getElementById(sectionId);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-  });
+  }
 
   function openResetModal() {
     document.getElementById('resetModalBackdrop').classList.add('show');
@@ -348,42 +532,6 @@
 
   function closeResetModal() {
     document.getElementById('resetModalBackdrop').classList.remove('show');
-  }
-
-  // Theme color radio selection & instant live preview
-  document.querySelectorAll('.theme-option').forEach(option => {
-    option.addEventListener('click', function(e) {
-      document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
-      this.classList.add('active');
-      const radio = this.querySelector('input[type="radio"]');
-      if (radio) {
-        radio.checked = true;
-        document.body.setAttribute('data-color', radio.value);
-        isFormDirty = true;
-      }
-    });
-  });
-
-  // Dark Mode instant live preview
-  const darkSwitch = document.querySelector('input[name="dark_mode"]');
-  if (darkSwitch) {
-    darkSwitch.addEventListener('change', function() {
-      document.body.setAttribute('data-theme', this.checked ? 'dark' : 'light');
-      isFormDirty = true;
-    });
-  }
-
-  // Compact Sidebar instant live preview
-  const compactSwitch = document.querySelector('input[name="compact_sidebar"]');
-  if (compactSwitch) {
-    compactSwitch.addEventListener('change', function() {
-      const sidebar = document.querySelector('.app-sidebar');
-      if (sidebar) {
-        if (this.checked) sidebar.classList.add('compact');
-        else sidebar.classList.remove('compact');
-      }
-      isFormDirty = true;
-    });
   }
 </script>
 {% endblock %}

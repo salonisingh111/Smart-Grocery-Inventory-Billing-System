@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from app.database import db
 from app.models.category import Category
 from app.validators.forms import CategoryForm
 from app.services.auth_service import verify_sensitive_password
+from app.utils.logger import log_activity
+from app.utils.notifications import create_activity_notification
 
 category_bp = Blueprint('category', __name__, url_prefix='/categories')
 
@@ -27,6 +29,8 @@ def index():
             )
             db.session.add(category)
             db.session.commit()
+            log_activity('Add Category', f'Category "{category.name}" (Code: {category.code}) created')
+            create_activity_notification('Add Category', f'Category "{category.name}" (Code: {category.code}) created', created_by=current_user.full_name)
             flash(f"Category '{category.name}' created successfully!", 'success')
             return redirect(url_for('category.index'))
 
@@ -55,7 +59,8 @@ def edit(id):
     category.description = description
     category.status = status
     db.session.commit()
-
+    log_activity('Edit Category', f'Category "{category.name}" updated')
+    create_activity_notification('Edit Category', f'Category "{category.name}" updated', created_by=current_user.full_name)
     flash(f"Category '{category.name}' updated successfully.", 'success')
     return redirect(url_for('category.index'))
 
@@ -77,6 +82,7 @@ def delete(id):
     cat_name = category.name
     db.session.delete(category)
     db.session.commit()
-
+    log_activity('Delete Category', f'Category "{cat_name}" deleted')
+    create_activity_notification('Delete Category', f'Category "{cat_name}" deleted', created_by=current_user.full_name)
     flash(f"Category '{cat_name}' deleted successfully.", 'info')
     return redirect(url_for('category.index'))

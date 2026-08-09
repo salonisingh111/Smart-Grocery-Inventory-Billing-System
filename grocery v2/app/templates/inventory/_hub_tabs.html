@@ -1,0 +1,21 @@
+<div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; align-items: center;">
+  <a href="{{ url_for('product.index') }}" 
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if request.endpoint and 'product.' in request.endpoint %}background: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-boxes-stacked"></i> Products Catalog
+  </a>
+
+  <a href="{{ url_for('category.index') }}" 
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if request.endpoint and 'category.' in request.endpoint %}background: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-tags"></i> Product Categories
+  </a>
+
+  <a href="{{ url_for('supplier.index') }}" 
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if request.endpoint and 'supplier.' in request.endpoint %}background: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-truck-field"></i> Suppliers Directory
+  </a>
+
+  <a href="{{ url_for('inventory.index') }}" 
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if request.endpoint and 'inventory.' in request.endpoint %}background: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-arrows-rotate"></i> Stock Adjustments & Audit Logs
+  </a>
+</div>

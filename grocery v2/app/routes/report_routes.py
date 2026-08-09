@@ -11,7 +11,7 @@ report_bp = Blueprint('report', __name__, url_prefix='/reports')
 @report_bp.route('/')
 @login_required
 def index():
-    report_type = request.args.get('type', 'sales', type=str)
+    report_type = request.args.get('type', 'inventory', type=str)
     start_date = request.args.get('start_date', '', type=str)
     end_date = request.args.get('end_date', '', type=str)
 

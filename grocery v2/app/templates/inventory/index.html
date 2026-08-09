@@ -10,17 +10,7 @@
 </div>
 
 <!-- In-Page Inventory Management Navigation Tabs -->
-<div class="inpage-nav-tabs">
-  <a href="{{ url_for('product.index') }}" class="inpage-tab">
-    <i class="fas fa-boxes-stacked"></i> Products Catalog
-  </a>
-  <a href="{{ url_for('category.index') }}" class="inpage-tab">
-    <i class="fas fa-tags"></i> Categories
-  </a>
-  <a href="{{ url_for('inventory.index') }}" class="inpage-tab active">
-    <i class="fas fa-arrows-rotate"></i> Stock Adjustments & Logs
-  </a>
-</div>
+{% include "inventory/_hub_tabs.html" %}
 
 <div style="display: flex; flex-direction: column; gap: 24px;">
   <!-- Manual Stock Adjustment Form (Horizontal Top Card) -->

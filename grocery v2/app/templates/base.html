@@ -42,7 +42,7 @@
       <a href="{{ url_for('product.index') }}" class="nav-link {% if request.endpoint and ('product.' in request.endpoint or 'category.' in request.endpoint or 'inventory.' in request.endpoint) %}active{% endif %}">
         <i class="fas fa-boxes-stacked"></i> <span>Inventory Hub</span>
       </a>
-      <a href="{{ url_for('billing.pos') }}" class="nav-link {% if request.endpoint and 'billing.' in request.endpoint %}active{% endif %}">
+      <a href="{{ url_for('billing.billing_dashboard') }}" class="nav-link {% if request.endpoint and 'billing.' in request.endpoint %}active{% endif %}">
         <i class="fas fa-file-invoice-dollar"></i> <span>Billing & Sales</span>
       </a>
       <a href="{{ url_for('report.index') }}" class="nav-link {% if request.endpoint and 'report.' in request.endpoint %}active{% endif %}">
@@ -51,7 +51,7 @@
       <a href="{{ url_for('setting.index') }}" class="nav-link {% if request.endpoint and 'setting.' in request.endpoint %}active{% endif %}">
         <i class="fas fa-sliders"></i> <span>Settings</span>
       </a>
-      <a href="{{ url_for('auth.logout') }}" class="nav-link text-danger" style="margin-top: auto;">
+      <a href="#" onclick="openLogoutModal(); return false;" class="nav-link text-danger" style="margin-top: auto;">
         <i class="fas fa-right-from-bracket"></i> <span>Logout</span>
       </a>
     </nav>
@@ -68,6 +68,98 @@
         <div style="font-weight: 600; color: var(--text-muted);">{{ store_name }}</div>
       </div>
       <div class="navbar-right">
+        <!-- Notification Bell -->
+        <div class="notif-bell-wrapper" id="notifBellWrapper">
+          <button class="notif-bell-btn" id="notifBellBtn" onclick="toggleNotifPanel(event)" title="Notifications">
+            <i class="fas fa-bell"></i>
+            {% if nav_notif_count > 0 %}
+              <span class="notif-badge">{{ nav_notif_count if nav_notif_count < 99 else '99+' }}</span>
+            {% endif %}
+          </button>
+
+          <!-- Notification Dropdown Panel -->
+          <div class="notif-panel" id="notifPanel">
+            <div class="notif-panel-header">
+              <span><i class="fas fa-bell" style="color: var(--primary);"></i> Notifications</span>
+              <button class="notif-clear-all-btn" onclick="clearAllNotifs()" title="Clear all notifications">
+                <i class="fas fa-trash-can"></i> Clear All
+              </button>
+            </div>
+
+            <!-- Tabs -->
+            <div class="notif-tabs" id="notifTabs">
+              {% set alert_count = nav_notifications | selectattr('type', 'in', ['warning', 'danger']) | list | length %}
+              <button class="notif-tab active" id="tabAlerts" onclick="switchNotifTab('alerts')">
+                <i class="fas fa-triangle-exclamation"></i> Alerts
+                {% if alert_count > 0 %}<span class="notif-tab-badge">{{ alert_count }}</span>{% endif %}
+              </button>
+              <button class="notif-tab" id="tabActivity" onclick="switchNotifTab('activity')">
+                <i class="fas fa-clock-rotate-left"></i> Activity
+                {% if nav_activity %}<span class="notif-tab-badge notif-tab-badge-info">{{ nav_activity | length }}</span>{% endif %}
+              </button>
+            </div>
+
+            <!-- Alerts Tab Body -->
+            <div class="notif-panel-body" id="notifBodyAlerts">
+              {% if nav_notifications %}
+                {% for notif in nav_notifications %}
+                  <div class="notif-item notif-item-{{ notif.type }}" data-id="{{ notif.id }}">
+                    <a href="{{ notif.link }}" class="notif-item-link" onclick="closeNotifPanel()">
+                      <div class="notif-item-icon notif-icon-{{ notif.type }}">
+                        <i class="fas {{ notif.icon }}"></i>
+                      </div>
+                      <div class="notif-item-content">
+                        <div class="notif-item-title">{{ notif.title }}</div>
+                        <div class="notif-item-msg">{{ notif.message }}</div>
+                      </div>
+                    </a>
+                    <button class="notif-delete-btn" onclick="deleteNotifItem(this)" title="Dismiss">
+                      <i class="fas fa-xmark"></i>
+                    </button>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="notif-empty-state">
+                  <i class="fas fa-circle-check" style="color: var(--success); opacity: 1;"></i>
+                  <div>No alerts right now. Store is running smoothly.</div>
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Activity Tab Body -->
+            <div class="notif-panel-body" id="notifBodyActivity" style="display:none;">
+              {% if nav_activity %}
+                {% for act in nav_activity %}
+                  <div class="notif-item notif-item-{{ act.type }}" data-id="{{ act.id }}">
+                    <a href="{{ act.link }}" class="notif-item-link" onclick="closeNotifPanel()">
+                      <div class="notif-item-icon notif-icon-{{ act.type }}">
+                        <i class="fas {{ act.icon }}"></i>
+                      </div>
+                      <div class="notif-item-content">
+                        <div class="notif-item-title">{{ act.action }}</div>
+                        <div class="notif-item-msg" title="{{ act.details }}">{{ act.details[:55] }}{% if act.details|length > 55 %}…{% endif %}</div>
+                        <div class="notif-item-meta">
+                          <i class="fas fa-user" style="font-size:0.65rem;"></i> {{ act.user }}
+                          &nbsp;·&nbsp;
+                          <i class="fas fa-clock" style="font-size:0.65rem;"></i> {{ act.time }}
+                        </div>
+                      </div>
+                    </a>
+                    <button class="notif-delete-btn" onclick="deleteNotifItem(this)" title="Dismiss">
+                      <i class="fas fa-xmark"></i>
+                    </button>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="notif-empty-state">
+                  <i class="fas fa-inbox"></i> No recent activity yet
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+
         <a href="{{ url_for('profile.index') }}" class="user-profile-btn">
           <div class="avatar">
             {% if current_user.profile_image %}
@@ -80,9 +172,6 @@
             <div style="font-weight: 600; font-size: 0.9rem;">{{ current_user.full_name }}</div>
             <div style="font-size: 0.75rem; color: var(--text-muted);">{{ current_user.role }}</div>
           </div>
-        </a>
-        <a href="{{ url_for('auth.logout') }}" class="btn btn-sm btn-secondary" title="Logout">
-          <i class="fas fa-sign-out-alt"></i>
         </a>
       </div>
     </header>
@@ -141,6 +230,27 @@
     <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
       <button class="btn btn-secondary" id="modalConfirmCancelBtn">Cancel</button>
       <button class="btn btn-danger" id="modalConfirmSubmitBtn"><i class="fas fa-shield-halved"></i> Confirm & Proceed</button>
+    </div>
+  </div>
+</div>
+
+<!-- Logout Confirmation Modal -->
+<div class="modal-backdrop" id="logoutModalBackdrop" style="z-index: 10000;">
+  <div class="modal-card" style="max-width: 420px; text-align: center;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 20px;">
+      <div class="metric-icon icon-red" style="width: 56px; height: 56px; font-size: 1.4rem;">
+        <i class="fas fa-right-from-bracket"></i>
+      </div>
+      <div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0 0 6px 0;">Sign Out of Smart Billing?</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">You will be returned to the login screen. Any unsaved changes will be lost.</p>
+      </div>
+    </div>
+    <div style="display: flex; justify-content: center; gap: 12px;">
+      <button class="btn btn-secondary" onclick="closeLogoutModal()" style="min-width: 110px;">Cancel</button>
+      <a href="{{ url_for('auth.logout') }}" class="btn btn-danger" style="min-width: 110px;">
+        <i class="fas fa-right-from-bracket"></i> Sign Out
+      </a>
     </div>
   </div>
 </div>

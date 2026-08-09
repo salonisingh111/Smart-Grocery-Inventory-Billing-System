@@ -5,6 +5,7 @@ from app.database import db
 from app.validators.forms import UserForm
 from app.middleware.auth_middleware import admin_required
 from app.services.auth_service import verify_sensitive_password
+from app.utils.logger import log_activity
 
 user_bp = Blueprint('user', __name__, url_prefix='/users')
 
@@ -49,6 +50,8 @@ def create():
         user.set_password(pwd)
         db.session.add(user)
         db.session.commit()
+
+        log_activity('Create User', f'Created user account "{user.full_name}" (Role: {user.role})')
         flash(f'User "{user.full_name}" created successfully.', 'success')
     else:
         for field, errors in form.errors.items():
@@ -79,6 +82,7 @@ def edit(user_id):
         user.set_password(new_password)
 
     db.session.commit()
+    log_activity('Update User', f'Updated user account details for "{user.full_name}"')
     flash(f'User "{user.full_name}" updated successfully.', 'success')
     return redirect(url_for('user.index'))
 
@@ -93,6 +97,7 @@ def toggle_status(user_id):
     user = User.query.get_or_404(user_id)
     user.status = 'Inactive' if user.status == 'Active' else 'Active'
     db.session.commit()
+    log_activity('Toggle User Status', f'Changed status for user "{user.full_name}" to {user.status}')
     flash(f'Status for user "{user.full_name}" changed to {user.status}.', 'success')
     return redirect(url_for('user.index'))
 
@@ -113,5 +118,6 @@ def delete(user_id):
     name = user.full_name
     db.session.delete(user)
     db.session.commit()
+    log_activity('Delete User', f'Deleted user account "{name}" (ID: {user_id})')
     flash(f'User "{name}" deleted successfully.', 'success')
     return redirect(url_for('user.index'))

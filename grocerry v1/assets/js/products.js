@@ -541,7 +541,7 @@ function showUndoToast(message) {
         toast.classList.remove('show');
         setTimeout(() => toast.remove(), 300);
         deletedProductData = null;
-    }, 5000);
+    }, 3000);
 
     const undoBtn = toast.querySelector('#undoDeleteBtn');
     undoBtn.addEventListener('click', () => {

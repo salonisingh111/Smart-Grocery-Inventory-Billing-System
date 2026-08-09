@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+{% block title %}Billing & Sales History{% endblock %}
+
+{% block content %}
+<div style="padding: 24px 0;">
+  <!-- Header -->
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-clock-rotate-left" style="color: var(--primary);"></i> Billing History & Audit
+      </h1>
+      <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 4px;">Complete register of generated sales receipts, customer orders, and status filters</p>
+    </div>
+    <div>
+      <a href="{{ url_for('billing.pos') }}" class="btn btn-primary" style="height: 42px; display: inline-flex; align-items: center; gap: 6px;">
+        <i class="fas fa-plus"></i> New Bill
+      </a>
+    </div>
+  </div>
+
+  <!-- Sub-Modules Pill Navigation Tabs -->
+  {% include "billing/_nav_tabs.html" %}
+
+  <!-- Filters & Search Bar -->
+  <div class="card-table" style="padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+    <form method="GET" action="{{ url_for('billing.billing_history') }}" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+      <div style="flex: 1.5; min-width: 220px;">
+        <input type="text" name="search" class="form-control" placeholder="Search by Bill #, Customer name or phone..." value="{{ search }}">
+      </div>
+
+      <div style="width: 150px;">
+        <select name="payment_method" class="form-control" onchange="this.form.submit()">
+          <option value="">All Payment Modes</option>
+          <option value="Cash" {% if payment_filter == 'Cash' %}selected{% endif %}>Cash</option>
+          <option value="UPI" {% if payment_filter == 'UPI' %}selected{% endif %}>UPI / QR</option>
+          <option value="Card" {% if payment_filter == 'Card' %}selected{% endif %}>Card</option>
+        </select>
+      </div>
+
+      <div style="width: 160px;">
+        <select name="status" class="form-control" onchange="this.form.submit()">
+          <option value="">All Statuses</option>
+          <option value="Paid" {% if status_filter == 'Paid' %}selected{% endif %}>Paid</option>
+          <option value="Partially Returned" {% if status_filter == 'Partially Returned' %}selected{% endif %}>Partially Returned</option>
+          <option value="Returned" {% if status_filter == 'Returned' %}selected{% endif %}>Returned</option>
+          <option value="Cancelled" {% if status_filter == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+        </select>
+      </div>
+
+      <div style="width: 140px;">
+        <input type="date" name="start_date" class="form-control" value="{{ start_date }}" placeholder="Start Date">
+      </div>
+
+      <div style="width: 140px;">
+        <input type="date" name="end_date" class="form-control" value="{{ end_date }}" placeholder="End Date">
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="height: 42px; display: inline-flex; align-items: center; gap: 6px;">
+        <i class="fas fa-filter"></i> Apply
+      </button>
+
+      {% if search or payment_filter or status_filter or start_date or end_date %}
+        <a href="{{ url_for('billing.billing_history') }}" class="btn btn-secondary" style="height: 42px; display: inline-flex; align-items: center; gap: 6px;">
+          <i class="fas fa-xmark"></i> Clear
+        </a>
+      {% endif %}
+    </form>
+  </div>
+
+  <!-- Bills Datatable -->
+  <div class="card-table table-scroll-container" style="border-radius: 12px; padding: 0;">
+    <table class="custom-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+      <thead>
+        <tr style="border-bottom: 2px solid var(--border); color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">
+          <th style="padding: 12px; position: sticky; top: 0; background: var(--surface); z-index: 10;">Bill Number</th>
+            <th style="padding: 12px;">Date & Time</th>
+            <th style="padding: 12px;">Customer</th>
+            <th style="padding: 12px; text-align: center;">Items</th>
+            <th style="padding: 12px; text-align: right;">Total Amount</th>
+            <th style="padding: 12px; text-align: center;">Payment</th>
+            <th style="padding: 12px; text-align: center;">Status</th>
+            <th style="padding: 12px; text-align: right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in bills %}
+            <tr style="border-bottom: 1px solid var(--border); transition: background 150ms;">
+              <td style="padding: 14px 12px; font-weight: 700; color: var(--primary);">
+                {{ b.bill_number }}
+              </td>
+              <td style="padding: 14px 12px; color: var(--text-muted); font-size: 0.85rem; white-space: nowrap;">
+                <i class="far fa-clock" style="margin-right: 4px;"></i> {{ b.created_at.strftime('%Y-%m-%d %H:%M') if b.created_at else '' }}
+              </td>
+              <td style="padding: 14px 12px;">
+                <strong style="color: var(--text-main);">{{ b.customer.name if b.customer else 'Walk-in Customer' }}</strong>
+                {% if b.customer and b.customer.phone %}
+                  <div style="font-size: 0.78rem; color: var(--text-muted);">{{ b.customer.phone }}</div>
+                {% endif %}
+              </td>
+              <td style="padding: 14px 12px; text-align: center;">
+                <span class="badge badge-secondary">{{ b.items|length }}</span>
+              </td>
+              <td style="padding: 14px 12px; text-align: right; font-weight: 800; color: var(--text-main);">
+                {{ currency }}{{ "%.2f"|format(b.net_amount) }}
+              </td>
+              <td style="padding: 14px 12px; text-align: center;">
+                {% if b.payment_method == 'Cash' %}
+                  <span class="badge badge-success"><i class="fas fa-money-bill-wave"></i> Cash</span>
+                {% elif b.payment_method == 'UPI' %}
+                  <span class="badge badge-primary"><i class="fas fa-qrcode"></i> UPI</span>
+                {% else %}
+                  <span class="badge badge-info"><i class="fas fa-credit-card"></i> Card</span>
+                {% endif %}
+              </td>
+              <td style="padding: 14px 12px; text-align: center;">
+                {% if b.status == 'Paid' %}
+                  <span class="badge badge-success">Paid</span>
+                {% elif b.status == 'Partially Returned' %}
+                  <span class="badge badge-warning">Partial Return</span>
+                {% elif b.status == 'Returned' %}
+                  <span class="badge badge-danger">Returned</span>
+                {% else %}
+                  <span class="badge badge-secondary">Cancelled</span>
+                {% endif %}
+              </td>
+              <td style="padding: 14px 12px; text-align: right;">
+                <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                  <button class="btn btn-sm btn-secondary" title="View Quick Details" onclick="viewBillModal({{ b.id }})">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <a href="{{ url_for('billing.view_invoice', id=b.id) }}" target="_blank" class="btn btn-sm btn-secondary" title="Print Invoice">
+                    <i class="fas fa-print"></i>
+                  </a>
+                  {% if b.status != 'Cancelled' and b.status != 'Returned' %}
+                    <a href="{{ url_for('billing.returns_and_refunds', bill_number=b.bill_number) }}" class="btn btn-sm btn-warning" title="Initiate Return">
+                      <i class="fas fa-rotate-left"></i> Return
+                    </a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="8" style="text-align: center; padding: 48px; color: var(--text-muted);">
+                <i class="fas fa-receipt" style="font-size: 2.5rem; margin-bottom: 12px; opacity: 0.4; display: block;"></i>
+                No billing history records match your search criteria.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if pagination and pagination.pages > 1 %}
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);">
+        <span style="font-size: 0.875rem; color: var(--text-muted);">
+          Page {{ pagination.page }} of {{ pagination.pages }} (Total {{ pagination.total }} bills)
+        </span>
+        <div style="display: flex; gap: 8px;">
+          {% if pagination.has_prev %}
+            <a href="{{ url_for('billing.billing_history', page=pagination.prev_num, search=search, payment_method=payment_filter, status=status_filter, start_date=start_date, end_date=end_date) }}" class="btn btn-secondary btn-sm">
+              <i class="fas fa-chevron-left"></i> Previous
+            </a>
+          {% endif %}
+          {% if pagination.has_next %}
+            <a href="{{ url_for('billing.billing_history', page=pagination.next_num, search=search, payment_method=payment_filter, status=status_filter, start_date=start_date, end_date=end_date) }}" class="btn btn-secondary btn-sm">
+              Next <i class="fas fa-chevron-right"></i>
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- View Bill Invoice Modal -->
+<div class="modal-backdrop" id="viewBillModal">
+  <div class="modal-card" style="max-width: 640px; padding: 28px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+      <h3 style="font-size: 1.2rem; font-weight: 700;" id="modalBillTitle">Bill Invoice Details</h3>
+      <button class="sidebar-toggle" onclick="document.getElementById('viewBillModal').classList.remove('show')"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <div id="modalBillContent" style="max-height: 420px; overflow-y: auto; font-size: 0.9rem;">
+      <div class="text-center p-4">Loading invoice details...</div>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px;">
+      <button type="button" class="btn btn-secondary" onclick="document.getElementById('viewBillModal').classList.remove('show')">Close</button>
+      <a id="modalPrintLink" href="#" target="_blank" class="btn btn-primary"><i class="fas fa-print"></i> Print Full Receipt</a>
+    </div>
+  </div>
+</div>
+
+<script>
+async function viewBillModal(billId) {
+  const modal = document.getElementById('viewBillModal');
+  const content = document.getElementById('modalBillContent');
+  const title = document.getElementById('modalBillTitle');
+  const printLink = document.getElementById('modalPrintLink');
+
+  content.innerHTML = '<div class="text-center p-4 text-muted"><i class="fas fa-spinner fa-spin"></i> Fetching invoice details...</div>';
+  printLink.href = `/billing/invoice/${billId}`;
+  modal.classList.add('show');
+
+  try {
+    const res = await fetch(`/billing/api/bill-details/${billId}`);
+    const data = await res.json();
+
+    title.textContent = `Invoice #${data.bill_number}`;
+
+    let itemsRows = data.items.map(item => `
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 8px 0;"><strong>${item.product_name}</strong></td>
+        <td style="padding: 8px; text-align: center;">${item.quantity}</td>
+        <td style="padding: 8px; text-align: right;">{{ currency }}${item.unit_price.toFixed(2)}</td>
+        <td style="padding: 8px 0; text-align: right; font-weight: 700;">{{ currency }}${item.total_price.toFixed(2)}</td>
+      </tr>
+    `).join('');
+
+    content.innerHTML = `
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; font-size: 0.85rem; background: var(--bg-body); padding: 12px; border-radius: 8px;">
+        <div><strong>Customer:</strong> ${data.customer_name}</div>
+        <div><strong>Phone:</strong> ${data.customer_phone || '-'}</div>
+        <div><strong>Biller:</strong> ${data.biller_name}</div>
+        <div><strong>Payment:</strong> ${data.payment_method}</div>
+      </div>
+
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border); font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">
+            <th style="text-align: left; padding-bottom: 6px;">Item</th>
+            <th style="text-align: center; padding-bottom: 6px;">Qty</th>
+            <th style="text-align: right; padding-bottom: 6px;">Price</th>
+            <th style="text-align: right; padding-bottom: 6px;">Total</th>
+          </tr>
+        </thead>
+        <tbody>${itemsRows}</tbody>
+      </table>
+
+      <div style="border-top: 1px dashed var(--border); padding-top: 10px; font-size: 0.9rem;">
+        <div style="display:flex; justify-content:space-between;"><span>Subtotal:</span> <span>{{ currency }}${data.total_amount.toFixed(2)}</span></div>
+        <div style="display:flex; justify-content:space-between;"><span>Tax:</span> <span>{{ currency }}${data.tax_amount.toFixed(2)}</span></div>
+        <div style="display:flex; justify-content:space-between;"><span>Discount:</span> <span>-{{ currency }}${data.discount_amount.toFixed(2)}</span></div>
+        <hr style="margin: 6px 0;">
+        <div style="display:flex; justify-content:space-between; font-weight: 800; font-size: 1.1rem; color: var(--primary);">
+          <span>Grand Total:</span> <span>{{ currency }}${data.net_amount.toFixed(2)}</span>
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    content.innerHTML = '<div class="text-center p-4 text-danger">Failed to load invoice details.</div>';
+  }
+}
+</script>
+{% endblock %}

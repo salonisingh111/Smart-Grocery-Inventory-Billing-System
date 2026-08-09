@@ -1,0 +1,31 @@
+<div class="billing-pill-tabs" style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; align-items: center;">
+  <a href="{{ url_for('billing.billing_dashboard') }}" 
+     class="pill-tab-btn {% if request.endpoint == 'billing.billing_dashboard' %}active{% endif %}"
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if request.endpoint == 'billing.billing_dashboard' %}background: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-chart-pie"></i> Billing Dashboard
+  </a>
+
+  <a href="{{ url_for('billing.pos') }}" 
+     class="pill-tab-btn {% if request.endpoint == 'billing.pos' %}active{% endif %}"
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if request.endpoint == 'billing.pos' %}background: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-cash-register"></i> Create Bill
+  </a>
+
+  <a href="{{ url_for('billing.billing_history') }}" 
+     class="pill-tab-btn {% if request.endpoint == 'billing.billing_history' %}active{% endif %}"
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if request.endpoint == 'billing.billing_history' %}background: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-clock-rotate-left"></i> Billing History
+  </a>
+
+  <a href="{{ url_for('billing.returns_and_refunds') }}" 
+     class="pill-tab-btn {% if request.endpoint == 'billing.returns_and_refunds' %}active{% endif %}"
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if request.endpoint == 'billing.returns_and_refunds' %}background: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-rotate-left"></i> Returns & Refunds
+  </a>
+
+  <a href="{{ url_for('billing.sales_reports') }}" 
+     class="pill-tab-btn {% if request.endpoint == 'billing.sales_reports' %}active{% endif %}"
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if request.endpoint == 'billing.sales_reports' %}background: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-chart-line"></i> Sales Reports
+  </a>
+</div>

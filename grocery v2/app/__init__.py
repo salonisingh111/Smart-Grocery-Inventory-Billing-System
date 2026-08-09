@@ -31,7 +31,9 @@ def create_app(config_class=Config):
     @app.context_processor
     def inject_global_settings():
         from app.models.setting import SystemSetting
-        return {
+        from flask_login import current_user
+
+        base_ctx = {
             'dark_mode': SystemSetting.get_bool('DARK_MODE', False),
             'theme_color': SystemSetting.get('THEME_COLOR', 'blue'),
             'compact_sidebar': SystemSetting.get_bool('COMPACT_SIDEBAR', False),
@@ -51,10 +53,64 @@ def create_app(config_class=Config):
             'require_pwd_confirm_delete': SystemSetting.get_bool('REQUIRE_PWD_CONFIRM_DELETE', True),
             'notif_low_stock': SystemSetting.get_bool('NOTIF_LOW_STOCK', True),
             'notif_expiry': SystemSetting.get_bool('NOTIF_EXPIRY', True),
-            'currency_symbol': SystemSetting.get('CURRENCY', '₹')
+            'currency_symbol': SystemSetting.get('CURRENCY', '₹'),
+            'nav_notifications': [],
+            'nav_notif_count': 0,
+            'nav_activity': []
         }
 
+        # ── Read navbar notifications from DB (fast, single query) ──────────
+        try:
+            if current_user.is_authenticated:
+                from app.models.notification import UserNotification
+
+                all_notifs = (
+                    UserNotification.query
+                    .filter_by(is_dismissed=False)
+                    .order_by(UserNotification.created_at.desc())
+                    .all()
+                )
+
+                raw_alerts   = [n for n in all_notifs if n.notif_type == 'alert']
+                raw_activity = [n for n in all_notifs if n.notif_type == 'activity']
+
+                # Alerts tab
+                nav_notifications = []
+                TYPE_MAP = {'low_stock': 'warning', 'out_of_stock': 'danger', 'expired': 'danger'}
+                for n in raw_alerts:
+                    nav_notifications.append({
+                        'id':      n.id,
+                        'type':    TYPE_MAP.get(n.source_type, 'warning'),
+                        'icon':    n.icon,
+                        'title':   n.title,
+                        'message': n.message,
+                        'link':    n.link,
+                    })
+
+                # Activity tab
+                nav_activity = []
+                for n in raw_activity[:15]:
+                    nav_activity.append({
+                        'id':      n.id,
+                        'icon':    n.icon,
+                        'type':    'info',
+                        'action':  n.title,
+                        'details': n.message or '',
+                        'user':    n.created_by or 'System',
+                        'time':    n.created_at.strftime('%d %b, %I:%M %p') if n.created_at else '',
+                        'link':    n.link or '/activity-logs/',
+                    })
+
+                base_ctx['nav_notifications'] = nav_notifications
+                base_ctx['nav_activity']      = nav_activity
+                base_ctx['nav_notif_count']   = len(raw_alerts) + len(raw_activity)
+        except Exception:
+            pass
+
+        return base_ctx
+
     # Register Blueprints
+    from app.routes.notification_routes import notif_bp
     from app.routes.auth_routes import auth_bp
     from app.routes.dashboard_routes import dashboard_bp
     from app.routes.product_routes import product_bp
@@ -68,6 +124,7 @@ def create_app(config_class=Config):
     from app.routes.profile_routes import profile_bp
     from app.routes.user_routes import user_bp
 
+    app.register_blueprint(notif_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(product_bp)

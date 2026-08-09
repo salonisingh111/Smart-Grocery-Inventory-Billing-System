@@ -1,14 +1,38 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from datetime import datetime, timedelta
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, Response
 from flask_login import login_required, current_user
-from app.models.bill import Bill
+from sqlalchemy import func
+from app.database import db
+from app.models.bill import Bill, BillItem, BillReturn
 from app.models.product import Product
 from app.models.customer import Customer
 from app.models.setting import SystemSetting
 from app.services.billing_service import BillingService
 from app.services.auth_service import verify_sensitive_password
+from app.utils.logger import log_activity
+from app.utils.notifications import create_activity_notification, sync_stock_alerts_for_product
+import csv
+import io
 
 billing_bp = Blueprint('billing', __name__, url_prefix='/billing')
 
+# ==========================================
+# 1. BILLING DASHBOARD
+# ==========================================
+@billing_bp.route('/dashboard')
+@login_required
+def billing_dashboard():
+    stats = BillingService.get_billing_dashboard_stats()
+    currency = SystemSetting.get('CURRENCY', '₹')
+    return render_template(
+        'billing/dashboard.html',
+        stats=stats,
+        currency=currency
+    )
+
+# ==========================================
+# 2. CREATE BILL (POS TERMINAL)
+# ==========================================
 @billing_bp.route('/pos')
 @login_required
 def pos():
@@ -30,16 +54,44 @@ def pos():
 def search_products():
     query_str = request.args.get('q', '', type=str)
     if not query_str:
-        products = Product.query.filter_by(status='Active').limit(20).all()
+        products = Product.query.filter_by(status='Active').limit(24).all()
     else:
         products = Product.query.filter(
             Product.status == 'Active',
-            (Product.name.like(f"%{query_str}%")) |
+            (Product.name.ilike(f"%{query_str}%")) |
             (Product.barcode == query_str) |
             (Product.sku == query_str)
         ).all()
         
     return jsonify([p.to_dict() for p in products])
+
+@billing_bp.route('/api/quick-create-customer', methods=['POST'])
+@login_required
+def quick_create_customer():
+    data = request.get_json() or {}
+    name = data.get('name', '').strip()
+    phone = data.get('phone', '').strip()
+    email = data.get('email', '').strip()
+    address = data.get('address', '').strip()
+
+    if not name or not phone:
+        return jsonify({'success': False, 'message': 'Customer Name and Phone are required.'}), 400
+
+    existing = Customer.query.filter_by(phone=phone).first()
+    if existing:
+        return jsonify({'success': True, 'customer': existing.to_dict(), 'message': 'Existing customer selected.'})
+
+    customer = Customer(
+        name=name,
+        phone=phone,
+        email=email,
+        address=address,
+        status='Active'
+    )
+    db.session.add(customer)
+    db.session.commit()
+
+    return jsonify({'success': True, 'customer': customer.to_dict(), 'message': 'Customer added successfully.'})
 
 @billing_bp.route('/api/checkout', methods=['POST'])
 @login_required
@@ -63,6 +115,13 @@ def checkout():
     if not success:
         return jsonify({'success': False, 'message': msg}), 400
 
+    log_activity('New Bill', f'Bill #{bill.bill_number} created — Amount: ₹{bill.total_amount:.2f} via {bill.payment_method}')
+    create_activity_notification('New Bill', f'Bill #{bill.bill_number} created — ₹{bill.total_amount:.2f} via {bill.payment_method}', source_id=bill.id, created_by=current_user.full_name, link=f'/billing/invoice/{bill.id}')
+    # Re-sync stock alerts for all bill items (stock was deducted)
+    for item_data in items:
+        pid = item_data.get('product_id')
+        if pid:
+            sync_stock_alerts_for_product(pid)
     return jsonify({
         'success': True,
         'message': msg,
@@ -90,6 +149,293 @@ def view_invoice(id):
         currency=currency
     )
 
+@billing_bp.route('/api/bill-details/<int:id>')
+@login_required
+def api_bill_details(id):
+    bill = Bill.query.get_or_404(id)
+    data = bill.to_dict()
+    data['items'] = [item.to_dict() for item in bill.items]
+    return jsonify(data)
+
+# ==========================================
+# 3. BILLING HISTORY
+# ==========================================
+@billing_bp.route('/history')
+@login_required
+def billing_history():
+    search = request.args.get('search', '').strip()
+    payment_filter = request.args.get('payment_method', '').strip()
+    status_filter = request.args.get('status', '').strip()
+    start_date = request.args.get('start_date', '').strip()
+    end_date = request.args.get('end_date', '').strip()
+    page = request.args.get('page', 1, type=int)
+
+    query = Bill.query
+
+    if search:
+        query = query.outerjoin(Customer).filter(
+            (Bill.bill_number.ilike(f"%{search}%")) |
+            (Customer.name.ilike(f"%{search}%")) |
+            (Customer.phone.ilike(f"%{search}%"))
+        )
+
+    if payment_filter:
+        query = query.filter(Bill.payment_method == payment_filter)
+
+    if status_filter:
+        query = query.filter(Bill.status == status_filter)
+
+    if start_date:
+        try:
+            s_dt = datetime.strptime(start_date, '%Y-%m-%d')
+            query = query.filter(Bill.created_at >= s_dt)
+        except ValueError:
+            pass
+
+    if end_date:
+        try:
+            e_dt = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
+            query = query.filter(Bill.created_at < e_dt)
+        except ValueError:
+            pass
+
+    pagination = query.order_by(Bill.created_at.desc()).paginate(page=page, per_page=15, error_out=False)
+    bills = pagination.items
+    currency = SystemSetting.get('CURRENCY', '₹')
+
+    return render_template(
+        'billing/history.html',
+        bills=bills,
+        pagination=pagination,
+        search=search,
+        payment_filter=payment_filter,
+        status_filter=status_filter,
+        start_date=start_date,
+        end_date=end_date,
+        currency=currency
+    )
+
+# ==========================================
+# 4. RETURNS & REFUNDS
+# ==========================================
+@billing_bp.route('/returns')
+@login_required
+def returns_and_refunds():
+    bill_number = request.args.get('bill_number', '').strip()
+    target_bill = None
+    if bill_number:
+        target_bill = Bill.query.filter_by(bill_number=bill_number).first()
+
+    returns_history = BillReturn.query.order_by(BillReturn.created_at.desc()).limit(20).all()
+    currency = SystemSetting.get('CURRENCY', '₹')
+
+    return render_template(
+        'billing/returns.html',
+        target_bill=target_bill,
+        returns_history=returns_history,
+        currency=currency
+    )
+
+@billing_bp.route('/api/bill-for-return/<path:bill_number>')
+@login_required
+def get_bill_for_return(bill_number):
+    bill = Bill.query.filter_by(bill_number=bill_number.strip()).first()
+    if not bill:
+        return jsonify({'success': False, 'message': f'Bill #{bill_number} not found.'}), 404
+
+    if bill.status == 'Cancelled':
+        return jsonify({'success': False, 'message': 'This bill is cancelled and cannot be returned.'}), 400
+
+    items_data = []
+    for item in bill.items:
+        returned_qty = item.returned_quantity or 0
+        remaining_qty = max(0, item.quantity - returned_qty)
+        items_data.append({
+            'bill_item_id': item.id,
+            'product_id': item.product_id,
+            'product_name': item.product_name,
+            'unit_price': item.unit_price,
+            'purchased_quantity': item.quantity,
+            'returned_quantity': returned_qty,
+            'max_returnable_quantity': remaining_qty,
+            'tax_amount': item.tax_amount,
+            'total_price': item.total_price
+        })
+
+    return jsonify({
+        'success': True,
+        'bill': bill.to_dict(),
+        'items': items_data
+    })
+
+@billing_bp.route('/api/process-return', methods=['POST'])
+@login_required
+def process_return_api():
+    data = request.get_json() or {}
+    bill_id = data.get('bill_id')
+    items = data.get('items', [])
+    refund_method = data.get('refund_method', 'Cash')
+    reason = data.get('reason', '')
+    confirm_password = data.get('confirm_password', '')
+
+    if not verify_sensitive_password(confirm_password):
+        return jsonify({'success': False, 'message': 'Action Denied: Incorrect password confirmation for refund.'}), 403
+
+    success, msg, return_rec = BillingService.process_return(
+        bill_id=bill_id,
+        items_data=items,
+        refund_method=refund_method,
+        reason=reason,
+        user_id=current_user.id
+    )
+
+    if not success:
+        return jsonify({'success': False, 'message': msg}), 400
+
+    return jsonify({
+        'success': True,
+        'message': msg,
+        'return_number': return_rec.return_number
+    })
+
+# ==========================================
+# 5. SALES REPORTS
+# ==========================================
+@billing_bp.route('/sales-reports')
+@login_required
+def sales_reports():
+    period = request.args.get('period', 'this_month', type=str)
+    start_date = request.args.get('start_date', '', type=str)
+    end_date = request.args.get('end_date', '', type=str)
+
+    now = datetime.utcnow()
+    
+    if period == 'today':
+        s_dt = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        e_dt = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+    elif period == 'yesterday':
+        y = now - timedelta(days=1)
+        s_dt = y.replace(hour=0, minute=0, second=0, microsecond=0)
+        e_dt = y.replace(hour=23, minute=59, second=59, microsecond=999999)
+    elif period == 'this_week':
+        s_dt = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+        e_dt = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+    elif period == 'this_year':
+        s_dt = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        e_dt = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+    elif period == 'custom' and start_date and end_date:
+        try:
+            s_dt = datetime.strptime(start_date, '%Y-%m-%d')
+            e_dt = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)
+        except ValueError:
+            s_dt = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            e_dt = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+    else: # default: this_month
+        period = 'this_month'
+        s_dt = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        e_dt = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+
+    bills_query = Bill.query.filter(
+        Bill.created_at >= s_dt,
+        Bill.created_at <= e_dt,
+        Bill.status != 'Cancelled'
+    )
+    bills = bills_query.order_by(Bill.created_at.desc()).all()
+
+    total_sales = sum(b.net_amount for b in bills)
+    total_bills = len(bills)
+    total_items_sold = sum(sum(item.quantity for item in b.items) for b in bills)
+    total_discount = sum(b.discount_amount for b in bills)
+    total_tax = sum(b.tax_amount for b in bills)
+    net_sales = total_sales
+    avg_bill_val = (total_sales / total_bills) if total_bills > 0 else 0.0
+
+    # Sales by Payment Method
+    pm_stats = {}
+    for b in bills:
+        pm_stats[b.payment_method] = pm_stats.get(b.payment_method, 0.0) + b.net_amount
+
+    # Sales by Category
+    category_sales_query = db.session.query(
+        Product.category_id,
+        func.sum(BillItem.total_price).label('revenue')
+    ).join(BillItem, Product.id == BillItem.product_id)\
+     .join(Bill, BillItem.bill_id == Bill.id)\
+     .filter(Bill.created_at >= s_dt, Bill.created_at <= e_dt, Bill.status != 'Cancelled')\
+     .group_by(Product.category_id).all()
+
+    from app.models.category import Category
+    cat_stats = []
+    for cat_id, rev in category_sales_query:
+        cat = Category.query.get(cat_id) if cat_id else None
+        cat_stats.append({
+            'category_name': cat.name if cat else 'Uncategorized',
+            'revenue': round(float(rev or 0.0), 2)
+        })
+
+    # Top Selling Products in Period
+    top_products_query = db.session.query(
+        BillItem.product_name,
+        func.sum(BillItem.quantity).label('qty'),
+        func.sum(BillItem.total_price).label('revenue')
+    ).join(Bill, BillItem.bill_id == Bill.id)\
+     .filter(Bill.created_at >= s_dt, Bill.created_at <= e_dt, Bill.status != 'Cancelled')\
+     .group_by(BillItem.product_name)\
+     .order_by(db.desc('qty')).limit(10).all()
+
+    top_products = [
+        {'name': r[0], 'qty': r[1], 'revenue': round(float(r[2] or 0.0), 2)}
+        for r in top_products_query
+    ]
+
+    currency = SystemSetting.get('CURRENCY', '₹')
+
+    return render_template(
+        'billing/sales_reports.html',
+        period=period,
+        start_date=start_date,
+        end_date=end_date,
+        total_sales=round(total_sales, 2),
+        total_bills=total_bills,
+        total_items_sold=total_items_sold,
+        total_discount=round(total_discount, 2),
+        total_tax=round(total_tax, 2),
+        net_sales=round(net_sales, 2),
+        avg_bill_val=round(avg_bill_val, 2),
+        pm_stats=pm_stats,
+        cat_stats=cat_stats,
+        top_products=top_products,
+        bills=bills,
+        currency=currency
+    )
+
+@billing_bp.route('/export/sales-csv')
+@login_required
+def export_sales_csv():
+    bills = Bill.query.filter(Bill.status != 'Cancelled').order_by(Bill.created_at.desc()).all()
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Bill Number', 'Date', 'Customer', 'Items Count', 'Payment Method', 'Discount', 'Tax', 'Grand Total', 'Status'])
+
+    for b in bills:
+        writer.writerow([
+            b.bill_number,
+            b.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            b.customer.name if b.customer else 'Walk-in Customer',
+            len(b.items),
+            b.payment_method,
+            b.discount_amount,
+            b.tax_amount,
+            b.net_amount,
+            b.status
+        ])
+
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-disposition": "attachment; filename=grocery_sales_report.csv"}
+    )
+
 @billing_bp.route('/delete/<int:id>', methods=['POST'])
 @login_required
 def delete_bill(id):
@@ -97,12 +443,11 @@ def delete_bill(id):
     confirm_password = request.form.get('confirm_password')
 
     if not verify_sensitive_password(confirm_password):
-        flash('Action Denied: Incorrect password confirmation for bill deletion.', 'danger')
-        return redirect(url_for('dashboard.index'))
+        flash('Action Denied: Incorrect password confirmation for bill cancellation.', 'danger')
+        return redirect(url_for('billing.billing_history'))
 
     bill.status = 'Cancelled'
-    from app.database import db
     db.session.commit()
 
     flash(f"Bill #{bill.bill_number} has been cancelled successfully.", 'info')
-    return redirect(url_for('dashboard.index'))
+    return redirect(url_for('billing.billing_history'))

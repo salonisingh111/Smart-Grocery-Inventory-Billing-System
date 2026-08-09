@@ -10,17 +10,7 @@
 </div>
 
 <!-- In-Page Inventory Management Navigation Tabs -->
-<div class="inpage-nav-tabs">
-  <a href="{{ url_for('product.index') }}" class="inpage-tab">
-    <i class="fas fa-boxes-stacked"></i> Products Catalog
-  </a>
-  <a href="{{ url_for('category.index') }}" class="inpage-tab active">
-    <i class="fas fa-tags"></i> Categories
-  </a>
-  <a href="{{ url_for('inventory.index') }}" class="inpage-tab">
-    <i class="fas fa-arrows-rotate"></i> Stock Adjustments & Logs
-  </a>
-</div>
+{% include "inventory/_hub_tabs.html" %}
 
 <div style="display: flex; flex-direction: column; gap: 24px;">
   <!-- Add Category Form (Top Horizontal Card) -->
@@ -66,10 +56,8 @@
       <h3 style="font-size: 1rem; font-weight: 700;">Categories List</h3>
       <form method="GET" style="display: flex; gap: 8px;">
         <input type="text" name="search" class="form-control" style="width: 200px;" placeholder="Search category..." value="{{ search }}">
-        <button type="submit" class="btn btn-sm btn-secondary"><i class="fas fa-search"></i></button>
-      </form>
-    </div>
-    <table class="custom-table">
+    <div class="table-scroll-container">
+      <table class="custom-table">
       <thead>
         <tr>
           <th>Code</th>

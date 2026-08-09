@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from app.database import db
 from app.models.customer import Customer
 from app.validators.forms import CustomerForm
 from app.services.auth_service import verify_sensitive_password
+from app.utils.logger import log_activity
+from app.utils.notifications import create_activity_notification
 
 customer_bp = Blueprint('customer', __name__, url_prefix='/customers')
 
@@ -26,6 +28,8 @@ def index():
             )
             db.session.add(customer)
             db.session.commit()
+            log_activity('Register Customer', f'Customer "{customer.name}" registered (Phone: {customer.phone})')
+            create_activity_notification('Register Customer', f'Customer "{customer.name}" registered (Phone: {customer.phone})', created_by=current_user.full_name)
             flash(f"Customer '{customer.name}' registered successfully!", 'success')
             return redirect(url_for('customer.index'))
 
@@ -51,6 +55,8 @@ def edit(id):
     customer.status = request.form.get('status', 'Active')
 
     db.session.commit()
+    log_activity('Edit Customer', f'Customer "{customer.name}" details updated')
+    create_activity_notification('Edit Customer', f'Customer "{customer.name}" details updated', created_by=current_user.full_name)
     flash(f"Customer '{customer.name}' updated successfully.", 'success')
     return redirect(url_for('customer.index'))
 
@@ -67,6 +73,7 @@ def delete(id):
     cust_name = customer.name
     db.session.delete(customer)
     db.session.commit()
-
+    log_activity('Delete Customer', f'Customer "{cust_name}" removed from system')
+    create_activity_notification('Delete Customer', f'Customer "{cust_name}" removed from system', created_by=current_user.full_name)
     flash(f"Customer '{cust_name}' deleted successfully.", 'info')
     return redirect(url_for('customer.index'))

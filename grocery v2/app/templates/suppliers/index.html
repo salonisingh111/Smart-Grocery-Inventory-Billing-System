@@ -9,6 +9,9 @@
   </div>
 </div>
 
+<!-- In-Page Inventory Management Navigation Tabs -->
+{% include "inventory/_hub_tabs.html" %}
+
 <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
   <!-- Add Supplier Form -->
   <div class="card-table" style="padding: 24px;">
@@ -57,10 +60,8 @@
       <h3 style="font-size: 1rem; font-weight: 700;">Suppliers List</h3>
       <form method="GET" style="display: flex; gap: 8px;">
         <input type="text" name="search" class="form-control" style="width: 200px;" placeholder="Search supplier..." value="{{ search }}">
-        <button type="submit" class="btn btn-sm btn-secondary"><i class="fas fa-search"></i></button>
-      </form>
-    </div>
-    <table class="custom-table">
+    <div class="table-scroll-container">
+      <table class="custom-table">
       <thead>
         <tr>
           <th>Supplier Name</th>

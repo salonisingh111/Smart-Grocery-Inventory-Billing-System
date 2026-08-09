@@ -6,6 +6,8 @@ from app.models.product import Product
 from app.models.bill import Bill, BillItem, PaymentMethod
 from app.models.inventory import InventoryHistory
 from app.models.setting import SystemSetting
+from app.models.activity_log import ActivityLog
+from app.models.notification import UserNotification
 
 __all__ = [
     'User',
@@ -17,5 +19,7 @@ __all__ = [
     'BillItem',
     'PaymentMethod',
     'InventoryHistory',
-    'SystemSetting'
+    'SystemSetting',
+    'ActivityLog',
+    'UserNotification'
 ]

@@ -14,6 +14,8 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(20), nullable=False, default='Admin')  # Admin, Manager, Cashier
     status = db.Column(db.String(20), nullable=False, default='Active')  # Active, Inactive
     profile_image = db.Column(db.String(255), nullable=True)
+    last_login_at = db.Column(db.DateTime, nullable=True)
+    last_login_ip = db.Column(db.String(45), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -35,5 +37,7 @@ class User(UserMixin, db.Model):
             'role': self.role,
             'status': self.status,
             'profile_image': self.profile_image,
+            'last_login_at': self.last_login_at.strftime('%Y-%m-%d %H:%M:%S') if self.last_login_at else None,
+            'last_login_ip': self.last_login_ip,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else ''
         }

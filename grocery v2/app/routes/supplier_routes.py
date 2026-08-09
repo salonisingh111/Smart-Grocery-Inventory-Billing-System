@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from app.database import db
 from app.models.supplier import Supplier
 from app.validators.forms import SupplierForm
 from app.services.auth_service import verify_sensitive_password
+from app.utils.logger import log_activity
+from app.utils.notifications import create_activity_notification
 
 supplier_bp = Blueprint('supplier', __name__, url_prefix='/suppliers')
 
@@ -24,6 +26,8 @@ def index():
         )
         db.session.add(supplier)
         db.session.commit()
+        log_activity('Add Supplier', f'Supplier "{supplier.name}" added (Phone: {supplier.phone})')
+        create_activity_notification('Add Supplier', f'Supplier "{supplier.name}" added (Phone: {supplier.phone})', created_by=current_user.full_name)
         flash(f"Supplier '{supplier.name}' added successfully!", 'success')
         return redirect(url_for('supplier.index'))
 
@@ -50,6 +54,8 @@ def edit(id):
     supplier.status = request.form.get('status', 'Active')
 
     db.session.commit()
+    log_activity('Edit Supplier', f'Supplier "{supplier.name}" updated')
+    create_activity_notification('Edit Supplier', f'Supplier "{supplier.name}" updated', created_by=current_user.full_name)
     flash(f"Supplier '{supplier.name}' updated successfully.", 'success')
     return redirect(url_for('supplier.index'))
 
@@ -66,6 +72,7 @@ def delete(id):
     sup_name = supplier.name
     db.session.delete(supplier)
     db.session.commit()
-
+    log_activity('Delete Supplier', f'Supplier "{sup_name}" deleted')
+    create_activity_notification('Delete Supplier', f'Supplier "{sup_name}" deleted', created_by=current_user.full_name)
     flash(f"Supplier '{sup_name}' deleted successfully.", 'info')
     return redirect(url_for('supplier.index'))

@@ -5,28 +5,36 @@
 <div class="page-header">
   <div>
     <h1 class="page-title">Reports & Business Analytics</h1>
-    <p class="page-subtitle">Export financial, inventory, and customer intelligence data</p>
+    <p class="page-subtitle">Export stock valuation, inventory alerts, customer intelligence, and supplier data</p>
   </div>
-  <div style="display: flex; gap: 12px;">
-    {% if report_type == 'sales' %}
-      <a href="{{ url_for('report.export_sales') }}" class="btn btn-primary"><i class="fas fa-file-excel"></i> Download Sales CSV</a>
-    {% else %}
-      <a href="{{ url_for('report.export_inventory') }}" class="btn btn-primary"><i class="fas fa-file-excel"></i> Download Inventory CSV</a>
-    {% endif %}
+  <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+    <a href="{{ url_for('billing.sales_reports') }}" class="btn btn-secondary">
+      <i class="fas fa-chart-line"></i> Sales Analytics & Reports
+    </a>
+    <a href="{{ url_for('report.export_inventory') }}" class="btn btn-primary">
+      <i class="fas fa-file-excel"></i> Export Inventory CSV
+    </a>
   </div>
 </div>
 
-<!-- Tabs Bar -->
-<div style="display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 2px solid var(--border); padding-bottom: 12px;">
-  <a href="{{ url_for('report.index', type='sales') }}" class="btn {% if report_type == 'sales' %}btn-primary{% else %}btn-secondary{% endif %}">Sales Report</a>
-  <a href="{{ url_for('report.index', type='inventory') }}" class="btn {% if report_type == 'inventory' %}btn-primary{% else %}btn-secondary{% endif %}">Stock Inventory</a>
-  <a href="{{ url_for('report.index', type='low_stock') }}" class="btn {% if report_type == 'low_stock' %}btn-primary{% else %}btn-secondary{% endif %}">Low Stock Report</a>
-  <a href="{{ url_for('report.index', type='expired') }}" class="btn {% if report_type == 'expired' %}btn-primary{% else %}btn-secondary{% endif %}">Expired Products</a>
-  <a href="{{ url_for('report.index', type='customer') }}" class="btn {% if report_type == 'customer' %}btn-primary{% else %}btn-secondary{% endif %}">Customer Insights</a>
+<!-- Non-Redundant Modern Pill Tabs Bar -->
+<div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; align-items: center;">
+  <a href="{{ url_for('report.index', type='inventory') }}" 
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if report_type == 'inventory' or not report_type %}background: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-boxes-stacked"></i> Stock & Valuation
+  </a>
+  <a href="{{ url_for('report.index', type='low_stock') }}" 
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if report_type == 'low_stock' %}background: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-triangle-exclamation"></i> Low Stock Alerts
+  </a>
+  <a href="{{ url_for('report.index', type='expired') }}" 
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if report_type == 'expired' %}background: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-calendar-xmark"></i> Expired Products
+  </a>
 </div>
 
 <!-- Table Data -->
-<div class="card-table">
+<div class="card-table table-scroll-container">
   {% if report_type == 'sales' %}
   <table class="custom-table">
     <thead>

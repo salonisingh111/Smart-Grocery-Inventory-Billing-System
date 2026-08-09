@@ -5,6 +5,8 @@ from app.models.inventory import InventoryHistory
 from app.services.inventory_service import InventoryService
 from app.services.auth_service import verify_sensitive_password
 from app.validators.forms import StockAdjustmentForm
+from app.utils.logger import log_activity
+from app.utils.notifications import create_activity_notification, sync_stock_alerts_for_product
 
 inventory_bp = Blueprint('inventory', __name__, url_prefix='/inventory')
 
@@ -33,6 +35,11 @@ def index():
         )
 
         if success:
+            product = Product.query.get(product_id)
+            pname = product.name if product else f'ID#{product_id}'
+            log_activity('Stock Adjustment', f'{form.change_type.data}: {abs(form.quantity_changed.data)} units of "{pname}" — {form.reason.data or "No reason given"}')
+            create_activity_notification('Stock Adjustment', f'{form.change_type.data}: {abs(form.quantity_changed.data)} units of "{pname}"', created_by=current_user.full_name)
+            sync_stock_alerts_for_product(product_id)
             flash(msg, 'success')
         else:
             flash(msg, 'danger')

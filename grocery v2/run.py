@@ -163,6 +163,38 @@ def init_seed_data():
                 if not Product.query.filter_by(sku=item.sku).first():
                     db.session.add(item)
 
+        # Seed / Ensure 7 realistic Out-of-Stock demo products exist
+        oos_items = [
+            {'name': 'Amul Taaza Toned Milk 1L', 'sku': 'MILK-001', 'cat_id': c1.id, 'brand': 'Amul', 'purchase_price': 60.0, 'selling_price': 66.0, 'min_stock': 10, 'unit': 'l'},
+            {'name': 'Britannia Brown Bread 400g', 'sku': 'BRD-001', 'cat_id': c1.id, 'brand': 'Britannia', 'purchase_price': 35.0, 'selling_price': 40.0, 'min_stock': 5, 'unit': 'pkt'},
+            {'name': 'Tata Tea Gold 250g', 'sku': 'TEA-001', 'cat_id': c2.id, 'brand': 'Tata', 'purchase_price': 140.0, 'selling_price': 165.0, 'min_stock': 8, 'unit': 'pkt'},
+            {'name': 'Aashirvaad Shudh Chakki Atta 5kg', 'sku': 'STP-001', 'cat_id': c5.id, 'brand': 'Aashirvaad', 'purchase_price': 210.0, 'selling_price': 245.0, 'min_stock': 10, 'unit': 'pkt'},
+            {'name': 'Parle-G Biscuits 800g', 'sku': 'BIS-001', 'cat_id': c3.id, 'brand': 'Parle', 'purchase_price': 70.0, 'selling_price': 85.0, 'min_stock': 15, 'unit': 'pkt'},
+            {'name': 'Amul Fresh Paneer 200g', 'sku': 'DAIRY-004', 'cat_id': c1.id, 'brand': 'Amul', 'purchase_price': 80.0, 'selling_price': 95.0, 'min_stock': 5, 'unit': 'pcs'},
+            {'name': 'Bournvita Chocolate Health Drink 500g', 'sku': 'BEV-007', 'cat_id': c2.id, 'brand': 'Bournvita', 'purchase_price': 210.0, 'selling_price': 245.0, 'min_stock': 6, 'unit': 'pcs'},
+        ]
+        for item_data in oos_items:
+            existing = Product.query.filter_by(sku=item_data['sku']).first()
+            if not existing:
+                p = Product(
+                    name=item_data['name'],
+                    sku=item_data['sku'],
+                    category_id=item_data['cat_id'],
+                    supplier_id=sup.id,
+                    brand=item_data['brand'],
+                    purchase_price=item_data['purchase_price'],
+                    selling_price=item_data['selling_price'],
+                    tax_percent=0.0,
+                    quantity=0,
+                    min_stock=item_data['min_stock'],
+                    max_stock=100,
+                    unit=item_data['unit'],
+                    status='Active'
+                )
+                db.session.add(p)
+            else:
+                existing.quantity = 0
+
         # Seed Default Walk-in Customer
         if Customer.query.count() == 0:
             cust = Customer(name='Walk-in Customer', phone='0000000000', email='walkin@grocery.com', address='Counter Checkout', total_purchases=0.0, outstanding_amount=0.0, status='Active')

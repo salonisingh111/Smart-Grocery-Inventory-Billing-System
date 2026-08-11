@@ -60,9 +60,12 @@
       <h3 style="font-size: 1rem; font-weight: 700;">Suppliers List</h3>
       <form method="GET" style="display: flex; gap: 8px;">
         <input type="text" name="search" class="form-control" style="width: 200px;" placeholder="Search supplier..." value="{{ search }}">
-    <div class="table-scroll-container">
+        <button type="submit" class="btn btn-sm btn-secondary"><i class="fas fa-search"></i></button>
+      </form>
+    </div>
+    <div class="table-scroll-container" style="max-height: 580px; overflow-y: auto; position: relative;">
       <table class="custom-table">
-      <thead>
+      <thead style="position: sticky; top: 0; background: var(--surface); z-index: 5; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
         <tr>
           <th>Supplier Name</th>
           <th>Contact Info</th>
@@ -105,5 +108,6 @@
       </tbody>
     </table>
   </div>
+</div>
 </div>
 {% endblock %}

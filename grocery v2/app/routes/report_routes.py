@@ -1,65 +1,185 @@
-from flask import Blueprint, render_template, request, Response
+from flask import Blueprint, render_template, request, jsonify, Response
 from flask_login import login_required
-from app.models.bill import Bill
+from app.models.category import Category
 from app.models.product import Product
-from app.models.customer import Customer
-from app.models.supplier import Supplier
 from app.services.report_service import ReportService
 
 report_bp = Blueprint('report', __name__, url_prefix='/reports')
 
+def _get_filter_options():
+    categories = Category.query.filter_by(status='Active').order_by(Category.name).all()
+    products = Product.query.filter_by(status='Active').order_by(Product.name).all()
+    payment_methods = ['Cash', 'UPI', 'Card']
+    return {
+        'all_categories': categories,
+        'all_products': products,
+        'all_payment_methods': payment_methods
+    }
+
+# -----------------------------------------------------------------------------
+# SUBMODULE PAGE ROUTES
+# -----------------------------------------------------------------------------
+
 @report_bp.route('/')
+@report_bp.route('/overview')
 @login_required
 def index():
-    report_type = request.args.get('type', 'inventory', type=str)
-    start_date = request.args.get('start_date', '', type=str)
-    end_date = request.args.get('end_date', '', type=str)
+    preset = request.args.get('range_preset', 'this_month')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
 
-    bills = []
-    products = []
-    customers = []
-    suppliers = []
-
-    if report_type == 'sales':
-        bills = Bill.query.order_by(Bill.created_at.desc()).all()
-    elif report_type == 'inventory' or report_type == 'stock':
-        products = Product.query.order_by(Product.name).all()
-    elif report_type == 'low_stock':
-        products = [p for p in Product.query.all() if p.is_low_stock()]
-    elif report_type == 'expired':
-        products = [p for p in Product.query.all() if p.is_expired()]
-    elif report_type == 'customer':
-        customers = Customer.query.order_by(Customer.total_purchases.desc()).all()
-    elif report_type == 'supplier':
-        suppliers = Supplier.query.order_by(Supplier.name).all()
-
+    data = ReportService.get_overview_analytics(preset, start_date, end_date)
+    ctx = _get_filter_options()
     return render_template(
-        'reports/index.html',
-        report_type=report_type,
-        bills=bills,
-        products=products,
-        customers=customers,
-        suppliers=suppliers,
-        start_date=start_date,
-        end_date=end_date
+        'reports/overview.html',
+        active_tab='overview',
+        data=data,
+        filters=request.args,
+        **ctx
     )
 
-@report_bp.route('/export/sales')
+@report_bp.route('/overview_alias')
+def overview():
+    return index()
+
+
+@report_bp.route('/sales')
 @login_required
-def export_sales():
-    csv_data = ReportService.generate_sales_csv()
-    return Response(
-        csv_data,
-        mimetype="text/csv",
-        headers={"Content-disposition": "attachment; filename=sales_report.csv"}
+def sales():
+    preset = request.args.get('range_preset', 'this_month')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    pay_method = request.args.get('payment_method')
+    cat_id = request.args.get('category_id', type=int)
+
+    data = ReportService.get_sales_analytics(preset, start_date, end_date, pay_method, cat_id)
+    ctx = _get_filter_options()
+    return render_template(
+        'reports/sales.html',
+        active_tab='sales',
+        data=data,
+        filters=request.args,
+        **ctx
     )
 
-@report_bp.route('/export/inventory')
+@report_bp.route('/products')
 @login_required
-def export_inventory():
-    csv_data = ReportService.generate_inventory_csv()
-    return Response(
-        csv_data,
-        mimetype="text/csv",
-        headers={"Content-disposition": "attachment; filename=inventory_report.csv"}
+def products():
+    preset = request.args.get('range_preset', 'this_month')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    cat_id = request.args.get('category_id', type=int)
+    prod_id = request.args.get('product_id', type=int)
+
+    data = ReportService.get_product_analytics(preset, start_date, end_date, cat_id, prod_id)
+    ctx = _get_filter_options()
+    return render_template(
+        'reports/products.html',
+        active_tab='products',
+        data=data,
+        filters=request.args,
+        **ctx
     )
+
+@report_bp.route('/customers')
+@login_required
+def customers():
+    preset = request.args.get('range_preset', 'this_month')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+
+    data = ReportService.get_customer_analytics(preset, start_date, end_date)
+    ctx = _get_filter_options()
+    return render_template(
+        'reports/customers.html',
+        active_tab='customers',
+        data=data,
+        filters=request.args,
+        **ctx
+    )
+
+@report_bp.route('/finance')
+@login_required
+def finance():
+    preset = request.args.get('range_preset', 'this_month')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+
+    data = ReportService.get_finance_analytics(preset, start_date, end_date)
+    ctx = _get_filter_options()
+    return render_template(
+        'reports/finance.html',
+        active_tab='finance',
+        data=data,
+        filters=request.args,
+        **ctx
+    )
+
+# -----------------------------------------------------------------------------
+# JSON API ENDPOINTS FOR DYNAMIC DASHBOARD / FILTER UPDATES
+# -----------------------------------------------------------------------------
+
+@report_bp.route('/api/overview')
+@login_required
+def api_overview():
+    preset = request.args.get('range_preset', 'this_month')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    data = ReportService.get_overview_analytics(preset, start_date, end_date)
+    return jsonify(data)
+
+@report_bp.route('/api/sales')
+@login_required
+def api_sales():
+    preset = request.args.get('range_preset', 'this_month')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    pay_method = request.args.get('payment_method')
+    cat_id = request.args.get('category_id', type=int)
+    data = ReportService.get_sales_analytics(preset, start_date, end_date, pay_method, cat_id)
+    return jsonify(data)
+
+@report_bp.route('/api/products')
+@login_required
+def api_products():
+    preset = request.args.get('range_preset', 'this_month')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    cat_id = request.args.get('category_id', type=int)
+    prod_id = request.args.get('product_id', type=int)
+    data = ReportService.get_product_analytics(preset, start_date, end_date, cat_id, prod_id)
+    return jsonify(data)
+
+@report_bp.route('/api/customers')
+@login_required
+def api_customers():
+    preset = request.args.get('range_preset', 'this_month')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    data = ReportService.get_customer_analytics(preset, start_date, end_date)
+    return jsonify(data)
+
+@report_bp.route('/api/finance')
+@login_required
+def api_finance():
+    preset = request.args.get('range_preset', 'this_month')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    data = ReportService.get_finance_analytics(preset, start_date, end_date)
+    return jsonify(data)
+
+# -----------------------------------------------------------------------------
+# CSV EXPORT ROUTE
+# -----------------------------------------------------------------------------
+
+@report_bp.route('/export/<submodule>')
+@login_required
+def export_csv(submodule):
+    if submodule not in ['overview', 'sales', 'products', 'customers', 'finance']:
+        submodule = 'overview'
+    csv_data, filename = ReportService.export_csv(submodule, request.args)
+    response = Response(csv_data, mimetype="text/csv")
+    response.headers["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return response
+
+

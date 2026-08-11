@@ -1,0 +1,105 @@
+<div class="card filter-card mb-4" style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; box-shadow: var(--shadow-sm);">
+  <form method="GET" action="" id="reportsFilterForm" style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px;">
+    
+    <!-- Date Range Select -->
+    <div class="filter-item" style="display: flex; flex-direction: column; gap: 4px; min-width: 140px;">
+      <label class="form-label text-muted mb-0" style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+        <i class="fas fa-calendar-alt me-1"></i> Date Range
+      </label>
+      <select name="range_preset" id="filterRangePreset" class="form-select form-select-sm" style="border-radius: 6px; font-weight: 500; height: 34px; border: 1px solid var(--border);" onchange="toggleCustomDateInputs()">
+        <option value="today" {% if filters.get('range_preset') == 'today' %}selected{% endif %}>Today</option>
+        <option value="this_week" {% if filters.get('range_preset') == 'this_week' %}selected{% endif %}>This Week</option>
+        <option value="this_month" {% if not filters.get('range_preset') or filters.get('range_preset') == 'this_month' %}selected{% endif %}>This Month</option>
+        <option value="last_month" {% if filters.get('range_preset') == 'last_month' %}selected{% endif %}>Last Month</option>
+        <option value="custom" {% if filters.get('range_preset') == 'custom' %}selected{% endif %}>Custom Range</option>
+        <option value="all" {% if filters.get('range_preset') == 'all' %}selected{% endif %}>All Time</option>
+      </select>
+    </div>
+
+    <!-- Custom Start Date -->
+    <div class="filter-item custom-date-wrapper" id="startDateWrapper" style="display: flex; flex-direction: column; gap: 4px; min-width: 130px; {% if filters.get('range_preset') != 'custom' %}display: none;{% endif %}">
+      <label class="form-label text-muted mb-0" style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Start Date</label>
+      <input type="date" name="start_date" id="filterStartDate" class="form-control form-control-sm" value="{{ filters.get('start_date', '') }}" style="border-radius: 6px; height: 34px; border: 1px solid var(--border);">
+    </div>
+
+    <!-- Custom End Date -->
+    <div class="filter-item custom-date-wrapper" id="endDateWrapper" style="display: flex; flex-direction: column; gap: 4px; min-width: 130px; {% if filters.get('range_preset') != 'custom' %}display: none;{% endif %}">
+      <label class="form-label text-muted mb-0" style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">End Date</label>
+      <input type="date" name="end_date" id="filterEndDate" class="form-control form-control-sm" value="{{ filters.get('end_date', '') }}" style="border-radius: 6px; height: 34px; border: 1px solid var(--border);">
+    </div>
+
+    <!-- Category Filter (Optional per submodule) -->
+    {% if show_category_filter %}
+    <div class="filter-item" style="display: flex; flex-direction: column; gap: 4px; min-width: 150px;">
+      <label class="form-label text-muted mb-0" style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+        <i class="fas fa-tags me-1"></i> Category
+      </label>
+      <select name="category_id" class="form-select form-select-sm" style="border-radius: 6px; font-weight: 500; height: 34px; border: 1px solid var(--border);">
+        <option value="">All Categories</option>
+        {% for cat in all_categories %}
+          <option value="{{ cat.id }}" {% if filters.get('category_id')|int == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+
+    <!-- Product Filter (Optional per submodule) -->
+    {% if show_product_filter %}
+    <div class="filter-item" style="display: flex; flex-direction: column; gap: 4px; min-width: 160px;">
+      <label class="form-label text-muted mb-0" style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+        <i class="fas fa-box me-1"></i> Product
+      </label>
+      <select name="product_id" class="form-select form-select-sm" style="border-radius: 6px; font-weight: 500; height: 34px; border: 1px solid var(--border);">
+        <option value="">All Products</option>
+        {% for prod in all_products %}
+          <option value="{{ prod.id }}" {% if filters.get('product_id')|int == prod.id %}selected{% endif %}>{{ prod.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+
+    <!-- Payment Method Filter (Optional per submodule) -->
+    {% if show_payment_filter %}
+    <div class="filter-item" style="display: flex; flex-direction: column; gap: 4px; min-width: 140px;">
+      <label class="form-label text-muted mb-0" style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+        <i class="fas fa-credit-card me-1"></i> Payment
+      </label>
+      <select name="payment_method" class="form-select form-select-sm" style="border-radius: 6px; font-weight: 500; height: 34px; border: 1px solid var(--border);">
+        <option value="">All Methods</option>
+        {% for pm in all_payment_methods %}
+          <option value="{{ pm }}" {% if filters.get('payment_method') == pm %}selected{% endif %}>{{ pm }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="filter-actions" style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
+      <button type="submit" class="btn btn-sm btn-primary" style="border-radius: 6px; font-weight: 600; padding: 6px 14px; height: 34px; display: inline-flex; align-items: center; gap: 5px;">
+        <i class="fas fa-filter"></i> Apply
+      </button>
+      <a href="{{ request.path }}" class="btn btn-sm btn-outline-secondary" style="border-radius: 6px; font-weight: 600; padding: 6px 12px; height: 34px; display: inline-flex; align-items: center; gap: 5px;">
+        <i class="fas fa-rotate-left"></i> Clear
+      </a>
+      <a id="btnExportCSV" href="{{ url_for('report.export_csv', submodule=active_tab, **request.args) }}" download="{{ active_tab }}-report.csv" class="btn btn-sm btn-success" style="border-radius: 6px; font-weight: 600; padding: 6px 14px; height: 34px; display: inline-flex; align-items: center; gap: 5px;" title="Export CSV Report">
+        <i class="fas fa-file-csv"></i> Export Report
+      </a>
+    </div>
+
+  </form>
+</div>
+
+<script>
+function toggleCustomDateInputs() {
+  const preset = document.getElementById('filterRangePreset').value;
+  const startW = document.getElementById('startDateWrapper');
+  const endW = document.getElementById('endDateWrapper');
+  if (preset === 'custom') {
+    startW.style.display = 'flex';
+    endW.style.display = 'flex';
+  } else {
+    startW.style.display = 'none';
+    endW.style.display = 'none';
+  }
+}
+</script>

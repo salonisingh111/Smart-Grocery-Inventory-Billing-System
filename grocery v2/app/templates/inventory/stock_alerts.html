@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Stock Alerts — Inventory Management{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Inventory Stock Alerts</h1>
+    <p class="page-subtitle">Real-time operational monitoring for low stock, out of stock, expired, and near-expiry items</p>
+  </div>
+</div>
+
+{% include 'inventory/_hub_tabs.html' %}
+
+<!-- Alert Section Pills Bar -->
+<div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; align-items: center;">
+  <a href="{{ url_for('inventory.stock_alerts', tab='low_stock') }}" 
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if active_tab == 'low_stock' %}background: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-triangle-exclamation"></i> Low Stock
+    <span class="badge" style="background: rgba(255,255,255,0.25); color: inherit; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem;">{{ low_stock_count }}</span>
+  </a>
+
+  <a href="{{ url_for('inventory.stock_alerts', tab='out_of_stock') }}" 
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if active_tab == 'out_of_stock' %}background: #DC2626; color: #FFFFFF; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-box-open"></i> Out of Stock
+    <span class="badge" style="background: rgba(255,255,255,0.25); color: inherit; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem;">{{ out_of_stock_count }}</span>
+  </a>
+
+  <a href="{{ url_for('inventory.stock_alerts', tab='expired') }}" 
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if active_tab == 'expired' %}background: #DC2626; color: #FFFFFF; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-calendar-xmark"></i> Expired Stock
+    <span class="badge" style="background: rgba(255,255,255,0.25); color: inherit; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem;">{{ expired_count }}</span>
+  </a>
+
+  <a href="{{ url_for('inventory.stock_alerts', tab='near_expiry') }}" 
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if active_tab == 'near_expiry' %}background: #D97706; color: #FFFFFF; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-hourglass-half"></i> Near Expiry
+    <span class="badge" style="background: rgba(255,255,255,0.25); color: inherit; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem;">{{ near_expiry_count }}</span>
+  </a>
+</div>
+
+<!-- Search & Filters Bar -->
+<div class="card-table" style="padding: 16px 20px; border-radius: 12px; margin-bottom: 20px;">
+  <form method="GET" action="{{ url_for('inventory.stock_alerts') }}" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+    <input type="hidden" name="tab" value="{{ active_tab }}">
+    
+    <div style="flex: 1; min-width: 220px;">
+      <input type="text" name="search" class="form-control" placeholder="Search product name or SKU..." value="{{ search }}">
+    </div>
+
+    <div style="width: 220px;">
+      <select name="category_id" class="form-control" onchange="this.form.submit()">
+        <option value="">All Categories</option>
+        {% for cat in all_categories %}
+          <option value="{{ cat.id }}" {% if category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    {% if search or category_id %}
+      <a href="{{ url_for('inventory.stock_alerts', tab=active_tab) }}" class="btn btn-secondary" style="height: 42px; display: inline-flex; align-items: center; gap: 6px;">
+        <i class="fas fa-xmark"></i> Clear
+      </a>
+    {% endif %}
+  </form>
+</div>
+
+<!-- Stock Alerts Data Table (Single-View Scrollable Container) -->
+<div class="card-table table-scroll-container" style="max-height: 580px; overflow-y: auto; position: relative;">
+  <table class="custom-table">
+    <thead style="position: sticky; top: 0; background: var(--surface); z-index: 5; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+      <tr>
+        <th>SKU</th>
+        <th>Product Name</th>
+        <th>Category</th>
+        <th>Current Stock</th>
+        <th>Unit</th>
+        <th>
+          {% if active_tab == 'low_stock' %}
+            Threshold Level
+          {% elif active_tab in ['expired', 'near_expiry'] %}
+            Expiry Date
+          {% else %}
+            Status Info
+          {% endif %}
+        </th>
+        <th>Status</th>
+        <th style="text-align: right;">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in products %}
+      <tr>
+        <td><code>{{ p.sku }}</code></td>
+        <td><strong>{{ p.name }}</strong></td>
+        <td>{{ p.category.name if p.category else 'Uncategorized' }}</td>
+        <td>
+          {% if p.is_out_of_stock() %}
+            <span class="badge badge-danger">0</span>
+          {% elif p.is_low_stock() %}
+            <span class="badge badge-warning">{{ p.quantity }}</span>
+          {% else %}
+            <span class="badge badge-success">{{ p.quantity }}</span>
+          {% endif %}
+        </td>
+        <td>{{ p.unit }}</td>
+        <td>
+          {% if active_tab == 'low_stock' %}
+            Limit: {{ p.min_stock }} {{ p.unit }}
+          {% elif active_tab in ['expired', 'near_expiry'] %}
+            <strong style="{% if p.is_expired() %}color: var(--danger);{% else %}color: var(--warning);{% endif %}">
+              {{ p.expiry_date.strftime('%Y-%m-%d') if p.expiry_date else 'N/A' }}
+            </strong>
+          {% else %}
+            Depleted Stock
+          {% endif %}
+        </td>
+        <td>
+          {% if active_tab == 'out_of_stock' or p.is_out_of_stock() %}
+            <span class="badge badge-danger">Out of Stock</span>
+          {% elif active_tab == 'low_stock' or p.is_low_stock() %}
+            <span class="badge badge-warning">Low Stock</span>
+          {% elif active_tab == 'expired' or p.is_expired() %}
+            <span class="badge badge-danger">Expired</span>
+          {% elif active_tab == 'near_expiry' or p.is_near_expiry() %}
+            <span class="badge badge-warning">Near Expiry</span>
+          {% endif %}
+        </td>
+        <td style="text-align: right;">
+          <a href="{{ url_for('product.edit', id=p.id) }}" class="btn btn-sm btn-secondary" title="View & Edit Product Details" style="display: inline-flex; align-items: center; gap: 4px;">
+            <i class="fas fa-edit"></i> Edit Product
+          </a>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="8" class="text-center p-5" style="color: var(--text-muted);">
+          <i class="fas fa-circle-check" style="font-size: 2.5rem; color: var(--success); opacity: 0.85; margin-bottom: 12px; display: block;"></i>
+          <strong style="font-size: 1.1rem; color: var(--text-main); display: block; margin-bottom: 4px;">No products match the selected stock alert criteria.</strong>
+          <span>Inventory levels in this section are healthy and within operational limits.</span>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

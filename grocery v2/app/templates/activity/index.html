@@ -1,120 +1,101 @@
 {% extends "base.html" %}
-{% block title %}System Activity Logs{% endblock %}
+{% block title %}Activity Logs — User Management{% endblock %}
 
 {% block content %}
-<div style="padding: 24px 0;">
-  <!-- Header Bar -->
-  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-    <div>
-      <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 10px;">
-        <i class="fas fa-list-check" style="color: var(--primary);"></i> System Activity Logs
-      </h1>
-      <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 4px;">Track authentication, user management, and security events across the portal</p>
-    </div>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Activity Logs</h1>
+    <p class="page-subtitle">Track user authentication, account changes, permissions, and security events</p>
   </div>
+</div>
 
-  <!-- Filter & Search Bar -->
-  <div class="card-table" style="padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-    <form method="GET" action="{{ url_for('activity.index') }}" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-      <div style="flex: 1; min-width: 240px;">
-        <input type="text" name="search" class="form-control" placeholder="Search by user, action, details, IP..." value="{{ search }}">
-      </div>
+{% include 'users/_user_tabs.html' %}
 
-      <div style="width: 200px;">
-        <select name="action" class="form-control" onchange="this.form.submit()">
-          <option value="">All Action Types</option>
-          {% for act in actions %}
-            <option value="{{ act }}" {% if action_filter == act %}selected{% endif %}>{{ act }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <button type="submit" class="btn btn-primary" style="height: 42px; display: inline-flex; align-items: center; gap: 6px;">
-        <i class="fas fa-search"></i> Search
-      </button>
-
-      {% if search or action_filter %}
-        <a href="{{ url_for('activity.index') }}" class="btn btn-secondary" style="height: 42px; display: inline-flex; align-items: center; gap: 6px;">
-          <i class="fas fa-xmark"></i> Clear
-        </a>
-      {% endif %}
-    </form>
-  </div>
-
-  <!-- Logs Table -->
-  <div class="card-table" style="border-radius: 12px; overflow: hidden; padding: 24px;">
-    <div style="overflow-x: auto;">
-      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
-        <thead>
-          <tr style="border-bottom: 2px solid var(--border); color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">
-            <th style="padding: 12px 16px;">Timestamp</th>
-            <th style="padding: 12px 16px;">User</th>
-            <th style="padding: 12px 16px;">Action</th>
-            <th style="padding: 12px 16px;">Details</th>
-            <th style="padding: 12px 16px;">IP Address</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for log in logs %}
-            <tr style="border-bottom: 1px solid var(--border); transition: background 150ms ease-in-out;">
-              <td style="padding: 14px 16px; color: var(--text-muted); font-size: 0.85rem; white-space: nowrap;">
-                <i class="far fa-clock" style="margin-right: 4px;"></i> {{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') if log.created_at else '' }}
-              </td>
-              <td style="padding: 14px 16px;">
-                <strong style="color: var(--text-main);">{{ log.user_name or (log.user.full_name if log.user else 'System') }}</strong>
-              </td>
-              <td style="padding: 14px 16px;">
-                {% if 'Login' in log.action and 'Failed' not in log.action %}
-                  <span class="badge badge-success"><i class="fas fa-right-to-bracket"></i> {{ log.action }}</span>
-                {% elif 'Failed' in log.action or 'Delete' in log.action %}
-                  <span class="badge badge-danger"><i class="fas fa-triangle-exclamation"></i> {{ log.action }}</span>
-                {% elif 'Logout' in log.action %}
-                  <span class="badge badge-secondary"><i class="fas fa-right-from-bracket"></i> {{ log.action }}</span>
-                {% elif 'Password' in log.action %}
-                  <span class="badge badge-warning"><i class="fas fa-key"></i> {{ log.action }}</span>
-                {% else %}
-                  <span class="badge badge-primary"><i class="fas fa-circle-info"></i> {{ log.action }}</span>
-                {% endif %}
-              </td>
-              <td style="padding: 14px 16px; color: var(--text-main);">
-                {{ log.details or '-' }}
-              </td>
-              <td style="padding: 14px 16px; color: var(--text-muted); font-family: monospace; font-size: 0.85rem;">
-                {{ log.ip_address or '127.0.0.1' }}
-              </td>
-            </tr>
-          {% else %}
-            <tr>
-              <td colspan="5" style="text-align: center; padding: 48px; color: var(--text-muted);">
-                <i class="fas fa-list-check" style="font-size: 2.5rem; margin-bottom: 12px; opacity: 0.5; display: block;"></i>
-                No activity logs found matching your filters.
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+<!-- Filter & Search Bar -->
+<div class="card-table" style="padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+  <form method="GET" action="{{ url_for('activity.index') }}" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
+    <div style="flex: 1; min-width: 220px;">
+      <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">Search Logs</label>
+      <input type="text" name="search" class="form-control" style="height: 42px;" placeholder="Search by user, action, details, IP..." value="{{ search }}">
     </div>
 
-    <!-- Pagination -->
-    {% if pagination and pagination.pages > 1 %}
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);">
-        <span style="font-size: 0.875rem; color: var(--text-muted);">
-          Page {{ pagination.page }} of {{ pagination.pages }} (Total {{ pagination.total }} logs)
-        </span>
-        <div style="display: flex; gap: 8px;">
-          {% if pagination.has_prev %}
-            <a href="{{ url_for('activity.index', page=pagination.prev_num, search=search, action=action_filter) }}" class="btn btn-secondary btn-sm">
-              <i class="fas fa-chevron-left"></i> Previous
-            </a>
-          {% endif %}
-          {% if pagination.has_next %}
-            <a href="{{ url_for('activity.index', page=pagination.next_num, search=search, action=action_filter) }}" class="btn btn-secondary btn-sm">
-              Next <i class="fas fa-chevron-right"></i>
-            </a>
-          {% endif %}
-        </div>
-      </div>
+    <div style="width: 180px;">
+      <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">Action Type</label>
+      <select name="action" class="form-control" style="height: 42px;" onchange="this.form.submit()">
+        <option value="">All Action Types</option>
+        {% for act in actions %}
+          <option value="{{ act }}" {% if action_filter == act %}selected{% endif %}>{{ act }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div style="width: 180px;">
+      <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">User</label>
+      <select name="user_id" class="form-control" style="height: 42px;" onchange="this.form.submit()">
+        <option value="">All Users</option>
+        {% for u in all_users %}
+          <option value="{{ u.id }}" {% if user_id_filter == u.id %}selected{% endif %}>{{ u.full_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div style="width: 140px;">
+      <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">Start Date</label>
+      <input type="date" name="start_date" class="form-control" style="height: 42px;" value="{{ start_date }}" title="Start Date" placeholder="Start Date" onchange="this.form.submit()">
+    </div>
+
+    <div style="width: 140px;">
+      <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">End Date</label>
+      <input type="date" name="end_date" class="form-control" style="height: 42px;" value="{{ end_date }}" title="End Date" placeholder="End Date" onchange="this.form.submit()">
+    </div>
+
+    {% if search or action_filter or user_id_filter or start_date or end_date %}
+      <a href="{{ url_for('activity.index') }}" class="btn btn-secondary" style="height: 42px; display: inline-flex; align-items: center; gap: 6px;">
+        <i class="fas fa-xmark"></i> Clear
+      </a>
     {% endif %}
-  </div>
+  </form>
+</div><!-- Logs Table (Single-View Scrollable Container) -->
+<div class="card-table" style="border-radius: 12px; padding: 0; max-height: 580px; overflow-y: auto; position: relative;">
+  <table class="custom-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+    <thead style="position: sticky; top: 0; background: var(--surface); z-index: 5; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+      <tr style="border-bottom: 2px solid var(--border); color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">
+        <th style="padding: 12px 16px;">Timestamp</th>
+        <th style="padding: 12px 16px;">User</th>
+        <th style="padding: 12px 16px;">Action</th>
+        <th style="padding: 12px 16px;">Details</th>
+        <th style="padding: 12px 16px;">IP Address</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for log in logs %}
+        <tr style="border-bottom: 1px solid var(--border); transition: background 150ms ease-in-out;" onmouseover="this.style.background='var(--background)'" onmouseout="this.style.background='transparent'">
+          <td style="padding: 14px 16px; color: var(--text-muted); font-size: 0.85rem; white-space: nowrap;">
+            <i class="far fa-clock" style="margin-right: 4px;"></i> {{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') if log.created_at else '' }}
+          </td>
+          <td style="padding: 14px 16px; font-weight: 600;">
+            {{ log.user.full_name if log.user else 'System / Anonymous' }}
+          </td>
+          <td style="padding: 14px 16px;">
+            <span class="badge badge-info">{{ log.action }}</span>
+          </td>
+          <td style="padding: 14px 16px; color: var(--text-main);">
+            {{ log.details or '-' }}
+          </td>
+          <td style="padding: 14px 16px; color: var(--text-muted); font-family: monospace; font-size: 0.85rem;">
+            {{ log.ip_address or '127.0.0.1' }}
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="5" style="text-align: center; padding: 48px; color: var(--text-muted);">
+            <i class="fas fa-list-check" style="font-size: 2.5rem; margin-bottom: 12px; opacity: 0.5; display: block;"></i>
+            <strong style="font-size: 1.05rem; color: var(--text-main); display: block; margin-bottom: 4px;">No security activity logs found.</strong>
+            <span>No user authentication or security logs match your current filter parameters.</span>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}

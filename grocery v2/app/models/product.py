@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.database import db
 
 class Product(db.Model):
@@ -47,6 +47,14 @@ class Product(db.Model):
         if not self.expiry_date:
             return False
         return self.expiry_date < datetime.utcnow().date()
+
+    def is_near_expiry(self) -> bool:
+        if not self.expiry_date:
+            return False
+        from app.models.setting import SystemSetting
+        warning_days = int(SystemSetting.get('EXPIRY_WARNING_DAYS', '30') or '30')
+        today = datetime.utcnow().date()
+        return today <= self.expiry_date <= (today + timedelta(days=warning_days))
 
     def to_dict(self):
         return {

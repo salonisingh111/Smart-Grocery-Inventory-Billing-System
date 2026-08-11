@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Inventory Audit Logs{% endblock %}
+{% block title %}Stock Audit — Inventory Management{% endblock %}
 
 {% block content %}
 <div class="page-header">
   <div>
-    <h1 class="page-title">Inventory Tracking & Stock Audit</h1>
-    <p class="page-subtitle">Real-time stock movement history, manual adjustments, and audit trail</p>
+    <h1 class="page-title">Stock Audit</h1>
+    <p class="page-subtitle">Track manual stock adjustments and maintain a complete inventory audit trail</p>
   </div>
 </div>
 
@@ -13,95 +13,366 @@
 {% include "inventory/_hub_tabs.html" %}
 
 <div style="display: flex; flex-direction: column; gap: 24px;">
-  <!-- Manual Stock Adjustment Form (Horizontal Top Card) -->
+  <!-- Section A: Stock Adjustment Form -->
   <div class="card-table" style="padding: 24px;">
     <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-      <i class="fas fa-boxes-stacked" style="color: var(--primary-color, #2563eb);"></i> Manual Stock Adjustment
+      <i class="fas fa-boxes-stacked" style="color: var(--primary-color, #2563eb);"></i> Stock Adjustment
     </h3>
-    <form method="POST" action="{{ url_for('inventory.index') }}">
-      {{ form.csrf_token }}
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; align-items: end;">
+
+    <form id="stockAuditForm" method="POST" action="{{ url_for('inventory.index') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" id="hidden_confirm_password" name="confirm_password" value="">
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 16px;">
+        <!-- Product Selection -->
         <div class="form-group" style="margin-bottom: 0;">
-          <label class="form-label">Select Product *</label>
-          <select name="product_id" class="form-control" required>
+          <label class="form-label">Product (Active Only) *</label>
+          <select id="adj_product_id" name="product_id" class="form-control" required onchange="updateCurrentStockDisplay()">
+            <option value="">Select Product...</option>
             {% for p in products %}
-              <option value="{{ p.id }}">{{ p.name }} (Current: {{ p.quantity }} {{ p.unit }})</option>
+              <option value="{{ p.id }}" data-stock="{{ p.quantity }}" data-unit="{{ p.unit }}" data-sku="{{ p.sku }}" data-name="{{ p.name }}">
+                {{ p.name }} (SKU: {{ p.sku }})
+              </option>
             {% endfor %}
           </select>
         </div>
 
+        <!-- Current Stock (Read Only) -->
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Current Stock</label>
+          <input type="text" id="adj_current_stock" class="form-control" value="Select product..." readonly style="background: var(--background); color: var(--text-muted);">
+        </div>
+
+        <!-- Adjustment Type -->
         <div class="form-group" style="margin-bottom: 0;">
           <label class="form-label">Adjustment Type *</label>
-          {{ form.change_type(class="form-control") }}
+          <select id="adj_type" name="change_type" class="form-control" required>
+            <option value="Stock Out">Stock Out (Decrease)</option>
+            <option value="Stock In">Stock In (Increase)</option>
+          </select>
         </div>
 
+        <!-- Quantity -->
         <div class="form-group" style="margin-bottom: 0;">
-          <label class="form-label">Quantity Difference *</label>
-          {{ form.quantity_changed(class="form-control", placeholder="e.g. 10") }}
+          <label class="form-label">Quantity *</label>
+          <input type="number" id="adj_quantity" name="quantity_changed" class="form-control" min="1" placeholder="Positive numeric value" required>
         </div>
 
+        <!-- Reason Dropdown -->
         <div class="form-group" style="margin-bottom: 0;">
-          <label class="form-label">Reason / Remark *</label>
-          {{ form.reason(class="form-control", placeholder="e.g. Stock Arrival") }}
+          <label class="form-label">Reason *</label>
+          <select id="adj_reason" name="reason" class="form-control" required>
+            <option value="Physical Count Correction">Physical Count Correction</option>
+            <option value="Damaged Stock">Damaged Stock</option>
+            <option value="Missing Stock">Missing Stock</option>
+            <option value="Expired Stock">Expired Stock</option>
+            <option value="Manual Stock Receipt">Manual Stock Receipt</option>
+            <option value="Data Correction">Data Correction</option>
+            <option value="Other">Other</option>
+          </select>
         </div>
 
+        <!-- Adjusted By (Read Only) -->
         <div class="form-group" style="margin-bottom: 0;">
-          <label class="form-label">Password Confirmation *</label>
-          {{ form.confirm_password(class="form-control", placeholder="••••••••") }}
-        </div>
-
-        <div class="form-group" style="margin-bottom: 0;">
-          <button type="submit" class="btn btn-primary" style="width: 100%; height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-            <i class="fas fa-arrows-rotate"></i> Submit Adjustment
-          </button>
+          <label class="form-label">Adjusted By</label>
+          <input type="text" class="form-control" value="{{ current_user.full_name }}" readonly style="background: var(--background); color: var(--text-muted);">
         </div>
       </div>
+
+      <!-- Remarks -->
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label class="form-label">Remarks (Optional)</label>
+        <input type="text" id="adj_remarks" name="remarks" class="form-control" placeholder="Additional explanation or notes...">
+      </div>
+
+      <button type="button" class="btn btn-primary" onclick="openConfirmAuditModal()" style="height: 44px; display: inline-flex; align-items: center; gap: 8px;">
+        <i class="fas fa-arrows-rotate"></i> Submit Adjustment
+      </button>
     </form>
   </div>
 
-  <!-- Audit Logs Table (Full Width Main Area) -->
+  <!-- Section B: Stock Audit History -->
   <div class="card-table" style="width: 100%;">
-    <div class="table-header">
-      <h3 style="font-size: 1rem; font-weight: 700;">Stock Audit Logs</h3>
-      <form method="GET" style="display: flex; gap: 8px;">
-        <input type="text" name="search" class="form-control" style="width: 250px;" placeholder="Search audit logs..." value="{{ search }}">
-        <button type="submit" class="btn btn-sm btn-secondary"><i class="fas fa-search"></i> Search</button>
+    <div class="table-header" style="padding: 20px 24px; border-bottom: 1px solid var(--border);">
+      <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0;">Stock Audit History</h3>
+    </div>
+
+    <!-- Filter Row -->
+    <div style="padding: 16px 24px; border-bottom: 1px solid var(--border); background: var(--surface);">
+      <form method="GET" action="{{ url_for('inventory.index') }}" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
+        <div style="flex: 1; min-width: 200px;">
+          <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">Search Logs</label>
+          <input type="text" name="search" class="form-control" style="height: 42px;" placeholder="Search product, SKU, reference..." value="{{ search }}">
+        </div>
+
+        <div style="width: 160px;">
+          <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">Audit Type</label>
+          <select name="change_type" class="form-control" style="height: 42px;" onchange="this.form.submit()">
+            <option value="">All Types</option>
+            <option value="Stock Out" {% if change_type_filter == 'Stock Out' %}selected{% endif %}>Stock Out</option>
+            <option value="Stock In" {% if change_type_filter == 'Stock In' %}selected{% endif %}>Stock In</option>
+            <option value="Sale" {% if change_type_filter == 'Sale' %}selected{% endif %}>Sale</option>
+            <option value="Return" {% if change_type_filter == 'Return' %}selected{% endif %}>Return</option>
+          </select>
+        </div>
+
+        <div style="width: 180px;">
+          <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">Reason</label>
+          <select name="reason" class="form-control" style="height: 42px;" onchange="this.form.submit()">
+            <option value="">All Reasons</option>
+            {% for r in reasons %}
+              <option value="{{ r }}" {% if reason_filter == r %}selected{% endif %}>{{ r }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div style="width: 160px;">
+          <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">User</label>
+          <select name="user_id" class="form-control" style="height: 42px;" onchange="this.form.submit()">
+            <option value="">All Users</option>
+            {% for u in all_users %}
+              <option value="{{ u.id }}" {% if user_id_filter == u.id %}selected{% endif %}>{{ u.full_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div style="width: 140px;">
+          <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">Start Date</label>
+          <input type="date" name="start_date" class="form-control" style="height: 42px;" value="{{ start_date }}" title="Start Date" placeholder="Start Date" onchange="this.form.submit()">
+        </div>
+
+        <div style="width: 140px;">
+          <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">End Date</label>
+          <input type="date" name="end_date" class="form-control" style="height: 42px;" value="{{ end_date }}" title="End Date" placeholder="End Date" onchange="this.form.submit()">
+        </div>
+
+        {% if search or change_type_filter or reason_filter or user_id_filter or start_date or end_date %}
+          <a href="{{ url_for('inventory.index') }}" class="btn btn-secondary" style="height: 42px; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fas fa-xmark"></i> Clear
+          </a>
+        {% endif %}
       </form>
     </div>
-    <table class="custom-table">
-      <thead>
-        <tr>
-          <th>Date & Time</th>
-          <th>Product</th>
-          <th>Type</th>
-          <th>Qty Changed</th>
-          <th>Remaining Qty</th>
-          <th>Performed By</th>
-          <th>Reason / Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for log in logs %}
-        <tr>
-          <td style="font-size: 0.85rem; color: var(--text-muted);">{{ log.created_at.strftime('%Y-%m-%d %H:%M') if log.created_at else '' }}</td>
-          <td><strong>{{ log.product.name if log.product else 'Deleted Product' }}</strong></td>
-          <td><span class="badge badge-secondary">{{ log.change_type }}</span></td>
-          <td>
-            {% if log.quantity_changed > 0 %}
-              <span class="badge badge-success">+{{ log.quantity_changed }}</span>
-            {% else %}
-              <span class="badge badge-danger">{{ log.quantity_changed }}</span>
-            {% endif %}
-          </td>
-          <td><strong>{{ log.remaining_quantity }}</strong></td>
-          <td>{{ log.user.full_name if log.user else 'System' }}</td>
-          <td style="font-size: 0.85rem; color: var(--text-muted);">{{ log.reason or '-' }}</td>
-        </tr>
-        {% else %}
-        <tr><td colspan="7" class="text-center p-4">No stock adjustment logs found.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+
+    <!-- History Table (Single-View Scrollable Container) -->
+    <div class="table-scroll-container" style="max-height: 580px; overflow-y: auto; position: relative;">
+      <table class="custom-table">
+        <thead style="position: sticky; top: 0; background: var(--surface); z-index: 5; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+          <tr>
+            <th>Date & Time</th>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Adjustment Type</th>
+            <th>Quantity Changed</th>
+            <th>Previous Stock</th>
+            <th>New Stock</th>
+            <th>Reason</th>
+            <th>Performed By</th>
+            <th>Reference</th>
+            <th style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in logs %}
+          <tr>
+            <td style="font-size: 0.85rem; color: var(--text-muted); white-space: nowrap;">
+              {{ log.created_at.strftime('%Y-%m-%d %H:%M') if log.created_at else '' }}
+            </td>
+            <td><strong>{{ log.product.name if log.product else 'Deleted Product' }}</strong></td>
+            <td><code>{{ log.product.sku if log.product else 'N/A' }}</code></td>
+            <td>
+              {% if log.change_type in ['Stock In', 'Return'] %}
+                <span class="badge badge-success"><i class="fas fa-plus"></i> {{ log.change_type }}</span>
+              {% elif log.change_type in ['Stock Out', 'Sale'] %}
+                <span class="badge badge-danger"><i class="fas fa-minus"></i> {{ log.change_type }}</span>
+              {% else %}
+                <span class="badge badge-warning">{{ log.change_type }}</span>
+              {% endif %}
+            </td>
+            <td>
+              <strong style="color: {% if log.quantity_changed > 0 %}var(--success){% else %}var(--danger){% endif %};">
+                {% if log.quantity_changed > 0 %}+{% endif %}{{ log.quantity_changed }}
+              </strong>
+            </td>
+            <td>{{ log.previous_stock if log.previous_stock is not none else '-' }}</td>
+            <td><strong>{{ log.remaining_quantity }}</strong></td>
+            <td style="font-size: 0.85rem; color: var(--text-muted);">{{ log.reason or '-' }}</td>
+            <td>{{ log.user.full_name if log.user else 'System' }}</td>
+            <td><code style="font-size: 0.8rem;">{{ log.get_reference() }}</code></td>
+            <td style="text-align: right;">
+              <button class="btn btn-sm btn-secondary" onclick="openAuditDetailModal({{ log.id }})" title="View Audit Details">
+                <i class="fas fa-eye"></i> View
+              </button>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="11" class="text-center p-5" style="color: var(--text-muted);">
+              <i class="fas fa-clipboard-check" style="font-size: 2.5rem; opacity: 0.5; margin-bottom: 12px; display: block;"></i>
+              <strong style="font-size: 1.05rem; color: var(--text-main); display: block; margin-bottom: 4px;">No stock audit logs found.</strong>
+              <span>No stock adjustment records match your current filter parameters.</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
+
+<!-- Confirmation Modal -->
+<div class="modal-backdrop" id="confirmAuditModalBackdrop" style="display: none;">
+  <div class="modal-card" style="max-width: 480px;">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+      <div class="metric-icon icon-blue" style="width: 44px; height: 44px; font-size: 1.2rem;">
+        <i class="fas fa-shield-halved"></i>
+      </div>
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0;">Confirm Stock Adjustment</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Review audit calculation details before confirming.</p>
+      </div>
+    </div>
+
+    <div style="background: var(--background); border-radius: 8px; padding: 16px; margin-bottom: 20px; font-size: 0.9rem; display: flex; flex-direction: column; gap: 8px;">
+      <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-muted);">Product:</span><strong id="modal_product_name">-</strong></div>
+      <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-muted);">Current Stock:</span><span id="modal_current_stock">-</span></div>
+      <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-muted);">Adjustment Type:</span><strong id="modal_adj_type">-</strong></div>
+      <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-muted);">Quantity:</span><span id="modal_quantity">-</span></div>
+      <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 6px;"><span style="color: var(--text-muted);">New Stock:</span><strong id="modal_new_stock" style="color: var(--primary);">-</strong></div>
+      <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-muted);">Reason:</span><span id="modal_reason">-</span></div>
+    </div>
+
+    <div class="form-group" style="margin-bottom: 20px;">
+      <label class="form-label">Password Confirmation (Security Rule)</label>
+      <input type="password" id="modal_password_input" class="form-control" placeholder="Enter your password to confirm">
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 12px;">
+      <button type="button" class="btn btn-secondary" onclick="closeConfirmAuditModal()">Cancel</button>
+      <button type="button" class="btn btn-primary" onclick="submitConfirmedAuditForm()"><i class="fas fa-check"></i> Confirm & Apply Adjustment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Audit Record Detail Read-Only Modal -->
+<div class="modal-backdrop" id="auditDetailModalBackdrop" style="display: none;">
+  <div class="modal-card" style="max-width: 520px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+      <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+        <i class="fas fa-receipt" style="color: var(--primary);"></i> Stock Audit Record Details
+      </h3>
+      <button type="button" class="alert-close-btn" onclick="closeAuditDetailModal()">&times;</button>
+    </div>
+
+    <div id="auditDetailContent" style="display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem;">
+      <div style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; color: var(--primary);"></i> Loading details...</div>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 12px;">
+      <button type="button" class="btn btn-secondary" onclick="closeAuditDetailModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function updateCurrentStockDisplay() {
+  const select = document.getElementById('adj_product_id');
+  const display = document.getElementById('adj_current_stock');
+  const selectedOption = select.options[select.selectedIndex];
+  
+  if (selectedOption && selectedOption.value) {
+    const stock = selectedOption.getAttribute('data-stock');
+    const unit = selectedOption.getAttribute('data-unit');
+    display.value = `${stock} ${unit}`;
+  } else {
+    display.value = 'Select product...';
+  }
+}
+
+function openConfirmAuditModal() {
+  const select = document.getElementById('adj_product_id');
+  const selectedOption = select.options[select.selectedIndex];
+  if (!selectedOption || !selectedOption.value) {
+    alert('Please select a product first.');
+    return;
+  }
+
+  const qtyInput = parseInt(document.getElementById('adj_quantity').value);
+  if (isNaN(qtyInput) || qtyInput <= 0) {
+    alert('Quantity must be a positive number greater than 0.');
+    return;
+  }
+
+  const currentStock = parseInt(selectedOption.getAttribute('data-stock')) || 0;
+  const unit = selectedOption.getAttribute('data-unit') || '';
+  const adjType = document.getElementById('adj_type').value;
+  const reason = document.getElementById('adj_reason').value;
+
+  let newStock = currentStock;
+  if (adjType === 'Stock Out') {
+    if (qtyInput > currentStock) {
+      alert(`Insufficient stock. Current stock is ${currentStock} ${unit}.`);
+      return;
+    }
+    newStock = currentStock - qtyInput;
+  } else {
+    newStock = currentStock + qtyInput;
+  }
+
+  document.getElementById('modal_product_name').innerText = selectedOption.getAttribute('data-name');
+  document.getElementById('modal_current_stock').innerText = `${currentStock} ${unit}`;
+  document.getElementById('modal_adj_type').innerText = adjType;
+  document.getElementById('modal_quantity').innerText = `${qtyInput} ${unit}`;
+  document.getElementById('modal_new_stock').innerText = `${newStock} ${unit}`;
+  document.getElementById('modal_reason').innerText = reason;
+  document.getElementById('modal_password_input').value = '';
+
+  document.getElementById('confirmAuditModalBackdrop').style.display = 'flex';
+}
+
+function closeConfirmAuditModal() {
+  document.getElementById('confirmAuditModalBackdrop').style.display = 'none';
+}
+
+function submitConfirmedAuditForm() {
+  const pwd = document.getElementById('modal_password_input').value;
+  document.getElementById('hidden_confirm_password').value = pwd;
+  closeConfirmAuditModal();
+  document.getElementById('stockAuditForm').submit();
+}
+
+function openAuditDetailModal(logId) {
+  const modal = document.getElementById('auditDetailModalBackdrop');
+  const content = document.getElementById('auditDetailContent');
+  content.innerHTML = '<div style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; color: var(--primary);"></i> Loading audit record details...</div>';
+  modal.style.display = 'flex';
+
+  fetch(`/inventory/audit-detail/${logId}`)
+    .then(res => res.json())
+    .then(data => {
+      content.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div><span style="color: var(--text-muted); font-size: 0.8rem;">Reference Code:</span><br><code>${data.reference_code}</code></div>
+          <div><span style="color: var(--text-muted); font-size: 0.8rem;">Date & Time:</span><br><strong>${data.created_at}</strong></div>
+          <div><span style="color: var(--text-muted); font-size: 0.8rem;">Product:</span><br><strong>${data.product_name}</strong></div>
+          <div><span style="color: var(--text-muted); font-size: 0.8rem;">SKU:</span><br><code>${data.sku}</code></div>
+          <div><span style="color: var(--text-muted); font-size: 0.8rem;">Adjustment Type:</span><br><strong style="color: var(--primary);">${data.change_type}</strong></div>
+          <div><span style="color: var(--text-muted); font-size: 0.8rem;">Quantity Changed:</span><br><strong>${data.quantity_changed}</strong></div>
+          <div><span style="color: var(--text-muted); font-size: 0.8rem;">Previous Stock:</span><br><span>${data.previous_stock}</span></div>
+          <div><span style="color: var(--text-muted); font-size: 0.8rem;">New Stock:</span><br><strong style="color: var(--success);">${data.remaining_quantity}</strong></div>
+          <div><span style="color: var(--text-muted); font-size: 0.8rem;">Reason:</span><br><span>${data.reason || '-'}</span></div>
+          <div><span style="color: var(--text-muted); font-size: 0.8rem;">Performed By:</span><br><span>${data.performed_by} (${data.user_role})</span></div>
+        </div>
+        ${data.remarks ? `<div style="border-top: 1px solid var(--border); padding-top: 8px; margin-top: 4px;"><span style="color: var(--text-muted); font-size: 0.8rem;">Remarks:</span><br><span>${data.remarks}</span></div>` : ''}
+      `;
+    })
+    .catch(err => {
+      content.innerHTML = `<div style="color: var(--danger); padding: 12px; text-align: center;">Failed to load audit record details: ${err}</div>`;
+    });
+}
+
+function closeAuditDetailModal() {
+  document.getElementById('auditDetailModalBackdrop').style.display = 'none';
+}
+</script>
 {% endblock %}

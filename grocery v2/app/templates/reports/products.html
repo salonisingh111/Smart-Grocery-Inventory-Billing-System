@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Reports & Analytics - Product Performance{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+  
+  <!-- Submodule Tabs Header -->
+  {% include 'reports/_reports_tabs.html' %}
+
+  <!-- Filter Bar -->
+  {% set show_category_filter = True %}
+  {% set show_product_filter = True %}
+  {% include 'reports/_reports_filter.html' %}
+
+  {% if not data.products_table %}
+  <div class="card border-0 text-center py-5 my-4" style="background: var(--surface); border-radius: 12px; border: 1px solid var(--border) !important;">
+    <div class="card-body">
+      <div class="mb-3" style="font-size: 2.5rem; color: var(--text-muted); opacity: 0.5;">
+        <i class="fas fa-boxes-stacked"></i>
+      </div>
+      <h5 class="fw-bold mb-2">No data available for this period.</h5>
+      <p class="text-muted mb-3" style="font-size: 0.88rem;">There are no product performance records matching your selection.</p>
+      <a href="{{ url_for('report.products') }}" class="btn btn-sm btn-outline-primary" style="border-radius: 6px;">
+        <i class="fas fa-rotate-left me-1"></i> Reset Filters
+      </a>
+    </div>
+  </div>
+  {% else %}
+
+  <!-- 6 Compact KPI Cards (3 per row on Desktop Grid) -->
+  <div class="reports-kpi-grid-3">
+    <!-- 1. Best-Selling Product -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Best-Selling Product</div>
+          <div class="h6 mb-0 fw-bold mt-1 text-truncate" style="color: #2563eb; max-width: 170px;" title="{{ data.kpis.best_selling }}">{{ data.kpis.best_selling }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 0.95rem;">
+          <i class="fas fa-trophy"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Slow-Moving Items -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Slow-Moving Items</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: #f59e0b;">{{ data.kpis.slow_moving_count }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(245, 158, 11, 0.1); color: #f59e0b; font-size: 0.95rem;">
+          <i class="fas fa-hourglass-half"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Units Sold -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Total Units Sold</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: var(--text-main);">{{ data.kpis.total_units }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(6, 182, 212, 0.1); color: #06b6d4; font-size: 0.95rem;">
+          <i class="fas fa-layer-group"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Product Revenue -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Product Revenue</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: var(--text-main);">{{ currency_symbol }}{{ "%.2f"|format(data.kpis.total_revenue) }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.95rem;">
+          <i class="fas fa-money-bill-wave"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Product Profit -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Product Profit</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: #10b981;">{{ currency_symbol }}{{ "%.2f"|format(data.kpis.total_profit) }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.95rem;">
+          <i class="fas fa-chart-line"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Profit Margin -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Overall Profit Margin</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: #8b5cf6;">{{ "%.1f"|format(data.kpis.overall_margin) }}%</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(139, 92, 246, 0.1); color: #8b5cf6; font-size: 0.95rem;">
+          <i class="fas fa-percent"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2-Column Charts Row -->
+  <div class="reports-charts-grid-2">
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 16px; box-shadow: var(--shadow-sm);">
+      <h6 class="fw-bold mb-2" style="font-size: 0.9rem; color: var(--text-main);">
+        <i class="fas fa-tags me-1 text-primary"></i> Category Revenue & Profit
+      </h6>
+      <div style="position: relative; height: 230px; width: 100%;">
+        <canvas id="categoryPerfChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 16px; box-shadow: var(--shadow-sm);">
+      <h6 class="fw-bold mb-2" style="font-size: 0.9rem; color: var(--text-main);">
+        <i class="fas fa-list-check me-1 text-success"></i> Category Performance Summary
+      </h6>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+          <thead>
+            <tr class="text-muted" style="border-bottom: 1px solid var(--border);">
+              <th>Category</th>
+              <th class="text-center">Units Sold</th>
+              <th class="text-end">Revenue</th>
+              <th class="text-end">Profit</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cat in data.category_performance %}
+            <tr>
+              <td class="fw-bold">{{ cat.name }}</td>
+              <td class="text-center"><span class="badge bg-light text-dark" style="border: 1px solid var(--border);">{{ cat.units }}</span></td>
+              <td class="text-end fw-bold text-primary">{{ currency_symbol }}{{ "%.2f"|format(cat.revenue) }}</td>
+              <td class="text-end fw-bold text-success">{{ currency_symbol }}{{ "%.2f"|format(cat.profit) }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Product Performance Table -->
+  <div class="card border-0 mb-4" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 16px; box-shadow: var(--shadow-sm);">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <h6 class="fw-bold mb-0" style="font-size: 0.9rem; color: var(--text-main);">
+        <i class="fas fa-table me-1 text-primary"></i> Product Performance Table
+      </h6>
+      <span class="badge bg-light text-dark" style="border: 1px solid var(--border); font-size: 0.72rem;">{{ data.products_table|length }} Products Analyzed</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+        <thead>
+          <tr class="text-muted" style="border-bottom: 1px solid var(--border);">
+            <th>SKU</th>
+            <th>Product Name</th>
+            <th>Category</th>
+            <th class="text-end">Cost Price</th>
+            <th class="text-end">Selling Price</th>
+            <th class="text-center">Units Sold</th>
+            <th class="text-end">Revenue</th>
+            <th class="text-end">COGS</th>
+            <th class="text-end">Profit</th>
+            <th class="text-end">Margin %</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in data.products_table %}
+          <tr>
+            <td class="fw-bold text-muted" style="font-size: 0.78rem;">{{ row.sku }}</td>
+            <td class="fw-bold">{{ row.name }}</td>
+            <td><span class="badge bg-light text-dark" style="border: 1px solid var(--border);">{{ row.category_name }}</span></td>
+            <td class="text-end text-muted">{{ currency_symbol }}{{ "%.2f"|format(row.purchase_price) }}</td>
+            <td class="text-end fw-bold">{{ currency_symbol }}{{ "%.2f"|format(row.selling_price) }}</td>
+            <td class="text-center">
+              <span class="badge {% if row.units_sold > 0 %}bg-primary{% else %}bg-secondary{% endif %}" style="border-radius: 6px;">
+                {{ row.units_sold }}
+              </span>
+            </td>
+            <td class="text-end fw-bold text-primary">{{ currency_symbol }}{{ "%.2f"|format(row.revenue) }}</td>
+            <td class="text-end text-danger">{{ currency_symbol }}{{ "%.2f"|format(row.cogs) }}</td>
+            <td class="text-end fw-bold {% if row.profit >= 0 %}text-success{% else %}text-danger{% endif %}">
+              {{ currency_symbol }}{{ "%.2f"|format(row.profit) }}
+            </td>
+            <td class="text-end fw-bold" style="color: #8b5cf6;">{{ "%.1f"|format(row.margin_percent) }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% endif %}
+</div>
+
+<!-- JS Charts Setup -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const catPerf = {{ data.category_performance | tojson }};
+
+  const catCanvas = document.getElementById('categoryPerfChart');
+  if (catCanvas && catPerf.length > 0) {
+    new Chart(catCanvas, {
+      type: 'bar',
+      data: {
+        labels: catPerf.map(c => c.name),
+        datasets: [
+          {
+            label: 'Revenue (₹)',
+            data: catPerf.map(c => c.revenue),
+            backgroundColor: '#2563eb',
+            borderRadius: 4
+          },
+          {
+            label: 'Profit (₹)',
+            data: catPerf.map(c => c.profit),
+            backgroundColor: '#10b981',
+            borderRadius: 4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

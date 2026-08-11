@@ -20,9 +20,9 @@ product_bp = Blueprint('product', __name__, url_prefix='/products')
 def index():
     search = request.args.get('search', '', type=str)
     category_id = request.args.get('category_id', type=int)
-    stock_status = request.args.get('stock_status', '', type=str)
+    min_price_raw = request.args.get('min_price', '', type=str).strip()
+    max_price_raw = request.args.get('max_price', '', type=str).strip()
     page = request.args.get('page', 1, type=int)
-    per_page = 10
 
     query = Product.query
 
@@ -38,17 +38,23 @@ def index():
     if category_id:
         query = query.filter_by(category_id=category_id)
 
-    all_items = query.order_by(Product.name).all()
+    min_price = None
+    if min_price_raw:
+        try:
+            min_price = float(min_price_raw)
+            query = query.filter(Product.selling_price >= min_price)
+        except ValueError:
+            pass
 
-    if stock_status == 'low':
-        items = [p for p in all_items if p.is_low_stock()]
-    elif stock_status == 'out':
-        items = [p for p in all_items if p.is_out_of_stock()]
-    elif stock_status == 'expired':
-        items = [p for p in all_items if p.is_expired()]
-    else:
-        items = all_items
+    max_price = None
+    if max_price_raw:
+        try:
+            max_price = float(max_price_raw)
+            query = query.filter(Product.selling_price <= max_price)
+        except ValueError:
+            pass
 
+    items = query.order_by(Product.name).all()
     total_count = len(items)
     categories = Category.query.filter_by(status='Active').all()
 
@@ -58,7 +64,8 @@ def index():
         categories=categories,
         search=search,
         selected_category=category_id,
-        stock_status=stock_status,
+        min_price=min_price_raw,
+        max_price=max_price_raw,
         total_count=total_count
     )
 

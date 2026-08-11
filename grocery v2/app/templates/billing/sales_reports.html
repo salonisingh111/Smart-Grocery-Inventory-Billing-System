@@ -26,9 +26,10 @@
 
   <!-- Period & Date Filters Bar -->
   <div class="card-table" style="padding: 20px; border-radius: 12px; margin-bottom: 24px;">
-    <form method="GET" action="{{ url_for('billing.sales_reports') }}" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+    <form method="GET" action="{{ url_for('billing.sales_reports') }}" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
       <div style="width: 180px;">
-        <select name="period" class="form-control" onchange="this.form.submit()">
+        <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">Time Period</label>
+        <select name="period" class="form-control" style="height: 42px;" onchange="this.form.submit()">
           <option value="today" {% if period == 'today' %}selected{% endif %}>Today</option>
           <option value="yesterday" {% if period == 'yesterday' %}selected{% endif %}>Yesterday</option>
           <option value="this_week" {% if period == 'this_week' %}selected{% endif %}>This Week</option>
@@ -39,11 +40,13 @@
       </div>
 
       <div style="width: 150px;">
-        <input type="date" name="start_date" class="form-control" value="{{ start_date }}" placeholder="Start Date">
+        <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">Start Date</label>
+        <input type="date" name="start_date" class="form-control" style="height: 42px;" value="{{ start_date }}" title="Start Date" placeholder="Start Date">
       </div>
 
       <div style="width: 150px;">
-        <input type="date" name="end_date" class="form-control" value="{{ end_date }}" placeholder="End Date">
+        <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">End Date</label>
+        <input type="date" name="end_date" class="form-control" style="height: 42px;" value="{{ end_date }}" title="End Date" placeholder="End Date">
       </div>
 
       <button type="submit" class="btn btn-primary" style="height: 42px; display: inline-flex; align-items: center; gap: 6px;">

@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block title %}Reports & Analytics - Finance Analytics{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+  
+  <!-- Submodule Tabs Header -->
+  {% include 'reports/_reports_tabs.html' %}
+
+  <!-- Filter Bar -->
+  {% include 'reports/_reports_filter.html' %}
+
+  <!-- 8 Compact KPI Cards (4 per row on Desktop Grid) -->
+  <div class="reports-kpi-grid-4">
+
+    <!-- 1. Gross Sales -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Gross Sales</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: var(--text-main);">{{ currency_symbol }}{{ "%.2f"|format(data.kpis.gross_sales) }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 0.95rem;">
+          <i class="fas fa-receipt"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Net Sales -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Net Sales</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: #2563eb;">{{ currency_symbol }}{{ "%.2f"|format(data.kpis.net_sales) }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 0.95rem;">
+          <i class="fas fa-chart-pie"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Cost of Goods Sold (COGS) -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">COGS (Cost of Goods)</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: #ef4444;">{{ currency_symbol }}{{ "%.2f"|format(data.kpis.cogs) }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(239, 68, 68, 0.1); color: #ef4444; font-size: 0.95rem;">
+          <i class="fas fa-boxes-stacked"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Gross Profit -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Gross Profit</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: #10b981;">{{ currency_symbol }}{{ "%.2f"|format(data.kpis.gross_profit) }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.95rem;">
+          <i class="fas fa-arrow-trend-up"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Profit Margin % -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Profit Margin</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: #8b5cf6;">{{ "%.1f"|format(data.kpis.profit_margin) }}%</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(139, 92, 246, 0.1); color: #8b5cf6; font-size: 0.95rem;">
+          <i class="fas fa-percent"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Total Discounts -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Total Discounts</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: #ec4899;">{{ currency_symbol }}{{ "%.2f"|format(data.kpis.discounts) }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(236, 72, 153, 0.1); color: #ec4899; font-size: 0.95rem;">
+          <i class="fas fa-tags"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Total Tax Collected -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Tax Collected</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: var(--text-main);">{{ currency_symbol }}{{ "%.2f"|format(data.kpis.tax_collected) }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(6, 182, 212, 0.1); color: #06b6d4; font-size: 0.95rem;">
+          <i class="fas fa-calculator"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. Total Refunds -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Total Refunds</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: #ef4444;">{{ currency_symbol }}{{ "%.2f"|format(data.kpis.refunds) }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(239, 68, 68, 0.1); color: #ef4444; font-size: 0.95rem;">
+          <i class="fas fa-rotate-left"></i>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 2-Column Desktop Charts Row -->
+  <div class="reports-charts-grid-2">
+    <!-- Chart 1: Revenue vs Cost Trend -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 16px; box-shadow: var(--shadow-sm);">
+      <h6 class="fw-bold mb-2" style="font-size: 0.9rem; color: var(--text-main);">
+        <i class="fas fa-scale-balanced me-1 text-primary"></i> Revenue vs Cost Trend
+      </h6>
+      <div style="position: relative; height: 230px; width: 100%;">
+        <canvas id="finRevVsCostChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 2: Profit Trend -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 16px; box-shadow: var(--shadow-sm);">
+      <h6 class="fw-bold mb-2" style="font-size: 0.9rem; color: var(--text-main);">
+        <i class="fas fa-seedling me-1 text-success"></i> Gross Profit Trend
+      </h6>
+      <div style="position: relative; height: 230px; width: 100%;">
+        <canvas id="finProfitTrendChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Financial Summary Statement Table -->
+  <div class="card border-0 mb-4" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 16px; box-shadow: var(--shadow-sm);">
+    <h6 class="fw-bold mb-3" style="font-size: 0.9rem; color: var(--text-main);">
+      <i class="fas fa-file-invoice-dollar me-1 text-primary"></i> Profit & Loss Summary Statement
+    </h6>
+
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle mb-0" style="font-size: 0.85rem;">
+        <thead class="table-light">
+          <tr>
+            <th>Financial Line Item</th>
+            <th class="text-end" style="width: 180px;">Amount ({{ currency_symbol }})</th>
+            <th>Formula / Calculation Method</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="fw-bold">Gross Sales</td>
+            <td class="text-end fw-bold">{{ "%.2f"|format(data.kpis.gross_sales) }}</td>
+            <td class="text-muted small">Sum of total billing amount before discounts & tax</td>
+          </tr>
+          <tr>
+            <td class="text-danger">(-) Discounts Allowed</td>
+            <td class="text-end text-danger">-{{ "%.2f"|format(data.kpis.discounts) }}</td>
+            <td class="text-muted small">Sum of promotional & bill-level discounts</td>
+          </tr>
+          <tr>
+            <td class="text-danger">(-) Sales Refunds</td>
+            <td class="text-end text-danger">-{{ "%.2f"|format(data.kpis.refunds) }}</td>
+            <td class="text-muted small">Sum of processed customer product return refunds</td>
+          </tr>
+          <tr class="table-primary fw-bold">
+            <td>(=) Net Sales</td>
+            <td class="text-end text-primary" style="font-size: 0.95rem;">{{ "%.2f"|format(data.kpis.net_sales) }}</td>
+            <td class="small">Gross Sales - Discounts - Refunds</td>
+          </tr>
+          <tr>
+            <td class="text-danger">(-) Cost of Goods Sold (COGS)</td>
+            <td class="text-end text-danger">-{{ "%.2f"|format(data.kpis.cogs) }}</td>
+            <td class="text-muted small">Sum of (units sold × purchase price per product)</td>
+          </tr>
+          <tr class="table-success fw-bold">
+            <td>(=) Gross Profit</td>
+            <td class="text-end text-success" style="font-size: 0.98rem;">{{ "%.2f"|format(data.kpis.gross_profit) }}</td>
+            <td class="small">Net Sales - Cost of Goods Sold</td>
+          </tr>
+          <tr>
+            <td class="fw-bold" style="color: #8b5cf6;">Gross Profit Margin %</td>
+            <td class="text-end fw-bold" style="color: #8b5cf6; font-size: 0.98rem;">{{ "%.1f"|format(data.kpis.profit_margin) }}%</td>
+            <td class="text-muted small">(Gross Profit / Net Sales) × 100</td>
+          </tr>
+          <tr>
+            <td>(+) Tax Collected</td>
+            <td class="text-end fw-bold text-secondary">+{{ "%.2f"|format(data.kpis.tax_collected) }}</td>
+            <td class="text-muted small">Total GST / Tax collected from sales</td>
+          </tr>
+          <tr class="table-dark fw-bold">
+            <td>(=) Net Total Revenue (With Tax)</td>
+            <td class="text-end" style="font-size: 0.98rem;">{{ "%.2f"|format(data.kpis.net_revenue) }}</td>
+            <td class="small">Net Sales + Tax Collected</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- JS Charts Setup -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const labels = {{ data.charts.trend_labels | tojson }};
+  const netSales = {{ data.charts.trend_net_sales | tojson }};
+  const cogs = {{ data.charts.trend_cogs | tojson }};
+  const profit = {{ data.charts.trend_profit | tojson }};
+
+  // 1. Revenue vs Cost Chart
+  const revCostCanvas = document.getElementById('finRevVsCostChart');
+  if (revCostCanvas && labels.length > 0) {
+    new Chart(revCostCanvas, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Net Sales (₹)',
+            data: netSales,
+            borderColor: '#2563eb',
+            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+            fill: true,
+            tension: 0.35
+          },
+          {
+            label: 'COGS (₹)',
+            data: cogs,
+            borderColor: '#ef4444',
+            backgroundColor: 'transparent',
+            borderDash: [4, 4],
+            tension: 0.35
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
+
+  // 2. Profit Trend Chart
+  const profitCanvas = document.getElementById('finProfitTrendChart');
+  if (profitCanvas && labels.length > 0) {
+    new Chart(profitCanvas, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Gross Profit (₹)',
+          data: profit,
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16, 185, 129, 0.15)',
+          fill: true,
+          tension: 0.35
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

@@ -215,107 +215,136 @@ class BillingService:
         }
 
     @classmethod
-    def process_return(cls, bill_id: int, items_data: list, refund_method: str, reason: str, user_id: int) -> tuple[bool, str, BillReturn]:
+    def process_return(cls, bill_id: int, items_data: list, refund_method: str, reason: str, user_id: int, remarks: str = '') -> tuple[bool, str, BillReturn]:
         bill = Bill.query.get(bill_id)
         if not bill:
-            return False, "Original Bill not found.", None
+            return False, "Original Bill not found in system.", None
 
         if bill.status == 'Cancelled':
             return False, "Cannot process return for a cancelled bill.", None
 
         if not items_data:
-            return False, "No items selected for return.", None
+            return False, "Please select at least one product to return.", None
 
         return_number = cls.generate_return_number()
         total_refund_amount = 0.0
         return_items_to_create = []
 
-        for item in items_data:
-            bill_item_id = item.get('bill_item_id')
-            return_qty = int(item.get('return_quantity', 0))
+        try:
+            for item in items_data:
+                bill_item_id = item.get('bill_item_id')
+                return_qty = int(item.get('return_quantity', 0))
+                item_reason = item.get('reason') or reason or 'Customer Return'
+                item_remarks = item.get('remarks', '')
 
-            if return_qty <= 0:
-                continue
+                if return_qty <= 0:
+                    continue
 
-            bill_item = BillItem.query.get(bill_item_id)
-            if not bill_item or bill_item.bill_id != bill.id:
-                return False, f"Invalid bill item reference ID {bill_item_id}.", None
+                bill_item = BillItem.query.get(bill_item_id)
+                if not bill_item or bill_item.bill_id != bill.id:
+                    return False, f"Invalid bill item reference ID {bill_item_id}.", None
 
-            already_returned = bill_item.returned_quantity or 0
-            max_allowed = bill_item.quantity - already_returned
+                already_returned = bill_item.returned_quantity or 0
+                max_allowed = bill_item.quantity - already_returned
 
-            if return_qty > max_allowed:
-                return False, f"Return quantity {return_qty} exceeds maximum returnable limit of {max_allowed} for '{bill_item.product_name}'.", None
+                if return_qty > max_allowed:
+                    return False, f"Return quantity {return_qty} exceeds remaining returnable limit of {max_allowed} for '{bill_item.product_name}'.", None
 
-            unit_refund = bill_item.unit_price + (bill_item.tax_amount / bill_item.quantity if bill_item.quantity else 0.0)
-            item_refund = unit_refund * return_qty
-            total_refund_amount += item_refund
+                unit_refund = bill_item.unit_price + (bill_item.tax_amount / bill_item.quantity if bill_item.quantity else 0.0)
+                item_refund = unit_refund * return_qty
+                total_refund_amount += item_refund
 
-            return_items_to_create.append({
-                'bill_item': bill_item,
-                'return_qty': return_qty,
-                'unit_price': bill_item.unit_price,
-                'refund_amount': item_refund
-            })
+                return_items_to_create.append({
+                    'bill_item': bill_item,
+                    'return_qty': return_qty,
+                    'unit_price': bill_item.unit_price,
+                    'refund_amount': item_refund,
+                    'reason': item_reason,
+                    'remarks': item_remarks
+                })
 
-        if not return_items_to_create:
-            return False, "No valid items selected for return.", None
+            if not return_items_to_create:
+                return False, "No valid items selected for return.", None
 
-        new_return = BillReturn(
-            return_number=return_number,
-            bill_id=bill.id,
-            customer_id=bill.customer_id,
-            user_id=user_id,
-            total_refund=round(total_refund_amount, 2),
-            refund_method=refund_method,
-            reason=reason or 'Customer Product Return'
-        )
-
-        db.session.add(new_return)
-        db.session.flush()
-
-        for r_item in return_items_to_create:
-            b_item = r_item['bill_item']
-            ret_qty = r_item['return_qty']
-
-            # 1. Update BillItem returned_quantity
-            b_item.returned_quantity = (b_item.returned_quantity or 0) + ret_qty
-
-            # 2. Increase returned product quantity back into inventory
-            product = Product.query.get(b_item.product_id)
-            if product:
-                product.quantity += ret_qty
-                # 3. Create inventory history entry
-                inv_log = InventoryHistory(
-                    product_id=product.id,
-                    change_type='Return',
-                    quantity_changed=ret_qty,
-                    remaining_quantity=product.quantity,
-                    reason=f"Return for Bill #{bill.bill_number} (Ref: {return_number})",
-                    performed_by_user_id=user_id
-                )
-                db.session.add(inv_log)
-
-            # Create BillReturnItem
-            return_item_rec = BillReturnItem(
-                return_id=new_return.id,
-                bill_item_id=b_item.id,
-                product_id=b_item.product_id,
-                product_name=b_item.product_name,
-                quantity=ret_qty,
-                unit_price=b_item.unit_price,
-                refund_amount=round(r_item['refund_amount'], 2)
+            new_return = BillReturn(
+                return_number=return_number,
+                bill_id=bill.id,
+                customer_id=bill.customer_id,
+                user_id=user_id,
+                total_refund=round(total_refund_amount, 2),
+                refund_method=refund_method or bill.payment_method or 'Cash',
+                reason=reason or 'Customer Product Return',
+                status='Completed',
+                remarks=remarks or ''
             )
-            db.session.add(return_item_rec)
 
-        # Update overall Bill Status
-        all_items_fully_returned = all(
-            (bi.returned_quantity or 0) >= bi.quantity for bi in bill.items
-        )
-        if all_items_fully_returned:
-            bill.status = 'Returned'
-        else:
-            bill.status = 'Partially Returned'
+            db.session.add(new_return)
+            db.session.flush()
 
-        db.session.commit()
-        return True, f"Return processed successfully. Refund Total: {SystemSetting.get('CURRENCY', '₹')}{round(total_refund_amount, 2)}", new_return
+            for r_item in return_items_to_create:
+                b_item = r_item['bill_item']
+                ret_qty = r_item['return_qty']
+
+                # 1. Update BillItem returned_quantity
+                b_item.returned_quantity = (b_item.returned_quantity or 0) + ret_qty
+
+                # 2. Increase returned product quantity back into inventory
+                product = Product.query.get(b_item.product_id)
+                if product:
+                    prev_stock = product.quantity or 0
+                    product.quantity = prev_stock + ret_qty
+
+                    # 3. Create inventory audit history entry (Integrates with Stock Audit)
+                    inv_log = InventoryHistory(
+                        product_id=product.id,
+                        change_type='Return',
+                        quantity_changed=ret_qty,
+                        previous_stock=prev_stock,
+                        remaining_quantity=product.quantity,
+                        reason=f"Customer Return: {r_item['reason']}",
+                        remarks=f"Return #{return_number} against Bill #{bill.bill_number}",
+                        reference_code=return_number,
+                        performed_by_user_id=user_id
+                    )
+                    db.session.add(inv_log)
+
+                # Create BillReturnItem
+                return_item_rec = BillReturnItem(
+                    return_id=new_return.id,
+                    bill_item_id=b_item.id,
+                    product_id=b_item.product_id,
+                    product_name=b_item.product_name,
+                    quantity=ret_qty,
+                    unit_price=b_item.unit_price,
+                    refund_amount=round(r_item['refund_amount'], 2),
+                    reason=r_item['reason'],
+                    remarks=r_item['remarks']
+                )
+                db.session.add(return_item_rec)
+
+            # Update overall Bill Status
+            all_items_fully_returned = all(
+                (bi.returned_quantity or 0) >= bi.quantity for bi in bill.items
+            )
+            if all_items_fully_returned:
+                bill.status = 'Returned'
+            else:
+                bill.status = 'Partially Returned'
+
+            # Log Security & User Activity
+            from app.utils.logger import log_activity
+            from app.utils.notifications import create_activity_notification
+            from app.models.user import User
+            
+            p_user = User.query.get(user_id)
+            user_name = p_user.full_name if p_user else 'System Admin'
+
+            log_activity('Customer Return Processed', f"Return #{return_number} against Bill #{bill.bill_number} for {SystemSetting.get('CURRENCY', '₹')}{round(total_refund_amount, 2)}")
+            create_activity_notification('Customer Return Processed', f"Return #{return_number} processed for {bill.bill_number}", created_by=user_name)
+
+            db.session.commit()
+            return True, f"Return processed successfully. Refund Total: {SystemSetting.get('CURRENCY', '₹')}{round(total_refund_amount, 2)}", new_return
+
+        except Exception as e:
+            db.session.rollback()
+            return False, f"Return could not be completed. No changes were made: {str(e)}", None

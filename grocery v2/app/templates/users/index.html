@@ -9,6 +9,8 @@
   </div>
 </div>
 
+{% include 'users/_user_tabs.html' %}
+
 <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
   <!-- Add User Form -->
   <div class="card-table" style="padding: 24px;">
@@ -63,9 +65,12 @@
           <option value="Manager" {% if role_filter == 'Manager' %}selected{% endif %}>Manager</option>
           <option value="Cashier" {% if role_filter == 'Cashier' %}selected{% endif %}>Cashier</option>
         </select>
-    <div class="table-scroll-container">
+        <button type="submit" class="btn btn-sm btn-secondary"><i class="fas fa-search"></i></button>
+      </form>
+    </div>
+    <div class="table-scroll-container" style="max-height: 580px; overflow-y: auto; position: relative;">
       <table class="custom-table">
-      <thead>
+      <thead style="position: sticky; top: 0; background: var(--surface); z-index: 5; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
         <tr>
           <th>User Info</th>
           <th>Role</th>

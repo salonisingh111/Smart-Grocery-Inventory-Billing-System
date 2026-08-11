@@ -86,6 +86,8 @@ class BillReturn(db.Model):
     total_refund = db.Column(db.Float, nullable=False, default=0.0)
     refund_method = db.Column(db.String(30), nullable=False, default='Cash') # Cash, UPI, Card
     reason = db.Column(db.String(255), nullable=True)
+    status = db.Column(db.String(20), nullable=False, default='Completed') # Completed, Pending, Rejected
+    remarks = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
 
     bill = db.relationship('Bill', backref='returns', lazy=True)
@@ -100,11 +102,28 @@ class BillReturn(db.Model):
             'bill_id': self.bill_id,
             'bill_number': self.bill.bill_number if self.bill else '',
             'customer_name': self.customer.name if self.customer else (self.bill.customer.name if self.bill and self.bill.customer else 'Walk-in Customer'),
+            'customer_phone': self.customer.phone if self.customer else (self.bill.customer.phone if self.bill and self.bill.customer else ''),
             'total_refund': self.total_refund,
             'refund_method': self.refund_method,
             'reason': self.reason or 'Product Return',
+            'status': self.status or 'Completed',
+            'remarks': self.remarks or '',
+            'processed_by': self.user.full_name if self.user else 'System Admin',
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else '',
-            'item_count': len(self.items)
+            'item_count': len(self.items),
+            'items': [
+                {
+                    'id': item.id,
+                    'product_id': item.product_id,
+                    'product_name': item.product_name,
+                    'sku': item.product.sku if item.product else 'N/A',
+                    'quantity': item.quantity,
+                    'unit_price': item.unit_price,
+                    'refund_amount': item.refund_amount,
+                    'reason': item.reason or self.reason or 'Product Return',
+                    'remarks': item.remarks or ''
+                } for item in self.items
+            ]
         }
 
 class BillReturnItem(db.Model):
@@ -118,6 +137,8 @@ class BillReturnItem(db.Model):
     quantity = db.Column(db.Integer, nullable=False, default=1)
     unit_price = db.Column(db.Float, nullable=False, default=0.0)
     refund_amount = db.Column(db.Float, nullable=False, default=0.0)
+    reason = db.Column(db.String(255), nullable=True)
+    remarks = db.Column(db.Text, nullable=True)
 
     product = db.relationship('Product', lazy=True)
 

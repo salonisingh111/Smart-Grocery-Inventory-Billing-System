@@ -1,0 +1,31 @@
+<div class="reports-pill-tabs d-flex flex-wrap align-items-center gap-2 mb-4">
+  <a href="{{ url_for('report.index', **request.args) }}" 
+     class="pill-tab-btn {% if active_tab == 'overview' %}active{% endif %}"
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border-radius: 10px; font-weight: 600; font-size: 0.88rem; text-decoration: none; transition: all 150ms ease-in-out; {% if active_tab == 'overview' %}background: #2563EB; color: #FFFFFF; box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-chart-pie"></i> Overview
+  </a>
+
+  <a href="{{ url_for('report.sales', **request.args) }}" 
+     class="pill-tab-btn {% if active_tab == 'sales' %}active{% endif %}"
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border-radius: 10px; font-weight: 600; font-size: 0.88rem; text-decoration: none; transition: all 150ms ease-in-out; {% if active_tab == 'sales' %}background: #2563EB; color: #FFFFFF; box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-chart-line"></i> Sales
+  </a>
+
+  <a href="{{ url_for('report.products', **request.args) }}" 
+     class="pill-tab-btn {% if active_tab == 'products' %}active{% endif %}"
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border-radius: 10px; font-weight: 600; font-size: 0.88rem; text-decoration: none; transition: all 150ms ease-in-out; {% if active_tab == 'products' %}background: #2563EB; color: #FFFFFF; box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-box-open"></i> Products
+  </a>
+
+  <a href="{{ url_for('report.customers', **request.args) }}" 
+     class="pill-tab-btn {% if active_tab == 'customers' %}active{% endif %}"
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border-radius: 10px; font-weight: 600; font-size: 0.88rem; text-decoration: none; transition: all 150ms ease-in-out; {% if active_tab == 'customers' %}background: #2563EB; color: #FFFFFF; box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-users"></i> Customers
+  </a>
+
+  <a href="{{ url_for('report.finance', **request.args) }}" 
+     class="pill-tab-btn {% if active_tab == 'finance' %}active{% endif %}"
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border-radius: 10px; font-weight: 600; font-size: 0.88rem; text-decoration: none; transition: all 150ms ease-in-out; {% if active_tab == 'finance' %}background: #2563EB; color: #FFFFFF; box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-wallet"></i> Finance
+  </a>
+</div>

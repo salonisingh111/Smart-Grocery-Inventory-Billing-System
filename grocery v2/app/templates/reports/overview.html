@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}Reports & Analytics - Overview{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+  
+  <!-- Submodule Tabs Header -->
+  {% include 'reports/_reports_tabs.html' %}
+
+  <!-- Filter Bar -->
+  {% include 'reports/_reports_filter.html' %}
+
+  {% if data.kpis.total_bills == 0 %}
+  <!-- Clean Empty State -->
+  <div class="card border-0 text-center py-5 my-4" style="background: var(--surface); border-radius: 12px; border: 1px solid var(--border) !important;">
+    <div class="card-body">
+      <div class="mb-3" style="font-size: 2.5rem; color: var(--text-muted); opacity: 0.5;">
+        <i class="fas fa-folder-open"></i>
+      </div>
+      <h5 class="fw-bold mb-2">No data available for this period.</h5>
+      <p class="text-muted mb-3" style="max-width: 360px; margin: 0 auto; font-size: 0.88rem;">There are no recorded sales transactions for the selected date range filter.</p>
+      <a href="{{ url_for('report.index') }}" class="btn btn-sm btn-outline-primary" style="border-radius: 6px;">
+        <i class="fas fa-rotate-left me-1"></i> Reset Date Filter
+      </a>
+    </div>
+  </div>
+  {% else %}
+
+  <!-- 8 Compact KPI Cards (4 per row on Desktop Grid) -->
+  <div class="reports-kpi-grid-4">
+
+    <!-- 1. Total Revenue -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Total Revenue</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: var(--text-main);">{{ currency_symbol }}{{ "%.2f"|format(data.kpis.total_revenue) }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 0.95rem;">
+          <i class="fas fa-indian-rupee-sign"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Net Sales -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Net Sales</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: #2563eb;">{{ currency_symbol }}{{ "%.2f"|format(data.kpis.net_sales) }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 0.95rem;">
+          <i class="fas fa-chart-pie"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Gross Profit -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Gross Profit</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: #10b981;">{{ currency_symbol }}{{ "%.2f"|format(data.kpis.gross_profit) }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.95rem;">
+          <i class="fas fa-seedling"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Profit Margin -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Profit Margin</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: #8b5cf6;">{{ "%.1f"|format(data.kpis.profit_margin) }}%</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(139, 92, 246, 0.1); color: #8b5cf6; font-size: 0.95rem;">
+          <i class="fas fa-percent"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Total Bills -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Total Bills</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: var(--text-main);">{{ data.kpis.total_bills }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(245, 158, 11, 0.1); color: #f59e0b; font-size: 0.95rem;">
+          <i class="fas fa-receipt"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Items Sold -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Items Sold</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: var(--text-main);">{{ data.kpis.items_sold }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(6, 182, 212, 0.1); color: #06b6d4; font-size: 0.95rem;">
+          <i class="fas fa-shopping-basket"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Total Discounts -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Total Discounts</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: #ec4899;">{{ currency_symbol }}{{ "%.2f"|format(data.kpis.total_discounts) }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(236, 72, 153, 0.1); color: #ec4899; font-size: 0.95rem;">
+          <i class="fas fa-tags"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. Total Refunds -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Total Refunds</div>
+          <div class="h5 mb-0 fw-bold mt-1" style="color: #ef4444;">{{ currency_symbol }}{{ "%.2f"|format(data.kpis.total_refunds) }}</div>
+        </div>
+        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background: rgba(239, 68, 68, 0.1); color: #ef4444; font-size: 0.95rem;">
+          <i class="fas fa-rotate-left"></i>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 2-Column Desktop Chart Layout -->
+  <div class="reports-charts-grid-2">
+    <!-- Chart 1: Revenue Trend -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h6 class="fw-bold mb-0" style="font-size: 0.9rem; color: var(--text-main);">
+          <i class="fas fa-chart-line me-1 text-primary"></i> Revenue Trend
+        </h6>
+        <span class="badge bg-light text-dark" style="border: 1px solid var(--border); font-size: 0.7rem;">{{ data.date_label }}</span>
+      </div>
+      <div style="position: relative; height: 230px; width: 100%;">
+        <canvas id="overviewTrendChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 2: Sales by Category -->
+    <div class="card border-0 h-100" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h6 class="fw-bold mb-0" style="font-size: 0.9rem; color: var(--text-main);">
+          <i class="fas fa-chart-pie me-1 text-purple" style="color: #8b5cf6;"></i> Sales by Category
+        </h6>
+      </div>
+      <div style="position: relative; height: 230px; width: 100%; display: flex; align-items: center; justify-content: center;">
+        <canvas id="overviewCategoryChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 3: Sales vs Cost -->
+  <div class="mb-4">
+    <div class="card border-0" style="background: var(--surface); border: 1px solid var(--border) !important; border-radius: 10px; padding: 16px; box-shadow: var(--shadow-sm);">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h6 class="fw-bold mb-0" style="font-size: 0.9rem; color: var(--text-main);">
+          <i class="fas fa-scale-balanced me-1 text-success"></i> Sales vs Cost Comparison
+        </h6>
+      </div>
+      <div style="position: relative; height: 210px; width: 100%;">
+        <canvas id="overviewSalesVsCostChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  {% endif %}
+</div>
+
+<!-- Embedded JS Charts -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const trendLabels = {{ data.charts.trend_labels | tojson }};
+  const trendRevenue = {{ data.charts.trend_revenue | tojson }};
+  const trendCost = {{ data.charts.trend_cost | tojson }};
+  const catLabels = {{ data.charts.cat_labels | tojson }};
+  const catValues = {{ data.charts.cat_values | tojson }};
+
+  // 1. Revenue Trend
+  const trendCanvas = document.getElementById('overviewTrendChart');
+  if (trendCanvas && trendLabels.length > 0) {
+    new Chart(trendCanvas, {
+      type: 'line',
+      data: {
+        labels: trendLabels,
+        datasets: [{
+          label: 'Net Sales (₹)',
+          data: trendRevenue,
+          borderColor: '#2563eb',
+          backgroundColor: 'rgba(37, 99, 235, 0.1)',
+          fill: true,
+          tension: 0.35,
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
+
+  // 2. Sales by Category
+  const catCanvas = document.getElementById('overviewCategoryChart');
+  if (catCanvas && catLabels.length > 0) {
+    new Chart(catCanvas, {
+      type: 'doughnut',
+      data: {
+        labels: catLabels,
+        datasets: [{
+          data: catValues,
+          backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#6b7280']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } }
+      }
+    });
+  }
+
+  // 3. Sales vs Cost Comparison
+  const svcCanvas = document.getElementById('overviewSalesVsCostChart');
+  if (svcCanvas && trendLabels.length > 0) {
+    new Chart(svcCanvas, {
+      type: 'bar',
+      data: {
+        labels: trendLabels,
+        datasets: [
+          {
+            label: 'Sales Revenue (₹)',
+            data: trendRevenue,
+            backgroundColor: '#2563eb',
+            borderRadius: 4
+          },
+          {
+            label: 'Cost of Goods (₹)',
+            data: trendCost,
+            backgroundColor: '#ef4444',
+            borderRadius: 4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

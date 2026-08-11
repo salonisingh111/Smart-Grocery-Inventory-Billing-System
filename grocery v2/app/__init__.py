@@ -110,6 +110,7 @@ def create_app(config_class=Config):
         return base_ctx
 
     # Register Blueprints
+    from app.routes.activity_routes import activity_bp
     from app.routes.notification_routes import notif_bp
     from app.routes.auth_routes import auth_bp
     from app.routes.dashboard_routes import dashboard_bp
@@ -124,6 +125,7 @@ def create_app(config_class=Config):
     from app.routes.profile_routes import profile_bp
     from app.routes.user_routes import user_bp
 
+    app.register_blueprint(activity_bp)
     app.register_blueprint(notif_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)

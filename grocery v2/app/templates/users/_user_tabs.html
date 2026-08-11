@@ -1,0 +1,11 @@
+<div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; align-items: center;">
+  <a href="{{ url_for('user.index') }}" 
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if request.endpoint == 'user.index' %}background: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-users"></i> Users
+  </a>
+
+  <a href="{{ url_for('activity.index') }}" 
+     style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 180ms ease-in-out; {% if request.endpoint == 'activity.index' %}background: #2563EB; color: #FFFFFF; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);{% else %}background: var(--surface); color: var(--text-main); border: 1px solid var(--border);{% endif %}">
+    <i class="fas fa-list-check"></i> Activity Logs
+  </a>
+</div>

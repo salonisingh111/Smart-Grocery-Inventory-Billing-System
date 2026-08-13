@@ -11,10 +11,10 @@
 
 {% include 'users/_user_tabs.html' %}
 
-<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
+<div style="display: grid; grid-template-columns: minmax(280px, 320px) 1fr; gap: 24px;" class="users-grid-container">
   <!-- Add User Form -->
   <div class="card-table" style="padding: 24px;">
-    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 20px;">Add New System User</h3>
+    <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 20px;"><i class="fas fa-user-plus" style="color: var(--primary); margin-right: 6px;"></i> Add System User</h3>
     <form method="POST" action="{{ url_for('user.create') }}">
       {{ form.csrf_token }}
       <div class="form-group">
@@ -56,10 +56,10 @@
   <!-- Users Table -->
   <div class="card-table">
     <div class="table-header">
-      <h3 style="font-size: 1rem; font-weight: 700;">Registered System Users</h3>
-      <form method="GET" style="display: flex; gap: 8px;">
-        <input type="text" name="search" class="form-control" style="width: 180px;" placeholder="Search user..." value="{{ search }}">
-        <select name="role" class="form-control" style="width: 130px;" onchange="this.form.submit()">
+      <h3 style="font-size: 1rem; font-weight: 700;"><i class="fas fa-users" style="color: var(--primary); margin-right: 6px;"></i> Registered System Users</h3>
+      <form method="GET" style="display: flex; gap: 8px; align-items: center;">
+        <input type="text" name="search" class="form-control" style="width: 160px; font-size: 0.85rem;" placeholder="Search user..." value="{{ search }}">
+        <select name="role" class="form-control" style="width: 115px; font-size: 0.85rem;" onchange="this.form.submit()">
           <option value="">All Roles</option>
           <option value="Admin" {% if role_filter == 'Admin' %}selected{% endif %}>Admin</option>
           <option value="Manager" {% if role_filter == 'Manager' %}selected{% endif %}>Manager</option>
@@ -82,10 +82,12 @@
       </thead>
       <tbody>
         {% for u in users %}
-        <tr>
+        <tr class="animated-row" style="animation-delay: {{ loop.index0 * 50 }}ms;">
           <td>
-            <div style="font-weight: 600;">{{ u.full_name }}</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">@{{ u.username }} &bull; {{ u.email }}</div>
+            <div style="font-weight: 600; color: var(--text-main);">{{ u.full_name }}</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ u.email }}">
+              @{{ u.username }} &bull; {{ u.email }}
+            </div>
           </td>
           <td>
             {% if u.role == 'Admin' %}
@@ -103,26 +105,26 @@
               <span class="badge badge-danger">Inactive</span>
             {% endif %}
           </td>
-          <td style="font-size: 0.825rem; color: var(--text-muted);">
+          <td style="font-size: 0.8rem; color: var(--text-muted); white-space: nowrap;">
             {% if u.last_login_at %}
-              {{ u.last_login_at.strftime('%Y-%m-%d %H:%M') }}
+              {{ u.last_login_at.strftime('%d %b, %H:%M') }}
             {% else %}
-              <span style="opacity: 0.6;">Never</span>
+              <span style="opacity: 0.5;">Never</span>
             {% endif %}
           </td>
-          <td style="font-size: 0.85rem;">{{ u.created_at.strftime('%Y-%m-%d') if u.created_at else '' }}</td>
-          <td>
+          <td style="font-size: 0.8rem; white-space: nowrap;">{{ u.created_at.strftime('%d %b %Y') if u.created_at else '' }}</td>
+          <td style="white-space: nowrap;">
             {% if u.id != current_user.id %}
-            <div style="display: flex; gap: 6px;">
+            <div style="display: flex; gap: 4px; align-items: center;">
               <!-- Toggle Active / Inactive -->
               <form method="POST" action="{{ url_for('user.toggle_status', user_id=u.id) }}" style="display: inline;">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 {% if u.status == 'Active' %}
-                  <button type="submit" class="btn btn-sm btn-warning" title="Deactivate User Account">
+                  <button type="submit" class="btn btn-xs btn-warning" title="Deactivate User Account">
                     <i class="fas fa-user-slash"></i> Deactivate
                   </button>
                 {% else %}
-                  <button type="submit" class="btn btn-sm btn-success" title="Activate User Account">
+                  <button type="submit" class="btn btn-xs btn-success" title="Activate User Account">
                     <i class="fas fa-user-check"></i> Activate
                   </button>
                 {% endif %}
@@ -131,18 +133,18 @@
               <!-- Delete User -->
               <form method="POST" action="{{ url_for('user.delete', user_id=u.id) }}" style="display: inline;" onsubmit="event.preventDefault(); promptPasswordConfirmation(this, 'Confirm Delete User: {{ u.full_name }} (@{{ u.username }})');">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="btn btn-sm btn-danger" title="Delete User">
+                <button type="submit" class="btn btn-xs btn-danger" title="Delete User">
                   <i class="fas fa-trash"></i> Delete
                 </button>
               </form>
             </div>
             {% else %}
-            <span class="badge badge-secondary" style="font-size: 0.75rem;"><i class="fas fa-shield-halved"></i> Logged in</span>
+            <span class="badge badge-secondary" style="font-size: 0.725rem;"><i class="fas fa-shield-halved"></i> Logged in</span>
             {% endif %}
           </td>
         </tr>
         {% else %}
-        <tr><td colspan="5" class="text-center p-4">No system users found.</td></tr>
+        <tr><td colspan="6" class="text-center p-4">No system users found.</td></tr>
         {% endfor %}
       </tbody>
     </table>

@@ -5,7 +5,8 @@ from app.models.activity_log import ActivityLog
 
 def log_activity(action: str, details: str = None, user_id: int = None, user_name: str = None):
     """
-    Utility function to record a system activity log into the database.
+    Utility function to record a system activity log into the database
+    and automatically create a real-time persistent user notification.
     """
     try:
         ip = None
@@ -30,6 +31,20 @@ def log_activity(action: str, details: str = None, user_id: int = None, user_nam
         )
         db.session.add(log_entry)
         db.session.commit()
+
+        # Automatically sync notification for this activity
+        try:
+            from app.utils.notifications import create_activity_notification
+            create_activity_notification(
+                action=action,
+                details=details or '',
+                source_id=log_entry.id,
+                created_by=target_user_name or 'System',
+                link='/activity-logs/'
+            )
+        except Exception as notif_err:
+            print(f"Failed to create notification for activity '{action}': {notif_err}")
+
     except Exception as e:
         db.session.rollback()
         print(f"Failed to log activity '{action}': {e}")

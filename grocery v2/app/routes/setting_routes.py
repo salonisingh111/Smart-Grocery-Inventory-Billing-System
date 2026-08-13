@@ -216,6 +216,8 @@ def export_backup():
     json_str = json.dumps(backup_data, indent=2)
     filename = f"smart_grocery_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
 
+    log_activity('Export System Backup', f'Exported system database & configuration backup file ({filename})')
+
     return Response(
         json_str,
         mimetype='application/json',
@@ -260,6 +262,8 @@ def reset():
     }
     for k, v in defaults.items():
         SystemSetting.set(k, v)
+
+    log_activity('Reset Settings', 'Reset all system settings to default factory values')
 
     flash('System settings reset to default values successfully.', 'warning')
     return redirect(url_for('setting.index'))

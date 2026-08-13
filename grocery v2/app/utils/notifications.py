@@ -9,9 +9,15 @@ from app.models.notification import UserNotification
 # ─── Icon / type maps ──────────────────────────────────────────────────────────
 ACTION_ICON_MAP = {
     'New Bill':             ('fa-receipt',            'activity'),
+    'Cancel Bill':          ('fa-ban',                'activity'),
+    'Return Items':         ('fa-rotate-left',        'activity'),
     'Add Product':          ('fa-plus-circle',        'activity'),
     'Edit Product':         ('fa-pen',                'activity'),
     'Delete Product':       ('fa-trash',              'activity'),
+    'Export Products':      ('fa-file-csv',           'activity'),
+    'Export Report':        ('fa-file-export',        'activity'),
+    'Export Sales Report':  ('fa-file-excel',         'activity'),
+    'Export System Backup': ('fa-file-zipper',        'activity'),
     'Add Category':         ('fa-tag',                'activity'),
     'Edit Category':        ('fa-tag',                'activity'),
     'Delete Category':      ('fa-tag',                'activity'),
@@ -31,6 +37,7 @@ ACTION_ICON_MAP = {
     'Update Profile':       ('fa-id-card',            'activity'),
     'Password Change':      ('fa-key',                'activity'),
     'Settings Updated':     ('fa-sliders',            'activity'),
+    'Reset Settings':       ('fa-rotate-left',        'activity'),
     'Failed Login Attempt': ('fa-lock',               'activity'),
 }
 
@@ -41,9 +48,14 @@ def create_activity_notification(action: str, details: str,
                                  link: str = '/activity-logs/'):
     """
     Persist an activity notification row.
-    Called from routes right after log_activity().
+    Prevent duplicate creation if source_id is already present.
     """
     try:
+        if source_id:
+            existing = UserNotification.query.filter_by(source_type='activity', source_id=source_id).first()
+            if existing:
+                return
+
         icon, ntype = ACTION_ICON_MAP.get(action, ('fa-circle-dot', 'activity'))
         notif = UserNotification(
             notif_type='activity',

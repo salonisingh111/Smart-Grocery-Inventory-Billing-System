@@ -560,6 +560,8 @@ def export_sales_csv():
             b.status
         ])
 
+    log_activity('Export Sales Report', f'Exported sales report ({len(bills)} sales transactions) to CSV file')
+
     return Response(
         output.getvalue(),
         mimetype="text/csv",
@@ -578,6 +580,8 @@ def delete_bill(id):
 
     bill.status = 'Cancelled'
     db.session.commit()
+
+    log_activity('Cancel Bill', f'Cancelled Bill #{bill.bill_number} (Amount: ₹{bill.net_amount})')
 
     flash(f"Bill #{bill.bill_number} has been cancelled successfully.", 'info')
     return redirect(url_for('billing.billing_history'))

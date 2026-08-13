@@ -213,6 +213,8 @@ def export_csv():
             p.quantity, p.min_stock, p.unit, p.status
         ])
 
+    log_activity('Export Products', f'Exported complete product inventory ({len(products)} products) to CSV file')
+
     return Response(
         output.getvalue(),
         mimetype="text/csv",

@@ -3,6 +3,7 @@ from flask_login import login_required
 from app.models.category import Category
 from app.models.product import Product
 from app.services.report_service import ReportService
+from app.utils.logger import log_activity
 
 report_bp = Blueprint('report', __name__, url_prefix='/reports')
 
@@ -178,6 +179,7 @@ def export_csv(submodule):
     if submodule not in ['overview', 'sales', 'products', 'customers', 'finance']:
         submodule = 'overview'
     csv_data, filename = ReportService.export_csv(submodule, request.args)
+    log_activity('Export Report', f'Exported {submodule.capitalize()} analytics report data to CSV file ({filename})')
     response = Response(csv_data, mimetype="text/csv")
     response.headers["Content-Disposition"] = f'attachment; filename="{filename}"'
     return response

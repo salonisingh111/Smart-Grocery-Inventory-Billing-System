@@ -122,6 +122,11 @@ def index():
         SystemSetting.set('NOTIF_SALES', notif_sales)
         SystemSetting.set('NOTIF_SYSTEM', notif_system)
 
+        # 7. Appearance & Theme
+        theme_mode = request.form.get('theme_mode', '').strip().lower()
+        if theme_mode in ['dark', 'light']:
+            SystemSetting.set('DARK_MODE', 'on' if theme_mode == 'dark' else 'off')
+
         flash('System settings saved successfully!', 'success')
         return redirect(url_for('setting.index'))
 
@@ -183,6 +188,10 @@ def index():
         'notif_sales': SystemSetting.get_bool('NOTIF_SALES', True),
         'notif_system': SystemSetting.get_bool('NOTIF_SYSTEM', True),
 
+        # Appearance & Theme
+        'dark_mode': SystemSetting.get_bool('DARK_MODE', False),
+        'theme_mode': 'dark' if SystemSetting.get_bool('DARK_MODE', False) else 'light',
+
         # Data & Backup Metadata
         'last_backup': SystemSetting.get('LAST_BACKUP_TIME', 'Ready (No Backup Yet)'),
 
@@ -194,6 +203,18 @@ def index():
     }
 
     return render_template('settings/index.html', settings=settings_data)
+
+@setting_bp.route('/theme', methods=['POST'])
+@login_required
+def update_theme():
+    data = request.get_json(silent=True) or {}
+    theme = (data.get('theme') or request.form.get('theme') or '').strip().lower()
+
+    if theme in ['dark', 'light']:
+        SystemSetting.set('DARK_MODE', 'on' if theme == 'dark' else 'off')
+        return {'status': 'success', 'theme': theme, 'dark_mode': (theme == 'dark')}, 200
+
+    return {'status': 'error', 'message': 'Invalid theme value. Expected light or dark.'}, 400
 
 @setting_bp.route('/export-backup', methods=['GET'])
 @login_required

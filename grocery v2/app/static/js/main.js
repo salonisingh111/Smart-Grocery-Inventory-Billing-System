@@ -298,3 +298,76 @@ function _updateNotifBadges() {
     }
   }
 }
+
+// Global Theme Engine Helper
+function setTheme(themeName, persistBackend = true) {
+  const theme = themeName === 'dark' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  if (document.body) {
+    document.body.setAttribute('data-theme', theme);
+  }
+  try {
+    localStorage.setItem('smartbilling_theme', theme);
+  } catch (e) {}
+
+  // Update Navbar Theme Toggle Button State (Icon Only)
+  const toggleBtn = document.getElementById('navThemeToggleBtn');
+  const toggleIcon = document.getElementById('navThemeToggleIcon');
+  if (toggleBtn && toggleIcon) {
+    if (theme === 'dark') {
+      // Currently in Night Mode -> Show Day Mode (sun icon)
+      toggleIcon.className = 'fas fa-sun';
+      toggleIcon.style.color = '#f59e0b';
+      toggleBtn.setAttribute('title', 'Switch to Day Mode');
+    } else {
+      // Currently in Day Mode -> Show Night Mode (moon icon)
+      toggleIcon.className = 'fas fa-moon';
+      toggleIcon.style.color = '#3b82f6';
+      toggleBtn.setAttribute('title', 'Switch to Night Mode');
+    }
+  }
+
+  // Update Appearance UI active state if present
+  document.querySelectorAll('.theme-card-option').forEach(card => {
+    if (card.dataset.themeMode === theme) {
+      card.classList.add('active');
+      const radio = card.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+    } else {
+      card.classList.remove('active');
+    }
+  });
+
+  // Reconfigure Chart.js defaults if loaded
+  if (typeof updateChartDefaultsForTheme === 'function') {
+    updateChartDefaultsForTheme(theme);
+  }
+
+  if (persistBackend) {
+    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+    fetch('/settings/theme', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken
+      },
+      body: JSON.stringify({ theme: theme })
+    }).catch(() => {});
+  }
+}
+
+function toggleTheme() {
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 
+                       (document.body ? document.body.getAttribute('data-theme') : 'light') || 
+                       'light';
+  const targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  setTheme(targetTheme, true);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const activeTheme = document.documentElement.getAttribute('data-theme') || 
+                      (document.body ? document.body.getAttribute('data-theme') : 'light') || 
+                      'light';
+  setTheme(activeTheme, false);
+});

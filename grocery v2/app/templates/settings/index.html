@@ -42,6 +42,9 @@
           <a href="#sec-store" class="settings-nav-item active" onclick="switchSettingsSection('sec-store', this)">
             <i class="fas fa-store"></i> <span>Store Identity</span>
           </a>
+          <a href="#sec-appearance" class="settings-nav-item" onclick="switchSettingsSection('sec-appearance', this)">
+            <i class="fas fa-palette"></i> <span>Appearance & Theme</span>
+          </a>
           <a href="#sec-regional" class="settings-nav-item" onclick="switchSettingsSection('sec-regional', this)">
             <i class="fas fa-globe"></i> <span>Regional & Tax</span>
           </a>
@@ -65,6 +68,60 @@
 
       <!-- Right Column: Settings Sections -->
       <div style="display: flex; flex-direction: column; gap: 24px;">
+
+        <!-- SECTION: APPEARANCE & THEME -->
+        <div id="sec-appearance" class="settings-section-card" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div class="metric-icon icon-blue" style="width: 40px; height: 40px; font-size: 1.1rem;"><i class="fas fa-palette"></i></div>
+              <div>
+                <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0;">Appearance & Theme Preferences</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 2px 0 0 0;">Switch between Light Mode and Professional Dark / Night Mode</p>
+              </div>
+            </div>
+            <span class="badge badge-info" style="font-size: 0.75rem;"><i class="fas fa-moon"></i> Theme System</span>
+          </div>
+
+          <input type="hidden" name="theme_mode" id="themeModeInput" value="{{ 'dark' if settings.dark_mode else 'light' }}">
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <!-- Light Mode Option Card -->
+            <div class="theme-card-option {% if not settings.dark_mode %}active{% endif %}" data-theme-mode="light" onclick="selectThemeMode('light')">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.95rem; color: var(--text-main);">
+                  <i class="fas fa-sun" style="color: #f59e0b;"></i> Light Mode
+                </div>
+                <input type="radio" name="theme_radio" value="light" {% if not settings.dark_mode %}checked{% endif %}>
+              </div>
+              <div class="theme-preview-box light">
+                <div class="theme-preview-sidebar"></div>
+                <div class="theme-preview-main">
+                  <div class="theme-preview-nav"></div>
+                  <div class="theme-preview-card"></div>
+                </div>
+              </div>
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">Clean, high-clarity daylight theme optimized for standard cashier counters.</p>
+            </div>
+
+            <!-- Dark Mode Option Card -->
+            <div class="theme-card-option {% if settings.dark_mode %}active{% endif %}" data-theme-mode="dark" onclick="selectThemeMode('dark')">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.95rem; color: var(--text-main);">
+                  <i class="fas fa-moon" style="color: #3b82f6;"></i> Dark Mode (Night Theme)
+                </div>
+                <input type="radio" name="theme_radio" value="dark" {% if settings.dark_mode %}checked{% endif %}>
+              </div>
+              <div class="theme-preview-box dark">
+                <div class="theme-preview-sidebar"></div>
+                <div class="theme-preview-main">
+                  <div class="theme-preview-nav"></div>
+                  <div class="theme-preview-card"></div>
+                </div>
+              </div>
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">Sleek, dark navy interface designed for low-light environments and reduced eye strain.</p>
+            </div>
+          </div>
+        </div>
 
         <!-- SECTION 1: STORE IDENTITY -->
         <div id="sec-store" class="settings-section-card" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
@@ -532,6 +589,14 @@
 
   function closeResetModal() {
     document.getElementById('resetModalBackdrop').classList.remove('show');
+  }
+
+  function selectThemeMode(mode) {
+    const input = document.getElementById('themeModeInput');
+    if (input) input.value = mode;
+    if (typeof setTheme === 'function') {
+      setTheme(mode, true);
+    }
   }
 </script>
 {% endblock %}

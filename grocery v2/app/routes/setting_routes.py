@@ -9,6 +9,8 @@ from app.models.product import Product
 from app.models.user import User
 from app.database import db
 from app.middleware.auth_middleware import admin_required
+from app.utils.logger import log_activity
+
 
 setting_bp = Blueprint('setting', __name__, url_prefix='/settings')
 

@@ -192,8 +192,7 @@ def init_seed_data():
                     status='Active'
                 )
                 db.session.add(p)
-            else:
-                existing.quantity = 0
+
 
         # Seed Default Walk-in Customer
         if Customer.query.count() == 0:

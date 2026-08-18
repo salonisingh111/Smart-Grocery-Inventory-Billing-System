@@ -255,7 +255,7 @@ def returns_and_refunds():
 @billing_bp.route('/api/search-bill')
 @login_required
 def search_bill():
-    q = request.args.get('query', '').strip()
+    q = request.args.get('query', '').strip() or request.args.get('q', '').strip()
     if not q:
         return jsonify({'success': False, 'message': 'Search query is required.'}), 400
 
@@ -360,6 +360,9 @@ def seed_returns_data():
         from app.database import db
         from app.models.user import User
         from app.models.product import Product
+        from app.models.bill import BillReturnItem
+        from app.models.inventory import InventoryHistory
+
         
         user = User.query.first()
         if not user:

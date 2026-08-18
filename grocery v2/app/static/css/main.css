@@ -72,8 +72,32 @@ body[data-theme="dark"] {
 .app-sidebar.compact {
   width: 80px;
 }
-.app-sidebar.compact .brand-title, .app-sidebar.compact .nav-link span, .app-sidebar.compact .dropdown-arrow {
-  display: none;
+.app-sidebar.compact .sidebar-header {
+  padding: 0;
+  justify-content: center;
+}
+.app-sidebar.compact .brand-title-group,
+.app-sidebar.compact .brand-title,
+.app-sidebar.compact .nav-link span,
+.app-sidebar.compact .dropdown-arrow,
+.app-sidebar.compact .nav-label,
+.app-sidebar.compact .sidebar-submenu {
+  display: none !important;
+}
+.app-sidebar.compact .sidebar-nav {
+  padding: 20px 10px;
+  align-items: center;
+}
+.app-sidebar.compact .nav-link {
+  justify-content: center;
+  padding: 12px;
+  width: 100%;
+}
+.app-sidebar.compact .nav-link i {
+  margin: 0;
+  font-size: 1.25rem;
+  width: auto;
+  text-align: center;
 }
 .app-sidebar.compact + .app-main {
   margin-left: 80px;
@@ -115,7 +139,8 @@ body {
   top: 0;
   bottom: 0;
   left: 0;
-  z-index: 100;
+  z-index: 1001;
+  overflow: hidden;
   transition: var(--transition);
 }
 

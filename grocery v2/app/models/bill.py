@@ -48,7 +48,7 @@ class BillItem(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     bill_id = db.Column(db.Integer, db.ForeignKey('bills.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=True)
     product_name = db.Column(db.String(150), nullable=False)
     unit_price = db.Column(db.Float, nullable=False, default=0.0)
     quantity = db.Column(db.Integer, nullable=False, default=1)

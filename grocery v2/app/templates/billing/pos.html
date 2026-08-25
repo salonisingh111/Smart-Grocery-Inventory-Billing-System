@@ -159,16 +159,57 @@
 .cart-qty-ctrl { display: flex; align-items: center; gap: 6px; }
 .payment-btn { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--background); font-weight: 600; cursor: pointer; text-align: center; }
 .payment-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+.pos-mode-switcher {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.mode-switch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 150ms ease-in-out;
+  min-height: 44px;
+}
+.mode-switch-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.mode-switch-btn.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="pos-container" style="padding-top: 16px;">
+<div class="pos-container">
   <!-- Sub-Modules Pill Navigation Tabs -->
   {% include "billing/_nav_tabs.html" %}
 
-  <!-- Full-Width Product Selector Screen -->
-  <div class="pos-products-panel">
+  <!-- Mode Switcher Header -->
+  <div class="pos-mode-switcher">
+    <button type="button" id="modeCatalogBtn" class="mode-switch-btn active" onclick="if(window.posSystem) window.posSystem.switchMode('catalog')">
+      <i class="fas fa-th-large"></i> Catalog Grid View
+    </button>
+    <button type="button" id="modeManualBtn" class="mode-switch-btn" onclick="if(window.posSystem) window.posSystem.switchMode('manual')">
+      <i class="fas fa-file-signature"></i> Manual Bill Creation
+    </button>
+  </div>
+
+  <!-- Full-Width Product Selector Screen (Catalog Mode) -->
+  <div class="pos-products-panel" id="posCatalogPanel">
     <div style="display: flex; gap: 12px; margin-bottom: 16px;">
       <div style="flex: 1; position: relative;">
         <input type="text" id="posSearchInput" name="pos_product_search" class="form-control" style="height: 48px; font-size: 1rem;" placeholder="Scan Barcode or Search Product by Name/SKU..." autocomplete="off" data-1p-ignore="true" data-bwignore="true" data-lpignore="true" data-form-type="action" spellcheck="false">
@@ -216,6 +257,175 @@
         </div>
       </div>
       {% endfor %}
+    </div>
+  </div>
+
+  <!-- Manual Bill Creation Mode Panel -->
+  <div id="posManualPanel" class="pos-manual-panel" style="display: none;">
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start;">
+      
+      <!-- Left Column: Add Item Form & Live Items Table -->
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        
+        <!-- Add Item Card -->
+        <div class="card" style="padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+              <i class="fas fa-plus-circle" style="color: var(--primary);"></i> Add Item to Manual Bill
+            </h3>
+            <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600; color: var(--primary); cursor: pointer; user-select: none;">
+              <input type="checkbox" id="manualCustomToggle" onchange="posSystem.toggleManualCustomItem(this.checked)" style="width: 16px; height: 16px; accent-color: var(--primary);">
+              Enter Custom / Unlisted Item
+            </label>
+          </div>
+
+          <form id="manualItemForm" onsubmit="event.preventDefault(); posSystem.addManualLineItem();">
+            <!-- Product Select Row -->
+            <div id="manualCatalogSelectGroup" class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label" style="font-weight: 600;">Select Product from Catalog</label>
+              <select id="manualProductSelect" class="form-control" onchange="posSystem.onManualCatalogSelect(this.value)">
+                <option value="">-- Choose a Product --</option>
+                {% for p in products %}
+                  <option value="{{ p.id }}" data-price="{{ p.selling_price }}" data-tax="{{ p.tax_percent or 0 }}" data-stock="{{ p.quantity }}" data-name="{{ p.name }}" data-unit="{{ p.unit }}">
+                    {{ p.name }} - {{ currency }}{{ "%.2f"|format(p.selling_price) }} (Stock: {{ p.quantity }} {{ p.unit }})
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-weight: 600;">Item Description *</label>
+                <input type="text" id="manualItemName" class="form-control" placeholder="e.g. Fresh Tomatoes 1kg" required>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-weight: 600;">Unit Price ({{ currency }}) *</label>
+                <input type="number" id="manualUnitPrice" class="form-control" step="0.01" min="0" placeholder="0.00" required oninput="posSystem.updateManualItemPreview()">
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-weight: 600;">Quantity *</label>
+                <input type="number" id="manualQuantity" class="form-control" min="1" value="1" step="1" required oninput="posSystem.updateManualItemPreview()">
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-weight: 600;">GST / Tax %</label>
+                <input type="number" id="manualTaxPercent" class="form-control" step="0.5" min="0" value="{{ default_tax }}" oninput="posSystem.updateManualItemPreview()">
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--background); padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+              <div style="font-size: 0.9rem; color: var(--text-muted);">
+                Item Line Total Preview: <strong id="manualLinePreview" style="color: var(--primary); font-size: 1rem;">{{ currency }}0.00</strong>
+              </div>
+              <button type="submit" class="btn btn-primary" style="height: 40px; padding: 0 20px; font-weight: 600;">
+                <i class="fas fa-plus"></i> Add Line Item
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Manual Table Card -->
+        <div class="card" style="padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+              <i class="fas fa-list-check" style="color: var(--primary);"></i> Manual Bill Items Table
+            </h3>
+            <button class="btn btn-sm btn-secondary" style="color: var(--danger);" onclick="posSystem.cart=[]; posSystem.renderCart();">
+              <i class="fas fa-trash"></i> Clear Table
+            </button>
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table class="custom-table" style="font-size: 0.9rem;">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Item Name</th>
+                  <th>Unit Price</th>
+                  <th style="width: 130px;">Qty</th>
+                  <th>Tax %</th>
+                  <th>Line Total</th>
+                  <th style="width: 60px; text-align: center;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="manualTableBody">
+                <tr><td colspan="7" class="text-center p-4 text-muted">No items added to bill yet. Use the form above to add items manually.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Customer & Checkout Summary -->
+      <div class="card" style="padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); position: sticky; top: 80px;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-receipt" style="color: var(--primary);"></i> Bill Summary & Checkout
+        </h3>
+
+        <!-- Customer Selector -->
+        <div class="form-group" style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="form-label" style="margin: 0; font-weight: 600;">Customer</label>
+            <button type="button" class="btn btn-sm btn-secondary" style="font-size: 0.75rem; padding: 2px 8px;" onclick="document.getElementById('posNewCustomerModal').classList.add('show')">
+              <i class="fas fa-user-plus"></i> New
+            </button>
+          </div>
+          <select id="manualCustomerSelect" class="form-control" onchange="posSystem.setCustomerFromManual(this.value)">
+            <option value="">Walk-in Customer (Default)</option>
+            {% for cust in customers %}
+              <option value="{{ cust.id }}">{{ cust.name }} ({{ cust.phone }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Discount Input -->
+        {% if enable_discount %}
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label" style="font-weight: 600;">Order Discount ({{ currency }})</label>
+          <input type="number" id="manualDiscountInput" class="form-control" value="0.00" step="0.5" min="0" oninput="posSystem.setDiscountFromManual(this.value)">
+        </div>
+        {% endif %}
+
+        <!-- Calculations Card -->
+        <div style="background: var(--background); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem;">
+            <span class="text-muted">Subtotal:</span>
+            <strong id="manualSubtotalText">{{ currency }}0.00</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem;">
+            <span class="text-muted">Tax Amount:</span>
+            <strong id="manualTaxText">{{ currency }}0.00</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem;">
+            <span class="text-muted">Discount:</span>
+            <strong id="manualDiscountText" style="color: var(--danger);">- {{ currency }}0.00</strong>
+          </div>
+          <hr style="border: 0; border-top: 1px dashed var(--border); margin: 10px 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 700; font-size: 1rem;">Net Payable:</span>
+            <strong id="manualNetText" style="font-size: 1.4rem; color: var(--primary); font-weight: 800;">{{ currency }}0.00</strong>
+          </div>
+        </div>
+
+        <!-- Payment Mode Select Buttons -->
+        <div style="margin-bottom: 20px;">
+          <label class="form-label" style="font-weight: 700; margin-bottom: 8px;">Payment Mode</label>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+            <button type="button" class="payment-btn active" data-method="Cash" onclick="posSystem.selectPaymentMethod('Cash', this)">Cash</button>
+            <button type="button" class="payment-btn" data-method="UPI" onclick="posSystem.selectPaymentMethod('UPI', this)">UPI</button>
+            <button type="button" class="payment-btn" data-method="Card" onclick="posSystem.selectPaymentMethod('Card', this)">Card</button>
+          </div>
+        </div>
+
+        <!-- Create & Pay Button -->
+        <button type="button" id="manualCreateBillBtn" class="btn btn-success" style="width: 100%; height: 48px; font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="posSystem.start3SecPaymentAnimation()">
+          <i class="fas fa-check-circle"></i> Create Bill & Complete Payment
+        </button>
+      </div>
+
     </div>
   </div>
 </div>

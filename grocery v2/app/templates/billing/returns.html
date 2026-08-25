@@ -2,19 +2,15 @@
 {% block title %}Returns & Refunds — Billing & Sales{% endblock %}
 
 {% block content %}
-<div style="padding: 24px 0;">
   <!-- Billing & Sales Header -->
   <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
     <div>
       <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 10px;">
-        <i class="fas fa-rotate-left" style="color: var(--primary);"></i> Billing & Sales
+        Billing & Sales
       </h1>
       <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 4px;">Live sales metrics, payment method analytics, and recent grocery receipts</p>
     </div>
     <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-      <a href="{{ url_for('billing.sales_reports') }}" class="btn btn-secondary" style="height: 44px; display: inline-flex; align-items: center; gap: 8px; font-weight: 600;">
-        <i class="fas fa-chart-line"></i> View Sales Reports
-      </a>
       <a href="{{ url_for('billing.pos') }}" class="btn btn-primary" style="height: 44px; display: inline-flex; align-items: center; gap: 8px; font-weight: 600;">
         <i class="fas fa-cash-register"></i> Open POS Terminal
       </a>
@@ -177,9 +173,45 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Pagination Controls -->
+      {% if pagination and pagination.pages > 1 %}
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 12px; font-size: 0.88rem; color: var(--text-muted);">
+        <div>
+          Showing <strong>{{ (pagination.page - 1) * pagination.per_page + 1 }}</strong> to 
+          <strong>{{ pagination.page * pagination.per_page if (pagination.page * pagination.per_page) < pagination.total else pagination.total }}</strong> of 
+          <strong>{{ pagination.total }}</strong> returns
+        </div>
+        
+        <div style="display: flex; gap: 6px; align-items: center;">
+          {% if pagination.has_prev %}
+            <a href="{{ url_for('billing.returns_and_refunds', page=pagination.prev_num, search=search, status=status_filter, bill_number=initial_bill_number) }}" 
+               class="btn btn-secondary" style="height: 34px; padding: 0 12px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+              <i class="fas fa-chevron-left"></i> Prev
+            </a>
+          {% else %}
+            <button class="btn btn-secondary" disabled style="height: 34px; padding: 0 12px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; opacity: 0.5;">
+              <i class="fas fa-chevron-left"></i> Prev
+            </button>
+          {% endif %}
+
+          <span style="font-weight: 600; padding: 0 8px; color: var(--text-main);">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+
+          {% if pagination.has_next %}
+            <a href="{{ url_for('billing.returns_and_refunds', page=pagination.next_num, search=search, status=status_filter, bill_number=initial_bill_number) }}" 
+               class="btn btn-secondary" style="height: 34px; padding: 0 12px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+              Next <i class="fas fa-chevron-right"></i>
+            </a>
+          {% else %}
+            <button class="btn btn-secondary" disabled style="height: 34px; padding: 0 12px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; opacity: 0.5;">
+              Next <i class="fas fa-chevron-right"></i>
+            </button>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
     </div>
   </div>
-</div>
 
 <!-- Confirmation Modal -->
 <div class="modal-backdrop" id="confirmReturnModalBackdrop" style="display: none;">

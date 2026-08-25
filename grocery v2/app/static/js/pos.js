@@ -13,6 +13,7 @@ class POSBilling {
     this.currentNet = 0.0;
 
     this.activeCategoryFilter = '';
+    this.mode = 'catalog'; // 'catalog' or 'manual'
     this.init();
   }
 
@@ -64,6 +65,22 @@ class POSBilling {
       discountInput.addEventListener('input', (e) => {
         this.discountAmount = parseFloat(e.target.value) || 0.0;
         this.renderCart();
+      });
+    }
+
+    const modeCatalogBtn = document.getElementById('modeCatalogBtn');
+    if (modeCatalogBtn) {
+      modeCatalogBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.switchMode('catalog');
+      });
+    }
+
+    const modeManualBtn = document.getElementById('modeManualBtn');
+    if (modeManualBtn) {
+      modeManualBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.switchMode('manual');
       });
     }
   }
@@ -239,36 +256,204 @@ class POSBilling {
     }
   }
 
-  renderCart() {
+  switchMode(mode) {
+    this.mode = mode;
+    const catalogBtn = document.getElementById('modeCatalogBtn');
+    const manualBtn = document.getElementById('modeManualBtn');
+    const catalogPanel = document.getElementById('posCatalogPanel');
+    const manualPanel = document.getElementById('posManualPanel');
     const bottomBar = document.getElementById('posBottomBar');
-    const tableBody = document.getElementById('posCartTableBody');
 
-    if (this.cart.length === 0) {
+    if (mode === 'manual') {
+      if (catalogBtn) catalogBtn.classList.remove('active');
+      if (manualBtn) manualBtn.classList.add('active');
+      if (catalogPanel) catalogPanel.style.display = 'none';
+      if (manualPanel) manualPanel.style.display = 'block';
       if (bottomBar) bottomBar.style.display = 'none';
-      if (tableBody) tableBody.innerHTML = '<tr><td colspan="5" class="text-center p-3 text-muted">No items chosen yet</td></tr>';
-      this.updateTotals(0, 0, 0, 0, 0);
+    } else {
+      if (manualBtn) manualBtn.classList.remove('active');
+      if (catalogBtn) catalogBtn.classList.add('active');
+      if (manualPanel) manualPanel.style.display = 'none';
+      if (catalogPanel) catalogPanel.style.display = 'flex';
+    }
+    this.renderCart();
+  }
+
+  toggleManualCustomItem(isCustom) {
+    const group = document.getElementById('manualCatalogSelectGroup');
+    const select = document.getElementById('manualProductSelect');
+    const nameInput = document.getElementById('manualItemName');
+    const priceInput = document.getElementById('manualUnitPrice');
+
+    if (isCustom) {
+      if (group) group.style.display = 'none';
+      if (select) select.value = '';
+      if (nameInput) {
+        nameInput.value = '';
+        nameInput.focus();
+      }
+      if (priceInput) priceInput.value = '';
+    } else {
+      if (group) group.style.display = 'block';
+      if (nameInput) nameInput.value = '';
+      if (priceInput) priceInput.value = '';
+    }
+    this.updateManualItemPreview();
+  }
+
+  onManualCatalogSelect(productId) {
+    const select = document.getElementById('manualProductSelect');
+    const nameInput = document.getElementById('manualItemName');
+    const priceInput = document.getElementById('manualUnitPrice');
+    const taxInput = document.getElementById('manualTaxPercent');
+    if (!select) return;
+
+    const selectedOpt = select.options[select.selectedIndex];
+    if (selectedOpt && selectedOpt.value) {
+      const name = selectedOpt.getAttribute('data-name') || '';
+      const price = parseFloat(selectedOpt.getAttribute('data-price')) || 0;
+      const tax = parseFloat(selectedOpt.getAttribute('data-tax')) || 0;
+
+      if (nameInput) nameInput.value = name;
+      if (priceInput) priceInput.value = price.toFixed(2);
+      if (taxInput) taxInput.value = tax;
+    } else {
+      if (nameInput) nameInput.value = '';
+      if (priceInput) priceInput.value = '';
+    }
+    this.updateManualItemPreview();
+  }
+
+  updateManualItemPreview() {
+    const priceInput = document.getElementById('manualUnitPrice');
+    const qtyInput = document.getElementById('manualQuantity');
+    const taxInput = document.getElementById('manualTaxPercent');
+    const previewEl = document.getElementById('manualLinePreview');
+
+    const price = parseFloat(priceInput?.value) || 0;
+    const qty = parseInt(qtyInput?.value) || 1;
+    const tax = parseFloat(taxInput?.value) || 0;
+
+    const subtotal = price * qty;
+    const taxAmt = (subtotal * tax) / 100;
+    const total = subtotal + taxAmt;
+
+    if (previewEl) {
+      previewEl.textContent = `${this.currency}${total.toFixed(2)}`;
+    }
+  }
+
+  addManualLineItem() {
+    const isCustom = document.getElementById('manualCustomToggle')?.checked || false;
+    const select = document.getElementById('manualProductSelect');
+    const productId = (!isCustom && select && select.value) ? parseInt(select.value) : null;
+
+    const nameInput = document.getElementById('manualItemName');
+    const priceInput = document.getElementById('manualUnitPrice');
+    const qtyInput = document.getElementById('manualQuantity');
+    const taxInput = document.getElementById('manualTaxPercent');
+
+    const name = nameInput?.value.trim();
+    const price = parseFloat(priceInput?.value);
+    const qty = parseInt(qtyInput?.value) || 1;
+    const tax = parseFloat(taxInput?.value) || 0;
+
+    if (!name) {
+      showToast('Please enter an item description.', 'warning');
+      return;
+    }
+    if (isNaN(price) || price < 0) {
+      showToast('Please enter a valid unit price.', 'warning');
+      return;
+    }
+    if (qty <= 0) {
+      showToast('Quantity must be at least 1.', 'warning');
       return;
     }
 
-    if (bottomBar) bottomBar.style.display = 'flex';
+    let maxStock = 999999;
+    if (productId) {
+      const prod = this.products.find(p => p.id === productId);
+      if (prod) maxStock = prod.quantity;
+    }
+
+    const existing = this.cart.find(item => (productId && item.product_id === productId) || (!productId && item.name.toLowerCase() === name.toLowerCase()));
+    if (existing) {
+      if (existing.quantity + qty > existing.max_stock) {
+        showToast(`Stock limit reached for '${existing.name}'`, 'warning');
+        return;
+      }
+      existing.quantity += qty;
+      existing.selling_price = price;
+      existing.tax_percent = tax;
+    } else {
+      this.cart.push({
+        product_id: productId,
+        name: name,
+        selling_price: price,
+        tax_percent: tax,
+        quantity: qty,
+        max_stock: maxStock,
+        is_custom: isCustom || !productId
+      });
+    }
+
+    if (nameInput) nameInput.value = '';
+    if (priceInput) priceInput.value = '';
+    if (qtyInput) qtyInput.value = '1';
+    if (select) select.value = '';
+    this.updateManualItemPreview();
+
+    showToast(`Added '${name}' to manual bill.`, 'success');
+    this.renderCart();
+  }
+
+  setCustomerFromManual(val) {
+    this.selectedCustomerId = val ? parseInt(val) : null;
+    const modalSelect = document.getElementById('posCustomerSelect');
+    if (modalSelect) modalSelect.value = val;
+  }
+
+  setDiscountFromManual(val) {
+    this.discountAmount = parseFloat(val) || 0.0;
+    const modalInput = document.getElementById('posDiscountInput');
+    if (modalInput) modalInput.value = val;
+    this.renderCart();
+  }
+
+  renderCart() {
+    const bottomBar = document.getElementById('posBottomBar');
+    const tableBody = document.getElementById('posCartTableBody');
+    const manualTableBody = document.getElementById('manualTableBody');
 
     let subtotal = 0.0;
     let taxTotal = 0.0;
     let totalQty = 0;
 
+    if (this.cart.length === 0) {
+      if (bottomBar) bottomBar.style.display = 'none';
+      if (tableBody) tableBody.innerHTML = '<tr><td colspan="5" class="text-center p-3 text-muted">No items chosen yet</td></tr>';
+      if (manualTableBody) manualTableBody.innerHTML = '<tr><td colspan="7" class="text-center p-4 text-muted">No items added to bill yet. Use the form above to add items manually.</td></tr>';
+      this.updateTotals(0, 0, 0, 0, 0);
+      return;
+    }
+
+    if (bottomBar && this.mode !== 'manual') {
+      bottomBar.style.display = 'flex';
+    } else if (bottomBar) {
+      bottomBar.style.display = 'none';
+    }
+
+    // Catalog Table View
     if (tableBody) {
       tableBody.innerHTML = this.cart.map((item, idx) => {
         const itemSubtotal = item.selling_price * item.quantity;
         const itemTax = (itemSubtotal * item.tax_percent) / 100.0;
         const itemTotal = itemSubtotal + itemTax;
 
-        subtotal += itemSubtotal;
-        taxTotal += itemTax;
-        totalQty += item.quantity;
-
         return `
           <tr>
-            <td><strong>${item.name}</strong></td>
+            <td><strong>${item.name}</strong> ${item.is_custom ? '<span class="badge badge-secondary" style="font-size:0.7rem;">Custom</span>' : ''}</td>
             <td>${this.currency}${item.selling_price.toFixed(2)}</td>
             <td>
               <div class="cart-qty-ctrl">
@@ -288,6 +473,54 @@ class POSBilling {
       }).join('');
     }
 
+    // Manual Table View
+    if (manualTableBody) {
+      manualTableBody.innerHTML = this.cart.map((item, idx) => {
+        const itemSubtotal = item.selling_price * item.quantity;
+        const itemTax = (itemSubtotal * item.tax_percent) / 100.0;
+        const itemTotal = itemSubtotal + itemTax;
+
+        subtotal += itemSubtotal;
+        taxTotal += itemTax;
+        totalQty += item.quantity;
+
+        return `
+          <tr>
+            <td><strong>${idx + 1}</strong></td>
+            <td>
+              <div style="font-weight: 600;">${item.name}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">
+                ${item.is_custom ? '<span class="badge badge-warning" style="font-size:0.65rem; padding: 2px 6px; border-radius: 4px;">Custom Item</span>' : '<span class="badge badge-info" style="font-size:0.65rem; padding: 2px 6px; border-radius: 4px;">Catalog Item</span>'}
+              </div>
+            </td>
+            <td>${this.currency}${item.selling_price.toFixed(2)}</td>
+            <td>
+              <div class="cart-qty-ctrl">
+                <button class="btn btn-sm btn-secondary" style="padding: 2px 8px;" onclick="posSystem.updateQuantity(${idx}, -1)">-</button>
+                <span style="font-weight: 700; min-width: 20px; text-align: center;">${item.quantity}</span>
+                <button class="btn btn-sm btn-secondary" style="padding: 2px 8px;" onclick="posSystem.updateQuantity(${idx}, 1)">+</button>
+              </div>
+            </td>
+            <td>${item.tax_percent}% (${this.currency}${itemTax.toFixed(2)})</td>
+            <td><strong style="color: var(--primary);">${this.currency}${itemTotal.toFixed(2)}</strong></td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-danger" style="padding: 4px 8px;" onclick="posSystem.removeFromCart(${idx})">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    } else {
+      this.cart.forEach(item => {
+        const itemSubtotal = item.selling_price * item.quantity;
+        const itemTax = (itemSubtotal * item.tax_percent) / 100.0;
+        subtotal += itemSubtotal;
+        taxTotal += itemTax;
+        totalQty += item.quantity;
+      });
+    }
+
     const gross = subtotal + taxTotal;
     const finalGross = Math.max(0.0, gross - this.discountAmount);
     const netAmount = Math.round(finalGross);
@@ -305,6 +538,17 @@ class POSBilling {
 
     if (bottomItemCount) bottomItemCount.textContent = `${totalQty} ${totalQty === 1 ? 'Item' : 'Items'}`;
     if (bottomTotalAmount) bottomTotalAmount.textContent = `${this.currency}${net.toFixed(2)}`;
+
+    // Manual Panel Calculations
+    const manualSubtotalText = document.getElementById('manualSubtotalText');
+    const manualTaxText = document.getElementById('manualTaxText');
+    const manualDiscountText = document.getElementById('manualDiscountText');
+    const manualNetText = document.getElementById('manualNetText');
+
+    if (manualSubtotalText) manualSubtotalText.textContent = `${this.currency}${subtotal.toFixed(2)}`;
+    if (manualTaxText) manualTaxText.textContent = `${this.currency}${tax.toFixed(2)}`;
+    if (manualDiscountText) manualDiscountText.textContent = `- ${this.currency}${discount.toFixed(2)}`;
+    if (manualNetText) manualNetText.textContent = `${this.currency}${net.toFixed(2)}`;
   }
 
   openCheckoutModal() {
@@ -431,12 +675,20 @@ class POSBilling {
       const res = await response.json();
       if (res.success) {
         const custSelect = document.getElementById('posCustomerSelect');
-        if (custSelect && res.customer) {
-          const opt = document.createElement('option');
-          opt.value = res.customer.id;
-          opt.textContent = `${res.customer.name} (${res.customer.phone})`;
-          opt.selected = true;
-          custSelect.appendChild(opt);
+        const manualCustSelect = document.getElementById('manualCustomerSelect');
+        if (res.customer) {
+          const opt1 = document.createElement('option');
+          opt1.value = res.customer.id;
+          opt1.textContent = `${res.customer.name} (${res.customer.phone})`;
+          opt1.selected = true;
+          if (custSelect) custSelect.appendChild(opt1);
+
+          const opt2 = document.createElement('option');
+          opt2.value = res.customer.id;
+          opt2.textContent = `${res.customer.name} (${res.customer.phone})`;
+          opt2.selected = true;
+          if (manualCustSelect) manualCustSelect.appendChild(opt2);
+
           this.selectedCustomerId = res.customer.id;
         }
         document.getElementById('posNewCustomerModal')?.classList.remove('show');
@@ -450,9 +702,10 @@ class POSBilling {
   }
 }
 
-let posSystem;
+window.posSystem = null;
 document.addEventListener('DOMContentLoaded', () => {
-  if (document.getElementById('posProductGrid')) {
-    posSystem = new POSBilling();
+  if (document.getElementById('posProductGrid') || document.getElementById('posManualPanel')) {
+    window.posSystem = new POSBilling();
   }
 });
+var posSystem = window.posSystem;

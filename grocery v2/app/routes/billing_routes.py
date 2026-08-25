@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, Response
 from flask_login import login_required, current_user
 from sqlalchemy import func
+from sqlalchemy.orm import joinedload, selectinload
 from app.database import db
 from app.models.bill import Bill, BillItem, BillReturn
 from app.models.product import Product
@@ -158,6 +159,7 @@ def api_bill_details(id):
     return jsonify(data)
 
 # ==========================================
+# ==========================================
 # 3. BILLING HISTORY
 # ==========================================
 @billing_bp.route('/history')
@@ -169,8 +171,9 @@ def billing_history():
     start_date = request.args.get('start_date', '').strip()
     end_date = request.args.get('end_date', '').strip()
     page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 25, type=int)
 
-    query = Bill.query
+    query = Bill.query.options(joinedload(Bill.customer), selectinload(Bill.items))
 
     if search:
         query = query.outerjoin(Customer).filter(
@@ -199,12 +202,16 @@ def billing_history():
         except ValueError:
             pass
 
-    bills = query.order_by(Bill.created_at.desc()).all()
+    pagination = query.order_by(Bill.created_at.desc(), Bill.id.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+    bills = pagination.items
     currency = SystemSetting.get('CURRENCY', '₹')
 
     return render_template(
         'billing/history.html',
         bills=bills,
+        pagination=pagination,
         search=search,
         payment_filter=payment_filter,
         status_filter=status_filter,
@@ -222,12 +229,14 @@ def returns_and_refunds():
     initial_bill_number = request.args.get('bill_number', '').strip()
     search = request.args.get('search', '').strip()
     status_filter = request.args.get('status', '').strip()
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 25, type=int)
 
     # Auto-seed realistic demo returns if database table is empty
     if BillReturn.query.count() == 0:
         seed_returns_data()
 
-    query = BillReturn.query.join(Bill)
+    query = BillReturn.query.options(joinedload(BillReturn.bill), joinedload(BillReturn.customer)).join(Bill)
 
     if search:
         query = query.outerjoin(Customer, BillReturn.customer_id == Customer.id).filter(
@@ -240,12 +249,16 @@ def returns_and_refunds():
     if status_filter:
         query = query.filter(BillReturn.status == status_filter)
 
-    returns_history = query.order_by(BillReturn.created_at.desc()).all()
+    pagination = query.order_by(BillReturn.created_at.desc(), BillReturn.id.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+    returns_history = pagination.items
     currency = SystemSetting.get('CURRENCY', '₹')
 
     return render_template(
         'billing/returns.html',
         returns_history=returns_history,
+        pagination=pagination,
         initial_bill_number=initial_bill_number,
         search=search,
         status_filter=status_filter,

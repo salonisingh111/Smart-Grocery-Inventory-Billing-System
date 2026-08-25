@@ -53,19 +53,28 @@ class BillingService:
             qty = int(item.get('quantity', 1))
 
             if qty <= 0:
-                return False, f"Invalid quantity for item ID {product_id}.", None
-
-            product = Product.query.get(product_id)
-            if not product:
-                return False, f"Product ID {product_id} not found.", None
-
-            if product.quantity < qty:
-                return False, f"Insufficient stock for '{product.name}'. Available: {product.quantity}, Requested: {qty}", None
+                return False, f"Invalid quantity for item {item.get('name', '')}.", None
 
             enable_tax = SystemSetting.get_bool('ENABLE_TAX', True)
-            unit_price = product.selling_price
+
+            if product_id:
+                product = Product.query.get(product_id)
+                if not product:
+                    return False, f"Product ID {product_id} not found.", None
+
+                if product.quantity < qty:
+                    return False, f"Insufficient stock for '{product.name}'. Available: {product.quantity}, Requested: {qty}", None
+
+                unit_price = float(item.get('selling_price', product.selling_price))
+                tax_rate = (product.tax_percent or 0.0) if enable_tax else 0.0
+                product_name = product.name
+            else:
+                product = None
+                product_name = str(item.get('name', 'Custom Item')).strip() or 'Custom Item'
+                unit_price = float(item.get('selling_price', 0.0))
+                tax_rate = float(item.get('tax_percent', 0.0)) if enable_tax else 0.0
+
             item_subtotal = unit_price * qty
-            tax_rate = (product.tax_percent or 0.0) if enable_tax else 0.0
             item_tax = (item_subtotal * tax_rate) / 100.0
             item_total = item_subtotal + item_tax
 
@@ -74,7 +83,8 @@ class BillingService:
 
             bill_items_to_create.append({
                 'product': product,
-                'product_name': product.name,
+                'product_id': product.id if product else None,
+                'product_name': product_name,
                 'unit_price': unit_price,
                 'quantity': qty,
                 'tax_percent': tax_rate,
@@ -108,23 +118,24 @@ class BillingService:
 
         for b_item in bill_items_to_create:
             prod = b_item['product']
-            # Deduct stock
-            prod.quantity -= b_item['quantity']
+            if prod:
+                # Deduct stock for catalog items
+                prod.quantity -= b_item['quantity']
 
-            # Record Inventory History
-            inv_log = InventoryHistory(
-                product_id=prod.id,
-                change_type='Sale',
-                quantity_changed=-b_item['quantity'],
-                remaining_quantity=prod.quantity,
-                reason=f"POS Bill #{bill_number}",
-                performed_by_user_id=user_id
-            )
-            db.session.add(inv_log)
+                # Record Inventory History
+                inv_log = InventoryHistory(
+                    product_id=prod.id,
+                    change_type='Sale',
+                    quantity_changed=-b_item['quantity'],
+                    remaining_quantity=prod.quantity,
+                    reason=f"POS Bill #{bill_number}",
+                    performed_by_user_id=user_id
+                )
+                db.session.add(inv_log)
 
             bill_item = BillItem(
                 bill_id=new_bill.id,
-                product_id=prod.id,
+                product_id=b_item['product_id'],
                 product_name=b_item['product_name'],
                 unit_price=b_item['unit_price'],
                 quantity=b_item['quantity'],

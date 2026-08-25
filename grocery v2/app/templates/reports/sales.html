@@ -3,9 +3,17 @@
 {% block title %}Reports & Analytics - Sales Analytics{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-4 py-3">
-  
-  <!-- Submodule Tabs Header -->
+  <!-- Header -->
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 10px;">
+        Sales & Revenue Analytics
+      </h1>
+      <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 4px;">Detailed sales breakdown, revenue trends, peak sales hours, and payment method analytics</p>
+    </div>
+  </div>
+
+  <!-- Sub-Modules Pill Navigation Tabs -->
   {% include 'reports/_reports_tabs.html' %}
 
   <!-- Filter Bar -->
@@ -176,7 +184,6 @@
   </div>
 
   {% endif %}
-</div>
 
 <!-- JS Charts Setup -->
 <script>

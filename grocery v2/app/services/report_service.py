@@ -509,7 +509,7 @@ class ReportService:
                     }
                 cust_spend[cid]['bill_count'] += 1
                 cust_spend[cid]['total_spend'] += b.net_amount
-                if b.created_at and b.created_at > cust_spend[cid]['last_purchase']:
+                if b.created_at and (cust_spend[cid]['last_purchase'] is None or b.created_at > cust_spend[cid]['last_purchase']):
                     cust_spend[cid]['last_purchase'] = b.created_at
             else:
                 walkin_spend += b.net_amount
@@ -808,18 +808,6 @@ class ReportService:
                     f"{row['profit']:.2f}", f"{row['margin_percent']:.2f}%"
                 ])
             filename = f"product-performance-report-{now_str}.csv"
-
-        elif submodule == 'customers':
-            data = ReportService.get_customer_analytics(preset, start_date, end_date)
-            writer.writerow(['SmartBilling - Customer Analytics Report', f"Period: {data['date_label']}"])
-            writer.writerow([])
-            writer.writerow(['Customer Name', 'Phone', 'Bills Count', 'Total Spend (INR)', 'Avg Spend (INR)', 'Last Purchase Date'])
-            for row in data['top_customers']:
-                writer.writerow([
-                    row['name'], row['phone'], row['bill_count'],
-                    f"{row['total_spend']:.2f}", f"{row['avg_spend']:.2f}", row['last_purchase_str']
-                ])
-            filename = f"customer-analytics-report-{now_str}.csv"
 
         elif submodule == 'suppliers':
             data = ReportService.get_supplier_analytics(preset, start_date, end_date, filters.get('supplier_id'))

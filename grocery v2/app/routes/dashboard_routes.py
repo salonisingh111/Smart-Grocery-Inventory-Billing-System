@@ -17,12 +17,8 @@ def index():
     today = datetime.utcnow().date()
     start_of_month = datetime(today.year, today.month, 1)
 
-    # Today's Sales & Count
-    today_bills = Bill.query.filter(
-        func.date(Bill.created_at) == today,
-        Bill.status == 'Paid'
-    ).all()
-    todays_sales = sum(b.net_amount for b in today_bills)
+    # Today's Sales & Count (Set to 0 as requested)
+    todays_sales = 0.0
 
     # Monthly Sales & Total Revenue
     monthly_bills = Bill.query.filter(
@@ -72,12 +68,16 @@ def chart_data():
     revenue_values = []
 
     for d in dates:
-        bills = Bill.query.filter(
-            func.date(Bill.created_at) == d,
-            Bill.status == 'Paid'
-        ).all()
-        sales_values.append(len(bills))
-        revenue_values.append(sum(b.net_amount for b in bills))
+        if d == today:
+            sales_values.append(0)
+            revenue_values.append(0.0)
+        else:
+            bills = Bill.query.filter(
+                func.date(Bill.created_at) == d,
+                Bill.status == 'Paid'
+            ).all()
+            sales_values.append(len(bills))
+            revenue_values.append(sum(b.net_amount for b in bills))
 
     # Category distribution
     categories = Category.query.all()

@@ -199,6 +199,22 @@ Exact installation commands should be documented after verifying the repository'
 
 ---
 
+---
+
+## Application Screenshots
+
+### Dashboard
+![SmartBilling Dashboard](dashboard.png)
+
+### Inventory Management
+![SmartBilling Inventory](inventory.png)
+
+### Billing
+![SmartBilling Billing](billing.png)
+
+### Reports & Analytics
+![SmartBilling Reports](reports.png)
+
 ## 👩‍💻 Developer
 
 **Saloni Singh**
